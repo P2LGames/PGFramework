@@ -6,7 +6,7 @@ import main.util.Serializer;
 import main.communication.TCPServer;
 import main.communication.command.CommandRequest;
 import org.junit.Test;
-import test.testutils.MockRouterValid;
+import test.testutils.MockRouter;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -22,7 +22,7 @@ public class TCPServerTest {
     @Test
     public void testConnection() throws Exception {
         TCPServer server = new TCPServer();
-        server.setRouter(new MockRouterValid());
+        server.setRouter(new MockRouter());
         new Thread(server).start();
         Socket clientSocket = new Socket();
         clientSocket.setSoTimeout(2000);

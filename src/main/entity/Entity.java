@@ -1,5 +1,7 @@
 package main.entity;
 
+import command.Command;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,8 +10,8 @@ import java.util.Map;
  */
 public abstract class Entity {
     private String entityID;
-    private Map<String, Object> defaults;
-    private Map<String, Object> commandInstances;
+    private Map<String, Command> defaults;
+    private Map<String, Command> commandInstances;
 
     Entity(String entityID) {
         this.entityID = entityID;
@@ -29,13 +31,13 @@ public abstract class Entity {
     /**
      * Replaces the current instance for a class with another(if one already exists)
      *
-     * @param command
+     * @param commandName
      *  the name of the command
-     * @param instance
-     *  the instance that should replace the current one(if one exists)
+     * @param command
+     *  the command that should replace the current one(if one exists)
      */
-    public void replaceCommand(String command, Object instance) {
-        commandInstances.put(command, instance);
+    public void replaceCommand(String commandName, Command command) {
+        commandInstances.put(commandName, command);
     }
 
     public String getEntityID() {
@@ -46,19 +48,19 @@ public abstract class Entity {
         this.entityID = entityID;
     }
 
-    public Map<String, Object> getDefaults() {
+    public Map<String, Command> getDefaults() {
         return defaults;
     }
 
-    public void setDefaults(Map<String, Object> defaults) {
+    public void setDefaults(Map<String, Command> defaults) {
         this.defaults = defaults;
     }
 
-    public Map<String, Object> getCommandInstances() {
+    public Map<String, Command> getCommandInstances() {
         return commandInstances;
     }
 
-    public void setCommandInstances(Map<String, Object> commandInstances) {
+    public void setCommandInstances(Map<String, Command> commandInstances) {
         this.commandInstances = commandInstances;
     }
 }

@@ -1,5 +1,6 @@
 package main.util;
 
+import command.Command;
 import main.communication.command.UpdateRequest;
 import main.communication.command.UpdateResult;
 import main.entity.Entity;
@@ -119,9 +120,10 @@ public class MyClassLoader extends ClassLoader {
                 return result;
             }
             Object instance = loadedClass.newInstance();
+            Command command = (Command) instance;
             EntityMap entities = EntityMap.getInstance();
             Entity entity = entities.get(request.getEntityID());
-            entity.replaceCommand(request.getCommand(), instance);
+            entity.replaceCommand(request.getCommand(), command);
         } catch (Exception e) {
             result.setSuccess(false);
             result.setErrorMessage(e.getMessage());

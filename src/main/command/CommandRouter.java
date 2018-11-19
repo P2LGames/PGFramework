@@ -1,7 +1,7 @@
 package main.command;
 
-import main.command.interfaces.ITalk;
-import main.communication.command.CommandResult;
+import command.Command;
+import command.ITalk;
 import main.util.EntityMap;
 import main.communication.command.CommandRequest;
 import main.entity.Entity;
@@ -21,21 +21,20 @@ public class CommandRouter implements Router {
      *  the result of the command that is ran based off of the request
      */
     @Override
-    public CommandResult route(CommandRequest request) {
+    public Command route(CommandRequest request) {
         //Create the commandResult
-        CommandResult commandResult = new CommandResult();
-        commandResult.setCommand(request.getCommand());
-        commandResult.setEntityID(request.getEntityID());
+
+        Command command = null;
 
         //Route the command (will probably be switched to an enum)
         if(request.getCommand().equals("talk")) {
             EntityMap entities = EntityMap.getInstance();
             Entity entity = entities.get(request.getEntityID());
-            ITalk talk = (ITalk) entity.getCommand("talk");
-            String talkString = talk.talk();
-            commandResult.setValue(talkString);
+            command = (ITalk) entity.getCommand("talk");
+//            String talkString = talk.talk();
+//            commandResult.setValue(talkString);
         }
-        return commandResult;
+        return command;
     }
 
 }

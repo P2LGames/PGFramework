@@ -3,6 +3,7 @@ package main.communication;
 import main.command.CommandRouter;
 import main.command.Router;
 import main.communication.command.*;
+import main.util.CommandHandler;
 import main.util.MyClassLoader;
 import main.util.Serializer;
 
@@ -49,8 +50,9 @@ public class TCPServer implements Runnable {
                 if(clientBundle.getType() == ClientBundle.RequestType.COMMAND) {
                     //If it is a command data then deserialize it accordingly and give it to the router
                     CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), CommandRequest.class);
-                    CommandResult commandResult = router.route(commandRequest);
-                    resultData = Serializer.serialize(commandResult);
+                    CommandHandler handler = new CommandHandler();
+                    CommandResult result = handler.handleCommand(commandRequest, router);
+                    resultData = Serializer.serialize(result);
                 }
                 else {
                     //If it is a update data then deserialize it accordingly, reload the new class and update it

@@ -1,9 +1,10 @@
 package test.command;
 
+import command.Command;
 import main.command.CommandRouter;
+import command.TestTalkDefault;
 import main.util.EntityMap;
 import main.communication.command.CommandRequest;
-import main.communication.command.CommandResult;
 import main.entity.TestEntity;
 import org.junit.Test;
 
@@ -18,9 +19,8 @@ public class CommandRouterTest {
         TestEntity entity = new TestEntity(request.getEntityID());
         entities.put(entity.getEntityID(), entity);
         CommandRouter router = new CommandRouter();
-        CommandResult actualCommandResult = router.route(request);
-        CommandResult expectedCommandResult = new CommandResult("testID", "talk", "I can talk!!");
-        assertEquals(actualCommandResult, expectedCommandResult);
+        Command command = router.route(request);
+        assertEquals(command, new TestTalkDefault());
     }
 
 }

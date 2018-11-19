@@ -16,13 +16,18 @@ public class MyClassLoaderTest {
         UpdateRequest request = new UpdateRequest();
         request.setFileContents("\n" +
                 "\n" +
+                "import command.ITalk;\n" +
                 "\n" +
-                "\n" +
-                "public class talk implements ITalk {\n" +
+                "/**\n" +
+                " * An example implementation of the Talk command\n" +
+                " */\n" +
+                "public class talk extends ITalk {\n" +
                 "    @Override\n" +
                 "    public String talk() {\n" +
                 "        return \"I can talk!!\";\n" +
                 "    }\n" +
+                "\n" +
+                "\n" +
                 "}\n");
         request.setCommand("talk");
         request.setEntityID("testID");

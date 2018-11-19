@@ -1,6 +1,6 @@
 package main.entity;
 
-import main.command.implementation.TestTalkDefault;
+import command.TestTalkDefault;
 
 /**
  * An example of a concrete implementation of the
