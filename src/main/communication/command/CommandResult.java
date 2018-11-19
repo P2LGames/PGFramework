@@ -2,14 +2,12 @@ package main.communication.command;
 
 import java.util.Objects;
 
-public class CommandResult extends Request {
+public class CommandResult {
     private Object value;
 
     public CommandResult() {}
 
-    public CommandResult(String entityID, String command, Object value) {
-        this.setEntityID(entityID);
-        this.setCommand(command);
+    public CommandResult(Object value) {
         this.value = value;
     }
 
@@ -26,13 +24,7 @@ public class CommandResult extends Request {
         if (this == o) return true;
         if (!(o instanceof CommandResult)) return false;
         CommandResult that = (CommandResult) o;
-        if(!Objects.equals(this.getValue(), that.getValue())) {
-            return false;
-        }
-        if(!this.getCommand().equals(that.getCommand())) {
-            return false;
-        }
-        return this.getEntityID().equals(that.getEntityID());
+        return Objects.equals(this.getValue(), that.getValue());
     }
 
 }

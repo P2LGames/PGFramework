@@ -1,5 +1,5 @@
 package test.utils;
-import main.util.EntityMap;
+import main.entity.EntityMap;
 import main.communication.command.UpdateRequest;
 import main.communication.command.UpdateResult;
 import main.entity.Entity;
@@ -16,12 +16,12 @@ public class MyClassLoaderTest {
         UpdateRequest request = new UpdateRequest();
         request.setFileContents("\n" +
                 "\n" +
-                "import command.ITalk;\n" +
+                "import command.Talker;\n" +
                 "\n" +
                 "/**\n" +
                 " * An example implementation of the Talk command\n" +
                 " */\n" +
-                "public class talk extends ITalk {\n" +
+                "public class talk extends Talker {\n" +
                 "    @Override\n" +
                 "    public String talk() {\n" +
                 "        return \"I can talk!!\";\n" +
@@ -37,7 +37,7 @@ public class MyClassLoaderTest {
         entities.put(entity.getEntityID(), entity);
 
         ClassLoader parentClassLoader = MyClassLoader.class.getClassLoader();
-        MyClassLoader loader = new MyClassLoader(parentClassLoader);
+        MyClassLoader loader = new MyClassLoader();
 
         UpdateResult result = loader.updateClass(request);
 

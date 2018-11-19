@@ -4,6 +4,7 @@ import command.Command;
 import main.communication.command.UpdateRequest;
 import main.communication.command.UpdateResult;
 import main.entity.Entity;
+import main.entity.EntityMap;
 
 import java.io.*;
 import java.net.URLConnection;
@@ -17,9 +18,9 @@ public class MyClassLoader extends ClassLoader {
     private UpdateResult result;
     private ClassLoader parent;
 
-    public MyClassLoader(ClassLoader parent) {
-        super(parent);
-        this.parent = parent;
+    public MyClassLoader() {
+        super(MyClassLoader.class.getClassLoader());
+        this.parent = MyClassLoader.class.getClassLoader();
         result = new UpdateResult();
     }
 

@@ -1,5 +1,8 @@
 package command;
 
+/**
+ * The interface used for all commands
+ */
 public interface Command {
-    public Object run();
+    Object run();
 }

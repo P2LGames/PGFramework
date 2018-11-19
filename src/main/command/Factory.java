@@ -4,8 +4,8 @@ import command.Command;
 import main.communication.command.CommandRequest;
 
 /**
- * An interface for a Router
+ * An interface for a Factory
  */
-public interface Router {
-    public Command route(CommandRequest request);
+public interface Factory {
+    Command route(CommandRequest request);
 }

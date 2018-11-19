@@ -1,6 +1,9 @@
 package command;
 
-public abstract class ITalk implements Command {
+/**
+ * The abstract class for a talk command
+ */
+public abstract class Talker implements Command {
     public abstract String talk();
 
     @Override

@@ -1,24 +1,24 @@
 package main.command;
 
 import command.Command;
-import command.ITalk;
-import main.util.EntityMap;
+import command.Talker;
+import main.entity.EntityMap;
 import main.communication.command.CommandRequest;
 import main.entity.Entity;
 
 /**
- * This class routes requests to their commands
+ * This class returns a command based on the request
  */
-public class CommandRouter implements Router {
+public class CommandFactory implements Factory {
 
     /**
-     * This method processes a CommandRequest and routes it to the correct command
+     * This method uses the request to return the correct command
      *
      * @param request
      *  the CommandRequest object to be processed
      *
      * @return
-     *  the result of the command that is ran based off of the request
+     *  the command that satisfies the request
      */
     @Override
     public Command route(CommandRequest request) {
@@ -30,9 +30,7 @@ public class CommandRouter implements Router {
         if(request.getCommand().equals("talk")) {
             EntityMap entities = EntityMap.getInstance();
             Entity entity = entities.get(request.getEntityID());
-            command = (ITalk) entity.getCommand("talk");
-//            String talkString = talk.talk();
-//            commandResult.setValue(talkString);
+            command = (Talker) entity.getCommand("talk");
         }
         return command;
     }

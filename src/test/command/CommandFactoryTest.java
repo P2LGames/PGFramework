@@ -1,16 +1,16 @@
 package test.command;
 
 import command.Command;
-import main.command.CommandRouter;
+import main.command.CommandFactory;
 import command.TestTalkDefault;
-import main.util.EntityMap;
+import main.entity.EntityMap;
 import main.communication.command.CommandRequest;
 import main.entity.TestEntity;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class CommandRouterTest {
+public class CommandFactoryTest {
 
     @Test
     public void testTalk() {
@@ -18,7 +18,7 @@ public class CommandRouterTest {
         EntityMap entities = EntityMap.getInstance();
         TestEntity entity = new TestEntity(request.getEntityID());
         entities.put(entity.getEntityID(), entity);
-        CommandRouter router = new CommandRouter();
+        CommandFactory router = new CommandFactory();
         Command command = router.route(request);
         assertEquals(command, new TestTalkDefault());
     }

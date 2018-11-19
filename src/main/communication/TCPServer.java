@@ -1,9 +1,9 @@
 package main.communication;
 
-import main.command.CommandRouter;
-import main.command.Router;
+import main.command.CommandFactory;
+import main.command.Factory;
 import main.communication.command.*;
-import main.util.CommandHandler;
+import main.command.CommandHandler;
 import main.util.MyClassLoader;
 import main.util.Serializer;
 
@@ -18,16 +18,16 @@ import java.net.Socket;
  */
 public class TCPServer implements Runnable {
 
-    private Router router;
+    private Factory factory;
     private Boolean shouldRun;
 
     public TCPServer() {
         this.shouldRun = true;
-        this.router = new CommandRouter();
+        this.factory = new CommandFactory();
     }
 
-    public void setRouter(Router router) {
-        this.router = router;
+    public void setFactory(Factory factory) {
+        this.factory = factory;
     }
 
     /**
@@ -48,17 +48,16 @@ public class TCPServer implements Runnable {
                 String resultData;
 
                 if(clientBundle.getType() == ClientBundle.RequestType.COMMAND) {
-                    //If it is a command data then deserialize it accordingly and give it to the router
+                    //If it is a command data then deserialize it accordingly and give it to the factory
                     CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), CommandRequest.class);
                     CommandHandler handler = new CommandHandler();
-                    CommandResult result = handler.handleCommand(commandRequest, router);
+                    CommandResult result = handler.handleCommand(commandRequest, factory);
                     resultData = Serializer.serialize(result);
                 }
                 else {
                     //If it is a update data then deserialize it accordingly, reload the new class and update it
                     UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), UpdateRequest.class);
-                    ClassLoader parentClassLoader = MyClassLoader.class.getClassLoader();
-                    MyClassLoader loader = new MyClassLoader(parentClassLoader);
+                    MyClassLoader loader = new MyClassLoader();
                     UpdateResult result = loader.updateClass(updateRequest);
                     resultData = Serializer.serialize(result);
                 }
@@ -79,7 +78,7 @@ public class TCPServer implements Runnable {
         this.shouldRun = false;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         TCPServer server = new TCPServer();
         server.run();
     }
