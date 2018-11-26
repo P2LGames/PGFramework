@@ -1,5 +1,5 @@
 package main.communication;
 
 public enum RequestType {
-    FILE, COMMAND, ENTITY
+    FILE_UPDATE, COMMAND, ENTITY, FILE_GET
 }

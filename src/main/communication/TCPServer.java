@@ -5,11 +5,14 @@ import main.command.CommandFactory;
 import main.command.CommandHandler;
 import main.communication.request.CommandRequest;
 import main.communication.request.EntityRequest;
+import main.communication.request.FileRequest;
 import main.communication.request.UpdateRequest;
 import main.communication.result.CommandResult;
 import main.communication.result.EntityResult;
+import main.communication.result.FileResult;
 import main.communication.result.UpdateResult;
 import main.entity.EntityLoader;
+import main.util.FileGetter;
 import main.util.MyClassLoader;
 import main.util.Serializer;
 
@@ -60,18 +63,25 @@ public class TCPServer implements Runnable {
                     CommandResult result = handler.handleCommand(commandRequest, ICommandFactory);
                     resultData = Serializer.serialize(result);
                 }
-                else if(clientBundle.getType() == RequestType.FILE){
+                else if(clientBundle.getType() == RequestType.FILE_UPDATE){
                     //If it is a update request then deserialize it accordingly, reload the new class and update it
                     UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), UpdateRequest.class);
                     MyClassLoader loader = new MyClassLoader();
                     UpdateResult result = loader.updateClass(updateRequest);
                     resultData = Serializer.serialize(result);
                 }
-                else {
+                else if (clientBundle.getType() == RequestType.ENTITY){
                     //If it is a entity request then deserialize it accordingly, register the entity with the server
                     EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), EntityRequest.class);
                     EntityLoader loader = new EntityLoader();
                     EntityResult result = loader.registerEntity(entityRequest);
+                    resultData = Serializer.serialize(result);
+                }
+                else {
+                    //If it is a get file request then deserialize it accordingly and get the file contents for the provided command name
+                    FileRequest fileRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), FileRequest.class);
+                    FileGetter fileGetter = new FileGetter();
+                    FileResult result = fileGetter.getFile(fileRequest);
                     resultData = Serializer.serialize(result);
                 }
                 //Write the result to the client
