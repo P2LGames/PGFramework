@@ -1,8 +1,8 @@
 package main.util;
 
 import command.Command;
-import main.communication.command.UpdateRequest;
-import main.communication.command.UpdateResult;
+import main.communication.request.UpdateRequest;
+import main.communication.result.UpdateResult;
 import main.entity.Entity;
 import main.entity.EntityMap;
 

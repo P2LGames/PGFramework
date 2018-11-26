@@ -1,4 +1,4 @@
-package main.communication.command;
+package main.communication.result;
 
 /**
  * The result from updating a class

@@ -1,4 +1,4 @@
-package main.communication.command;
+package main.communication.request;
 
 /**
  * The request that holds the data for updating a class

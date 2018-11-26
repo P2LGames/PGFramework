@@ -1,9 +1,15 @@
 package main.communication;
 
+import main.command.ICommandFactory;
 import main.command.CommandFactory;
-import main.command.Factory;
-import main.communication.command.*;
 import main.command.CommandHandler;
+import main.communication.request.CommandRequest;
+import main.communication.request.EntityRequest;
+import main.communication.request.UpdateRequest;
+import main.communication.result.CommandResult;
+import main.communication.result.EntityResult;
+import main.communication.result.UpdateResult;
+import main.entity.EntityLoader;
 import main.util.MyClassLoader;
 import main.util.Serializer;
 
@@ -18,16 +24,16 @@ import java.net.Socket;
  */
 public class TCPServer implements Runnable {
 
-    private Factory factory;
+    private ICommandFactory ICommandFactory;
     private Boolean shouldRun;
 
     public TCPServer() {
         this.shouldRun = true;
-        this.factory = new CommandFactory();
+        this.ICommandFactory = new CommandFactory();
     }
 
-    public void setFactory(Factory factory) {
-        this.factory = factory;
+    public void setICommandFactory(ICommandFactory ICommandFactory) {
+        this.ICommandFactory = ICommandFactory;
     }
 
     /**
@@ -47,18 +53,25 @@ public class TCPServer implements Runnable {
                 ClientBundle clientBundle = Serializer.deserialize(requestData, ClientBundle.class);
                 String resultData;
 
-                if(clientBundle.getType() == ClientBundle.RequestType.COMMAND) {
-                    //If it is a command data then deserialize it accordingly and give it to the factory
+                if(clientBundle.getType() == RequestType.COMMAND) {
+                    //If it is a command request then deserialize it accordingly and give it to the ICommandFactory
                     CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), CommandRequest.class);
                     CommandHandler handler = new CommandHandler();
-                    CommandResult result = handler.handleCommand(commandRequest, factory);
+                    CommandResult result = handler.handleCommand(commandRequest, ICommandFactory);
                     resultData = Serializer.serialize(result);
                 }
-                else {
-                    //If it is a update data then deserialize it accordingly, reload the new class and update it
+                else if(clientBundle.getType() == RequestType.FILE){
+                    //If it is a update request then deserialize it accordingly, reload the new class and update it
                     UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), UpdateRequest.class);
                     MyClassLoader loader = new MyClassLoader();
                     UpdateResult result = loader.updateClass(updateRequest);
+                    resultData = Serializer.serialize(result);
+                }
+                else {
+                    //If it is a entity request then deserialize it accordingly, register the entity with the server
+                    EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), EntityRequest.class);
+                    EntityLoader loader = new EntityLoader();
+                    EntityResult result = loader.registerEntity(entityRequest);
                     resultData = Serializer.serialize(result);
                 }
                 //Write the result to the client

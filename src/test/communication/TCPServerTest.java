@@ -1,12 +1,13 @@
 package test.communication;
 
-import main.communication.command.ClientBundle;
-import main.communication.command.CommandResult;
+import main.communication.ClientBundle;
+import main.communication.RequestType;
+import main.communication.result.CommandResult;
 import main.util.Serializer;
 import main.communication.TCPServer;
-import main.communication.command.CommandRequest;
+import main.communication.request.CommandRequest;
 import org.junit.Test;
-import test.testutils.MockFactory;
+import test.testutils.MockCommandFactory;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -22,7 +23,7 @@ public class TCPServerTest {
     @Test
     public void testConnection() throws Exception {
         TCPServer server = new TCPServer();
-        server.setFactory(new MockFactory());
+        server.setICommandFactory(new MockCommandFactory());
         new Thread(server).start();
         Socket clientSocket = new Socket();
         clientSocket.setSoTimeout(2000);
@@ -31,7 +32,7 @@ public class TCPServerTest {
         commandRequest.setCommand("testCommand");
         commandRequest.setEntityID("testID");
         ClientBundle clientBundle = new ClientBundle();
-        clientBundle.setType(ClientBundle.RequestType.COMMAND);
+        clientBundle.setType(RequestType.COMMAND);
         clientBundle.setSerializedRequest(Serializer.serialize(commandRequest));
         String requestData = Serializer.serialize(clientBundle);
         DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());

@@ -3,9 +3,9 @@ package command;
 /**
  * An example implementation of the Talk command
  */
-public class TestTalkDefault extends Talker {
+public class TestTalkDefault extends StringCommand {
     @Override
-    public String talk() {
+    public String getString() {
         return "I can talk!!";
     }
 

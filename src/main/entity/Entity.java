@@ -1,9 +1,9 @@
 package main.entity;
 
 import command.Command;
+import java.util.Map.Entry;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents an in game entity that is programmable on the client
@@ -44,23 +44,20 @@ public abstract class Entity {
         return entityID;
     }
 
-    public void setEntityID(String entityID) {
-        this.entityID = entityID;
-    }
-
     public Map<String, Command> getDefaults() {
         return defaults;
-    }
-
-    public void setDefaults(Map<String, Command> defaults) {
-        this.defaults = defaults;
     }
 
     public Map<String, Command> getCommandInstances() {
         return commandInstances;
     }
 
-    public void setCommandInstances(Map<String, Command> commandInstances) {
-        this.commandInstances = commandInstances;
+    public List<String> getCommandsAsStringList() {
+        List<String> commandList = new ArrayList<>();
+        Set<Entry<String, Command>> defaultEntries = defaults.entrySet();
+        for(Entry entry : defaultEntries) {
+            commandList.add((String)entry.getKey());
+        }
+        return commandList;
     }
 }

@@ -1,15 +1,15 @@
 package main.command;
 
 import command.Command;
-import command.Talker;
+import command.StringCommand;
 import main.entity.EntityMap;
-import main.communication.command.CommandRequest;
+import main.communication.request.CommandRequest;
 import main.entity.Entity;
 
 /**
  * This class returns a command based on the request
  */
-public class CommandFactory implements Factory {
+public class CommandFactory implements ICommandFactory {
 
     /**
      * This method uses the request to return the correct command
@@ -21,7 +21,7 @@ public class CommandFactory implements Factory {
      *  the command that satisfies the request
      */
     @Override
-    public Command route(CommandRequest request) {
+    public Command getCommand(CommandRequest request) {
         //Create the commandResult
 
         Command command = null;
@@ -30,7 +30,7 @@ public class CommandFactory implements Factory {
         if(request.getCommand().equals("talk")) {
             EntityMap entities = EntityMap.getInstance();
             Entity entity = entities.get(request.getEntityID());
-            command = (Talker) entity.getCommand("talk");
+            command = (StringCommand) entity.getCommand("talk");
         }
         return command;
     }

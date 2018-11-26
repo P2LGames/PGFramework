@@ -1,4 +1,4 @@
-package main.communication.command;
+package main.communication.request;
 
 /**
  * Super class of file and command requests

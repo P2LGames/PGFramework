@@ -1,7 +1,7 @@
 package test.utils;
 import main.entity.EntityMap;
-import main.communication.command.UpdateRequest;
-import main.communication.command.UpdateResult;
+import main.communication.request.UpdateRequest;
+import main.communication.result.UpdateResult;
 import main.entity.Entity;
 import main.entity.TestEntity;
 import main.util.MyClassLoader;
@@ -16,12 +16,12 @@ public class MyClassLoaderTest {
         UpdateRequest request = new UpdateRequest();
         request.setFileContents("\n" +
                 "\n" +
-                "import command.Talker;\n" +
+                "import command.StringCommand;\n" +
                 "\n" +
                 "/**\n" +
                 " * An example implementation of the Talk command\n" +
                 " */\n" +
-                "public class talk extends Talker {\n" +
+                "public class talk extends StringCommand {\n" +
                 "    @Override\n" +
                 "    public String talk() {\n" +
                 "        return \"I can talk!!\";\n" +

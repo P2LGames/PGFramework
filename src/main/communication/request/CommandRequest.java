@@ -1,4 +1,4 @@
-package main.communication.command;
+package main.communication.request;
 
 /**
  * The request for a command from the client

@@ -1,12 +1,9 @@
-package main.communication.command;
+package main.communication;
 
 /**
  * The class that will be passed over from the client
  */
 public class ClientBundle {
-    public enum RequestType {
-        FILE, COMMAND
-    }
     private RequestType type;
     private String serializedRequest;
 
