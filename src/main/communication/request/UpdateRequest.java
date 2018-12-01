@@ -27,4 +27,8 @@ public class UpdateRequest extends Request {
     public void setHasParameter(Boolean hasParameter) {
         this.hasParameter = hasParameter;
     }
+
+    public void setParameterClassName(String parameterClassName) {
+        this.parameterClassName = parameterClassName;
+    }
 }

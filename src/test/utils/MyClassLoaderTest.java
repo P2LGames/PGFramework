@@ -44,4 +44,45 @@ public class MyClassLoaderTest {
         assertNull(result.getErrorMessage());
         assertTrue(result.getSuccess());
     }
+
+    @Test
+    public void updateClassTestWithParameters() {
+        UpdateRequest request = new UpdateRequest();
+        request.setFileContents("\n" +
+                "\n" +
+                "import command.InputCommand;\n" +
+                "import command.Input;\n" +
+                "import command.Output;\n" +
+                "public class inputComm extends InputCommand {\n" +
+                "    private Input input;\n" +
+                "\n" +
+                "    public inputComm(Input input) {\n" +
+                "        this.input = input;\n" +
+                "    }\n" +
+                "\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public Output runOnInput() {\n" +
+                "        Output output = new Output();\n" +
+                "        output.setInteger(input.getInteger());\n" +
+                "        output.setString(\"it worked\");\n" +
+                "        return output;\n" +
+                "    }\n" +
+                "}");
+        request.setCommand("inputComm");
+        request.setEntityID("testID");
+        request.setHasParameter(true);
+        request.setParameterClassName("command.Input");
+
+        EntityMap entities = EntityMap.getInstance();
+        Entity entity = new TestEntity(request.getEntityID());
+        entities.put(entity.getEntityID(), entity);
+
+        MyClassLoader loader = new MyClassLoader();
+
+        UpdateResult result = loader.updateClass(request);
+
+        assertNull(result.getErrorMessage());
+        assertTrue(result.getSuccess());
+    }
 }
