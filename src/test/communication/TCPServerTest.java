@@ -2,7 +2,7 @@ package test.communication;
 
 import main.communication.ClientBundle;
 import main.communication.RequestType;
-import main.communication.result.CommandResult;
+import command.CommandResult;
 import main.util.Serializer;
 import main.communication.TCPServer;
 import main.communication.request.CommandRequest;
@@ -31,6 +31,7 @@ public class TCPServerTest {
         CommandRequest commandRequest = new CommandRequest();
         commandRequest.setCommand("testCommand");
         commandRequest.setEntityID("testID");
+        commandRequest.setHasParameter(false);
         ClientBundle clientBundle = new ClientBundle();
         clientBundle.setType(RequestType.COMMAND);
         clientBundle.setSerializedRequest(Serializer.serialize(commandRequest));

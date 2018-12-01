@@ -31,12 +31,12 @@ public class MyClassLoaderTest {
                 "}\n");
         request.setCommand("talk");
         request.setEntityID("testID");
+        request.setHasParameter(false);
 
         EntityMap entities = EntityMap.getInstance();
         Entity entity = new TestEntity(request.getEntityID());
         entities.put(entity.getEntityID(), entity);
 
-        ClassLoader parentClassLoader = MyClassLoader.class.getClassLoader();
         MyClassLoader loader = new MyClassLoader();
 
         UpdateResult result = loader.updateClass(request);

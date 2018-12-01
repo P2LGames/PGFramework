@@ -1,8 +1,8 @@
 package main.entity;
 
 import command.Command;
-import java.util.Map.Entry;
 
+import java.lang.reflect.Constructor;
 import java.util.*;
 
 /**
@@ -10,13 +10,19 @@ import java.util.*;
  */
 public abstract class Entity {
     private String entityID;
-    private Map<String, Command> defaults;
-    private Map<String, Command> commandInstances;
+    private Map<String, Constructor> constructorInstances;
+    private Map<String, Class> parameterClassNames;
 
     Entity(String entityID) {
         this.entityID = entityID;
-        defaults = new HashMap<>();
-        this.commandInstances = new HashMap<>();
+        this.constructorInstances = new HashMap<>();
+        this.parameterClassNames = new HashMap<>();
+    }
+
+    Entity(String entityID, Map<String, Constructor> constructorInstances, Map<String, Class> parameterClassNames) {
+        this.entityID = entityID;
+        this.constructorInstances = constructorInstances;
+        this.parameterClassNames = parameterClassNames;
     }
 
     /**
@@ -26,38 +32,31 @@ public abstract class Entity {
      * @return
      *  the instance that implements the correct command interface
      */
-    public abstract Object getCommand(String command);
+    public abstract Command getCommand(String command, String serializedParameter);
+
+    public abstract Command getCommand(String command);
 
     /**
      * Replaces the current instance for a class with another(if one already exists)
      *
      * @param commandName
      *  the name of the command
-     * @param command
+     * @param constructor
      *  the command that should replace the current one(if one exists)
      */
-    public void replaceCommand(String commandName, Command command) {
-        commandInstances.put(commandName, command);
+    public void replaceCommand(String commandName, Constructor constructor) {
+        constructorInstances.put(commandName, constructor);
     }
 
     public String getEntityID() {
         return entityID;
     }
 
-    public Map<String, Command> getDefaults() {
-        return defaults;
+    public Map<String, Constructor> getConstructorInstances() {
+        return constructorInstances;
     }
 
-    public Map<String, Command> getCommandInstances() {
-        return commandInstances;
-    }
-
-    public List<String> getCommandsAsStringList() {
-        List<String> commandList = new ArrayList<>();
-        Set<Entry<String, Command>> defaultEntries = defaults.entrySet();
-        for(Entry entry : defaultEntries) {
-            commandList.add((String)entry.getKey());
-        }
-        return commandList;
+    public Map<String, Class> getParameterClassNames() {
+        return parameterClassNames;
     }
 }

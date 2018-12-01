@@ -1,23 +1,24 @@
 package main.communication.result;
 
-import java.util.List;
 import java.util.Objects;
 
 public class EntityResult {
     private String entityId;
-    private List<String> commands;
+    private Boolean success;
+    private String errorMessage;
 
-    public EntityResult(String entityId, List<String> commands) {
+    public EntityResult(String entityId) {
+        this.success = true;
         this.entityId = entityId;
-        this.commands = commands;
+    }
+
+    public EntityResult(Boolean success, String errorMessage) {
+        this.success = success;
+        this.errorMessage = errorMessage;
     }
 
     public String getEntityId() {
         return entityId;
-    }
-
-    public List<String> getCommands() {
-        return commands;
     }
 
     @Override
@@ -25,7 +26,6 @@ public class EntityResult {
         if (this == o) return true;
         if (!(o instanceof EntityResult)) return false;
         EntityResult that = (EntityResult) o;
-        return Objects.equals(entityId, that.entityId) &&
-                Objects.equals(commands, that.commands);
+        return Objects.equals(entityId, that.entityId);
     }
 }

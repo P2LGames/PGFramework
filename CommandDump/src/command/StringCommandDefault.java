@@ -3,7 +3,7 @@ package command;
 /**
  * An example implementation of the Talk command
  */
-public class TestTalkDefault extends StringCommand {
+public class StringCommandDefault extends StringCommand {
     @Override
     public String getString() {
         return "I can talk!!";
@@ -11,6 +11,6 @@ public class TestTalkDefault extends StringCommand {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof TestTalkDefault;
+        return obj instanceof StringCommandDefault;
     }
 }

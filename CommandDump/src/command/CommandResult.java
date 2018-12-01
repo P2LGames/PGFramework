@@ -1,4 +1,4 @@
-package main.communication.result;
+package command;
 
 import java.util.Objects;
 

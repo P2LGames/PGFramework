@@ -7,7 +7,7 @@ import main.communication.request.CommandRequest;
 import main.communication.request.EntityRequest;
 import main.communication.request.FileRequest;
 import main.communication.request.UpdateRequest;
-import main.communication.result.CommandResult;
+import command.CommandResult;
 import main.communication.result.EntityResult;
 import main.communication.result.FileResult;
 import main.communication.result.UpdateResult;

@@ -2,7 +2,9 @@ package main.command;
 
 import command.Command;
 import main.communication.request.CommandRequest;
-import main.communication.result.CommandResult;
+import command.CommandResult;
+
+import java.lang.reflect.Constructor;
 
 /**
  * This class handles command requests given by the client
@@ -21,10 +23,12 @@ public class CommandHandler {
      *  the result of the command that is run
      */
     public CommandResult handleCommand(CommandRequest request, ICommandFactory ICommandFactory) {
-        CommandResult commandResult = new CommandResult();
         Command command = ICommandFactory.getCommand(request);
-        Object commandOutput = command.run();
-        commandResult.setValue(commandOutput);
-        return commandResult;
+        if(request.getHasParameter()) {
+            Class commandClass = command.getClass();
+//            Class<?> parameterType = Class.forName();
+//            Constructor constructor =
+        }
+        return command.run();
     }
 }

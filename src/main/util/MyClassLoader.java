@@ -1,12 +1,12 @@
 package main.util;
 
-import command.Command;
 import main.communication.request.UpdateRequest;
 import main.communication.result.UpdateResult;
 import main.entity.Entity;
 import main.entity.EntityMap;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.net.URLConnection;
 import java.net.URL;
 
@@ -116,15 +116,21 @@ public class MyClassLoader extends ClassLoader {
     public UpdateResult updateClass(UpdateRequest request) {
         try {
             createClassFile(request);
-            Class loadedClass = loadClass(request.getCommand());
+            Class<?> loadedClass = loadClass(request.getCommand());
             if(!result.getSuccess()) {
                 return result;
             }
-            Object instance = loadedClass.newInstance();
-            Command command = (Command) instance;
+            Constructor constructor;
+            if(request.getHasParameter()) {
+                Class<?> parameterClassObject = Class.forName(request.getParameterClassName());
+                constructor = loadedClass.getDeclaredConstructor(parameterClassObject);
+            }
+            else {
+                constructor = loadedClass.getConstructor();
+            }
             EntityMap entities = EntityMap.getInstance();
             Entity entity = entities.get(request.getEntityID());
-            entity.replaceCommand(request.getCommand(), command);
+            entity.replaceCommand(request.getCommand(), constructor);
         } catch (Exception e) {
             result.setSuccess(false);
             result.setErrorMessage(e.getMessage());

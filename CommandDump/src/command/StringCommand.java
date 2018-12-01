@@ -7,7 +7,7 @@ public abstract class StringCommand implements Command {
     public abstract String getString();
 
     @Override
-    public Object run() {
-        return getString();
+    public CommandResult run() {
+        return new CommandResult(getString());
     }
 }

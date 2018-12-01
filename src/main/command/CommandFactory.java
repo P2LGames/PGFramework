@@ -26,11 +26,16 @@ public class CommandFactory implements ICommandFactory {
 
         Command command = null;
 
-        //Route the command (will probably be switched to an enum)
-        if(request.getCommand().equals("talk")) {
+        if(request.getHasParameter()) {
             EntityMap entities = EntityMap.getInstance();
             Entity entity = entities.get(request.getEntityID());
-            command = (StringCommand) entity.getCommand("talk");
+            command = entity.getCommand(request.getCommand(), request.getSerializedParameter());
+
+        }
+        else {
+            EntityMap entities = EntityMap.getInstance();
+            Entity entity = entities.get(request.getEntityID());
+            command = entity.getCommand(request.getCommand());
         }
         return command;
     }
