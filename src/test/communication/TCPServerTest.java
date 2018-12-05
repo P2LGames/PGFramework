@@ -3,11 +3,11 @@ package test.communication;
 import main.communication.ClientBundle;
 import main.communication.RequestType;
 import command.CommandResult;
-import main.util.Serializer;
 import main.communication.TCPServer;
 import main.communication.request.CommandRequest;
 import org.junit.Test;
 import test.testutils.MockCommandFactory;
+import util.Serializer;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

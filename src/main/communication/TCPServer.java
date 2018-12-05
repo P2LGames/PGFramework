@@ -14,7 +14,7 @@ import main.communication.result.UpdateResult;
 import main.entity.EntityLoader;
 import main.util.FileGetter;
 import main.util.MyClassLoader;
-import main.util.Serializer;
+import util.Serializer;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

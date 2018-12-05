@@ -1,6 +1,7 @@
-package main.entity;
+package entity;
 
 import command.Command;
+import util.Serializer;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -12,6 +13,11 @@ public abstract class Entity {
     private String entityID;
     private Map<String, Constructor> constructorInstances;
     private Map<String, Class> parameterClassNames;
+
+    Entity() {
+        this.constructorInstances = new HashMap<>();
+        this.parameterClassNames = new HashMap<>();
+    }
 
     Entity(String entityID) {
         this.entityID = entityID;
@@ -27,14 +33,36 @@ public abstract class Entity {
 
     /**
      * A command for getting a command, must be called from a concrete instance of the class
-     * @param command
+     * @param commandName
      *  the name of the command
      * @return
      *  the instance that implements the correct command interface
      */
-    public abstract Command getCommand(String command, String serializedParameter);
+    public Command getCommand(String commandName, String serializedParameter) {
+        Class<?> parameterClass = this.getParameterClassNames().get(commandName);
+        Object parameter = Serializer.deserialize(serializedParameter, parameterClass);
+        Constructor constructor = this.getConstructorInstances().get(commandName);
+        Command command;
+        try {
+            command = (Command) constructor.newInstance(parameter);
+        } catch (Exception e) {
+            System.out.println("Fatal Error");
+            return null;
+        }
+        return command;
+    }
 
-    public abstract Command getCommand(String command);
+    public Command getCommand(String commandName) {
+        Constructor constructor = this.getConstructorInstances().get(commandName);
+        Command command;
+        try {
+            command = (Command) constructor.newInstance();
+        } catch(Exception e) {
+            System.out.println("Fatal Error");
+            return null;
+        }
+        return command;
+    }
 
     /**
      * Replaces the current instance for a class with another(if one already exists)
@@ -44,7 +72,7 @@ public abstract class Entity {
      * @param constructor
      *  the command that should replace the current one(if one exists)
      */
-    public void replaceCommand(String commandName, Constructor constructor) {
+    public void replaceConstructor(String commandName, Constructor constructor) {
         constructorInstances.put(commandName, constructor);
     }
 

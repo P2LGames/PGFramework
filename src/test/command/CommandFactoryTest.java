@@ -4,8 +4,7 @@ import command.*;
 import main.command.CommandFactory;
 import main.entity.EntityMap;
 import main.communication.request.CommandRequest;
-import main.entity.TestEntity;
-import main.util.Serializer;
+import entity.TestEntity;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;
@@ -34,11 +33,7 @@ public class CommandFactoryTest {
     public void testInputCommand() throws NoSuchMethodException {
         CommandRequest request = new CommandRequest("testID", "input", true, "{\"string\":\"blah blah blah\", \"integer\":10}");
         EntityMap entities = EntityMap.getInstance();
-        Map<String, Constructor> constructorInstances = new HashMap<>();
-        constructorInstances.put("input", InputCommandDefault.class.getDeclaredConstructor(Input.class));
-        Map<String, Class> parameterClassNames = new HashMap<>();
-        parameterClassNames.put("input", Input.class);
-        TestEntity entity = new TestEntity(request.getEntityID(), constructorInstances, parameterClassNames);
+        TestEntity entity = new TestEntity(request.getEntityID());
         entities.put(entity.getEntityID(), entity);
         CommandFactory router = new CommandFactory();
         Command command = router.getCommand(request);

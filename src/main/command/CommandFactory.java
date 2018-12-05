@@ -1,10 +1,9 @@
 package main.command;
 
 import command.Command;
-import command.StringCommand;
 import main.entity.EntityMap;
 import main.communication.request.CommandRequest;
-import main.entity.Entity;
+import entity.Entity;
 
 /**
  * This class returns a command based on the request

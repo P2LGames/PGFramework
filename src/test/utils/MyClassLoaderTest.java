@@ -2,8 +2,8 @@ package test.utils;
 import main.entity.EntityMap;
 import main.communication.request.UpdateRequest;
 import main.communication.result.UpdateResult;
-import main.entity.Entity;
-import main.entity.TestEntity;
+import entity.Entity;
+import entity.TestEntity;
 import main.util.MyClassLoader;
 import org.junit.Test;
 

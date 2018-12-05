@@ -1,50 +1,34 @@
 package main.entity;
 
-import command.Command;
-import main.communication.request.CommandData;
+import entity.Entity;
 import main.communication.request.EntityRequest;
 import main.communication.result.EntityResult;
 
-import java.lang.reflect.Constructor;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 public class EntityLoader {
-    private IEntityFactory factory;
+    private Integer idCount;
 
     public EntityLoader() {
-        this.factory = EntityFactory.getInstance();
+        idCount = 0;
     }
 
     public EntityResult registerEntity(EntityRequest request) {
-        Entity entity = factory.getNewEntity(request);
+        Entity entity;
         try {
-            addCommandDefaults(entity, request.getCommandsMap());
+            Class<?> loadedClass = Class.forName(request.getEntityType());
+            entity = (Entity) loadedClass.newInstance();
         } catch (Exception e) {
+            System.out.println("Fatal error");
             return new EntityResult(false, e.getMessage());
         }
-        return new EntityResult(entity.getEntityID());
+        String entityId = getEntityId();
+        EntityMap entityMap = EntityMap.getInstance();
+        entityMap.put(entityId, entity);
+        return new EntityResult(entityId);
     }
 
-    private void addCommandDefaults(Entity entity, Map<String, CommandData> commandsMap) throws ClassNotFoundException, NoSuchMethodException {
-        Set<Entry<String, CommandData>> entrySet = commandsMap.entrySet();
-        for(Entry<String, CommandData> entry : entrySet) {
-            CommandData data = entry.getValue();
-            Class<?> commandClassObject = Class.forName(data.getCommandName());
-            Constructor constructor;
-            if(data.getHasParameter()) {
-                Class<?> parameterClassObject = Class.forName(data.getParameterClassName());
-                constructor = commandClassObject.getDeclaredConstructor(parameterClassObject);
-            }
-            else {
-                constructor = commandClassObject.getConstructor();
-            }
-            entity.replaceCommand(entry.getKey(), constructor);
-        }
-    }
-
-    public void setFactory(IEntityFactory factory) {
-        this.factory = factory;
+    public String getEntityId() {
+        String id = Entity.class.toString() + idCount;
+        idCount++;
+        return id;
     }
 }

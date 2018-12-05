@@ -2,18 +2,15 @@ package main.communication.result;
 
 import java.util.Objects;
 
-public class FileResult {
+public class FileResult extends Result {
     private String fileContents;
-    private Boolean success;
-    private String errorMessage;
 
     public FileResult(Boolean success, String errorMessage) {
-        this.success = success;
-        this.errorMessage = errorMessage;
+        super(errorMessage, success);
     }
 
     public FileResult(String fileContents) {
-        this.success = true;
+        super(null, true);
         this.fileContents = fileContents;
     }
 

@@ -35,5 +35,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="CommandDump" />
+    <orderEntry type="module" module-name="shared" />
   </component>
 </module>

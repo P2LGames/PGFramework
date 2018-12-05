@@ -2,19 +2,18 @@ package main.communication.result;
 
 import java.util.Objects;
 
-public class EntityResult {
+
+
+public class EntityResult extends Result {
     private String entityId;
-    private Boolean success;
-    private String errorMessage;
 
     public EntityResult(String entityId) {
-        this.success = true;
+        super(null, true);
         this.entityId = entityId;
     }
 
     public EntityResult(Boolean success, String errorMessage) {
-        this.success = success;
-        this.errorMessage = errorMessage;
+        super(errorMessage, success);
     }
 
     public String getEntityId() {

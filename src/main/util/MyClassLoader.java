@@ -2,7 +2,7 @@ package main.util;
 
 import main.communication.request.UpdateRequest;
 import main.communication.result.UpdateResult;
-import main.entity.Entity;
+import entity.Entity;
 import main.entity.EntityMap;
 
 import java.io.*;
@@ -130,7 +130,7 @@ public class MyClassLoader extends ClassLoader {
             }
             EntityMap entities = EntityMap.getInstance();
             Entity entity = entities.get(request.getEntityID());
-            entity.replaceCommand(request.getCommand(), constructor);
+            entity.replaceConstructor(request.getCommand(), constructor);
         } catch (Exception e) {
             result.setSuccess(false);
             result.setErrorMessage(e.getMessage());

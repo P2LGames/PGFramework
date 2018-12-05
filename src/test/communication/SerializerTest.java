@@ -1,8 +1,8 @@
 package test.communication;
 
-import main.util.Serializer;
 import main.communication.request.CommandRequest;
 import org.junit.Test;
+import util.Serializer;
 
 import static org.junit.Assert.*;
 

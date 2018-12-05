@@ -1,5 +1,7 @@
 package main.entity;
 
+import entity.Entity;
+
 import java.util.HashMap;
 
 public class EntityMap extends HashMap<String, Entity> {

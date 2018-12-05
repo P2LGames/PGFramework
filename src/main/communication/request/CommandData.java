@@ -1,5 +1,8 @@
 package main.communication.request;
 
+/**
+ * The data needed to load a new command
+ */
 public class CommandData {
     private String commandName;
     private Boolean hasParameter;
