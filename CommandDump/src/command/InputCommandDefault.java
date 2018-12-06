@@ -1,5 +1,8 @@
 package command;
 
+import command.parameter.Input;
+import command.returns.Output;
+
 import java.util.Objects;
 
 public class InputCommandDefault extends InputCommand {

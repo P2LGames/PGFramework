@@ -1,6 +1,7 @@
 package test.command;
 
 import command.*;
+import command.parameter.Input;
 import main.command.CommandFactory;
 import main.entity.EntityMap;
 import main.communication.request.CommandRequest;
@@ -30,7 +31,7 @@ public class CommandFactoryTest {
     }
 
     @Test
-    public void testInputCommand() throws NoSuchMethodException {
+    public void testInputCommand() {
         CommandRequest request = new CommandRequest("testID", "input", true, "{\"string\":\"blah blah blah\", \"integer\":10}");
         EntityMap entities = EntityMap.getInstance();
         TestEntity entity = new TestEntity(request.getEntityID());

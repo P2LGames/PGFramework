@@ -24,11 +24,6 @@ public class CommandHandler {
      */
     public CommandResult handleCommand(CommandRequest request, ICommandFactory ICommandFactory) {
         Command command = ICommandFactory.getCommand(request);
-        if(request.getHasParameter()) {
-            Class commandClass = command.getClass();
-//            Class<?> parameterType = Class.forName();
-//            Constructor constructor =
-        }
         return command.run();
     }
 }

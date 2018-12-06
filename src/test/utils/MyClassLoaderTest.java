@@ -51,8 +51,8 @@ public class MyClassLoaderTest {
         request.setFileContents("\n" +
                 "\n" +
                 "import command.InputCommand;\n" +
-                "import command.Input;\n" +
-                "import command.Output;\n" +
+                "import command.parameter.Input;\n" +
+                "import command.returns.Output;\n" +
                 "public class inputComm extends InputCommand {\n" +
                 "    private Input input;\n" +
                 "\n" +
@@ -72,7 +72,7 @@ public class MyClassLoaderTest {
         request.setCommand("inputComm");
         request.setEntityID("testID");
         request.setHasParameter(true);
-        request.setParameterClassName("command.Input");
+        request.setParameterClassName("command.parameter.Input");
 
         EntityMap entities = EntityMap.getInstance();
         Entity entity = new TestEntity(request.getEntityID());

@@ -4,6 +4,9 @@ import entity.Entity;
 
 import java.util.HashMap;
 
+/**
+ * The map that holds all entities registered with the server
+ */
 public class EntityMap extends HashMap<String, Entity> {
     private static EntityMap instance;
 

@@ -1,4 +1,4 @@
-package command;
+package command.returns;
 
 public class Output {
     private String string;

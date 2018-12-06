@@ -1,4 +1,4 @@
-package command;
+package command.parameter;
 
 import java.util.Objects;
 

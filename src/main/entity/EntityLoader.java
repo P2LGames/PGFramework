@@ -4,6 +4,9 @@ import entity.Entity;
 import main.communication.request.EntityRequest;
 import main.communication.result.EntityResult;
 
+/**
+ * Loads the entities into the server
+ */
 public class EntityLoader {
     private Integer idCount;
 
@@ -11,6 +14,14 @@ public class EntityLoader {
         idCount = 0;
     }
 
+    /**
+     * Creates an entity of the specified type, assigns it an id, registers it, and returns the id
+     *
+     * @param request
+     *  holds the type of entity to be created
+     * @return
+     *  the data structure holding the success of the operation and the entity id if it was successful
+     */
     public EntityResult registerEntity(EntityRequest request) {
         Entity entity;
         try {
@@ -26,7 +37,13 @@ public class EntityLoader {
         return new EntityResult(entityId);
     }
 
-    public String getEntityId() {
+    /**
+     * Returns the next entity id
+     *
+     * @return
+     *  the id
+     */
+    private String getEntityId() {
         String id = Entity.class.toString() + idCount;
         idCount++;
         return id;
