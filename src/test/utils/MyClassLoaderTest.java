@@ -23,7 +23,7 @@ public class MyClassLoaderTest {
                 " */\n" +
                 "public class talk extends StringCommand {\n" +
                 "    @Override\n" +
-                "    public String talk() {\n" +
+                "    public String getString() {\n" +
                 "        return \"I can talk!!\";\n" +
                 "    }\n" +
                 "\n" +

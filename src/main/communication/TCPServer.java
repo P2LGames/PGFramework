@@ -48,10 +48,10 @@ public class TCPServer implements Runnable {
         try {
             //Initialize the socket
             welcomeSocket = new ServerSocket(6789);
+            Socket connectionSocket = welcomeSocket.accept();
+            BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
             while (shouldRun) {
                 //Accept input and process it
-                Socket connectionSocket = welcomeSocket.accept();
-                BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                 String requestData = inFromClient.readLine();
                 ClientBundle clientBundle = Serializer.deserialize(requestData, ClientBundle.class);
                 String resultData;

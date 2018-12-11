@@ -3,7 +3,6 @@
 import command.InputCommand;
 import command.parameter.Input;
 import command.returns.Output;
-
 public class inputComm extends InputCommand {
     private Input input;
 

@@ -10,4 +10,6 @@ public class talk extends StringCommand {
     public String getString() {
         return "I can talk!!";
     }
+
+
 }

@@ -8,11 +8,6 @@ import main.communication.result.EntityResult;
  * Loads the entities into the server
  */
 public class EntityLoader {
-    private Integer idCount;
-
-    public EntityLoader() {
-        idCount = 0;
-    }
 
     /**
      * Creates an entity of the specified type, assigns it an id, registers it, and returns the id
@@ -31,8 +26,8 @@ public class EntityLoader {
             System.out.println("Fatal error");
             return new EntityResult(false, e.getMessage());
         }
-        String entityId = getEntityId();
         EntityMap entityMap = EntityMap.getInstance();
+        String entityId = getEntityId(request.getEntityType(), entityMap.size());
         entityMap.put(entityId, entity);
         return new EntityResult(entityId);
     }
@@ -43,9 +38,7 @@ public class EntityLoader {
      * @return
      *  the id
      */
-    private String getEntityId() {
-        String id = Entity.class.toString() + idCount;
-        idCount++;
-        return id;
+    private String getEntityId(String name, int idNum) {
+        return name + idNum;
     }
 }

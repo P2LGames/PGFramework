@@ -14,7 +14,7 @@ public class EntityLoaderTest {
         EntityRequest request = new EntityRequest("entity.TestEntity");
         EntityLoader loader = new EntityLoader();
         EntityResult result = loader.registerEntity(request);
-        EntityResult expectedResult = new EntityResult("class entity.Entity0");
+        EntityResult expectedResult = new EntityResult("entity.TestEntity1");
         assertEquals(result, expectedResult);
     }
 }
