@@ -1,7 +1,6 @@
 package entity;
 
 import command.Command;
-import command.parameter.Input;
 import util.Serializer;
 
 import java.lang.reflect.Constructor;
