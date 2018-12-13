@@ -55,7 +55,9 @@ public class TCPServer implements Runnable {
                 String requestData = inFromClient.readLine();
                 ClientBundle clientBundle = Serializer.deserialize(requestData, ClientBundle.class);
                 String resultData;
-
+                if(clientBundle == null) {
+                    continue;
+                }
                 if(clientBundle.getType() == RequestType.COMMAND) {
                     //If it is a command request then deserialize it accordingly and give it to the ICommandFactory
                     CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), CommandRequest.class);

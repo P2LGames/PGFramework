@@ -36,5 +36,16 @@
     </orderEntry>
     <orderEntry type="module" module-name="CommandDump" />
     <orderEntry type="module" module-name="shared" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/mockito-all-1.10.19.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/libs/mockito-all-1.10.19.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>

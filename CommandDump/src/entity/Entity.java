@@ -1,6 +1,7 @@
 package entity;
 
 import command.Command;
+import command.parameter.Input;
 import util.Serializer;
 
 import java.lang.reflect.Constructor;
@@ -74,6 +75,39 @@ public abstract class Entity {
      */
     public void replaceConstructor(String commandName, Constructor constructor) {
         constructorInstances.put(commandName, constructor);
+    }
+
+    /**
+     * Creates the default for a command that does not take a parameter
+     *
+     * @param commandName
+     *  the name of the command
+     * @param commandClass
+     *  the class object of the command class
+     *
+     * @throws NoSuchMethodException
+     *  if the constructor requested does not exist
+     */
+    void makeDefault(String commandName, Class<?> commandClass) throws NoSuchMethodException {
+        this.replaceConstructor(commandName, commandClass.getConstructor());
+    }
+
+    /**
+     * Creates the default for a command that takes a parameter
+     *
+     * @param commandName
+     *  the name of the command
+     * @param commandClass
+     *  the class object of the command class
+     * @param parameterClass
+     *  the class object of the parameter class
+     *
+     * @throws NoSuchMethodException
+     *  if the constructor requested does not exist
+     */
+    void makeDefault(String commandName, Class<?> commandClass, Class<?> parameterClass) throws NoSuchMethodException {
+        this.replaceConstructor(commandName, commandClass.getConstructor(parameterClass));
+        parameterClassNames.put(commandName, parameterClass);
     }
 
     public String getEntityID() {

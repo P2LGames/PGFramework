@@ -18,9 +18,8 @@ public class TestEntity extends Entity {
     public TestEntity() {
         super();
         try {
-            this.replaceConstructor("talk", StringCommandDefault.class.getConstructor());
-            this.replaceConstructor("input", InputCommandDefault.class.getDeclaredConstructor(Input.class));
-            this.getParameterClassNames().put("input", Input.class);
+            this.makeDefault("talk", StringCommandDefault.class);
+            this.makeDefault("input", InputCommandDefault.class, Input.class);
         } catch (Exception e) {
             System.out.println("Fatal Error");
         }
