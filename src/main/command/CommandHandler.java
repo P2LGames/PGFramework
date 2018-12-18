@@ -31,7 +31,12 @@ public class CommandHandler {
      *  the result of the command that is run
      */
     public CommandResult handleCommand(CommandRequest request) {
-        Command command = commandFactory.getCommand(request);
+        Command command;
+        try {
+            command = commandFactory.getCommand(request);
+        } catch (CommandException e) {
+            return new CommandResult(e.getMessage(), false);
+        }
         return command.run();
     }
 }

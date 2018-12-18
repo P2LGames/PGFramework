@@ -9,6 +9,10 @@ public class CommandResult extends Result {
         super();
     }
 
+    public CommandResult(String errorMessage, Boolean success) {
+        super(errorMessage, success);
+    }
+
     public CommandResult(Object value) {
         this.value = value;
     }

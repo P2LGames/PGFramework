@@ -2,6 +2,7 @@ package test.command;
 
 import command.*;
 import command.parameter.Input;
+import main.command.CommandException;
 import main.command.CommandFactory;
 import main.entity.EntityMap;
 import main.communication.request.CommandRequest;
@@ -17,7 +18,7 @@ import static org.junit.Assert.*;
 public class CommandFactoryTest {
 
     @Test
-    public void testTalk() throws NoSuchMethodException {
+    public void testTalk() throws NoSuchMethodException, CommandException {
         CommandRequest request = new CommandRequest("testID", "talk", false, null);
         EntityMap entities = EntityMap.getInstance();
         Map<String, Constructor> constructorInstances = new HashMap<>();
@@ -25,13 +26,13 @@ public class CommandFactoryTest {
         Map<String, Class> parameterClassNames = new HashMap<>();
         TestEntity entity = new TestEntity(request.getEntityID(), constructorInstances, parameterClassNames);
         entities.put(entity.getEntityID(), entity);
-        CommandFactory router = new CommandFactory();
-        Command command = router.getCommand(request);
+        CommandFactory factory = new CommandFactory();
+        Command command = factory.getCommand(request);
         assertEquals(command, new StringCommandDefault());
     }
 
     @Test
-    public void testInputCommand() {
+    public void testInputCommand() throws CommandException {
         CommandRequest request = new CommandRequest("testID", "input", true, "{\"string\":\"blah blah blah\", \"integer\":10}");
         EntityMap entities = EntityMap.getInstance();
         TestEntity entity = new TestEntity(request.getEntityID());

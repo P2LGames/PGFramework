@@ -17,7 +17,7 @@ public class EntityLoader {
      * @return
      *  the data structure holding the success of the operation and the entity id if it was successful
      */
-    public EntityResult registerEntity(EntityRequest request) {
+    public synchronized EntityResult registerEntity(EntityRequest request) {
         Entity entity;
         try {
             Class<?> loadedClass = Class.forName(request.getEntityType());
