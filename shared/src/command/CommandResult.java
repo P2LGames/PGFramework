@@ -2,10 +2,12 @@ package command;
 
 import java.util.Objects;
 
-public class CommandResult {
+public class CommandResult extends Result {
     private Object value;
 
-    public CommandResult() {}
+    public CommandResult() {
+        super();
+    }
 
     public CommandResult(Object value) {
         this.value = value;

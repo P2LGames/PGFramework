@@ -1,5 +1,7 @@
 package main.communication.result;
 
+import command.Result;
+
 /**
  * The result from updating a class
  */

@@ -1,4 +1,4 @@
-package main.communication.result;
+package command;
 
 public abstract class Result {
     String errorMessage;
@@ -7,6 +7,9 @@ public abstract class Result {
     public Result(String errorMessage, Boolean success) {
         this.errorMessage = errorMessage;
         this.success = success;
+    }
+
+    public Result() {
     }
 
     public String getErrorMessage() {

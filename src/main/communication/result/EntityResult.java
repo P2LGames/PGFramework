@@ -1,5 +1,7 @@
 package main.communication.result;
 
+import command.Result;
+
 import java.util.Objects;
 
 

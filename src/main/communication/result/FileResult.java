@@ -1,5 +1,7 @@
 package main.communication.result;
 
+import command.Result;
+
 import java.util.Objects;
 
 public class FileResult extends Result {
@@ -20,7 +22,7 @@ public class FileResult extends Result {
         if (!(o instanceof FileResult)) return false;
         FileResult that = (FileResult) o;
         return Objects.equals(fileContents, that.fileContents) &&
-                Objects.equals(success, that.success) &&
-                Objects.equals(errorMessage, that.errorMessage);
+                Objects.equals(this.getSuccess(), that.getSuccess()) &&
+                Objects.equals(this.getErrorMessage(), that.getErrorMessage());
     }
 }

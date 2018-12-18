@@ -1,7 +1,6 @@
 package test.communication;
 
-import command.StringCommandDefault;
-import main.command.CommandFactory;
+import main.command.CommandHandler;
 import main.communication.ClientBundle;
 import main.communication.RequestType;
 import command.CommandResult;
@@ -26,16 +25,18 @@ public class TCPServerTest {
     @Test
     public void testConnection() throws Exception {
         //Mock the command factory
-        CommandFactory factory = mock(CommandFactory.class);
+        CommandHandler handler = mock(CommandHandler.class);
+        CommandResult expectedCommandResult = new CommandResult("I can talk!!");
         CommandRequest commandRequest = new CommandRequest();
         commandRequest.setCommand("testCommand");
         commandRequest.setEntityID("testID");
         commandRequest.setHasParameter(false);
-        when(factory.getCommand(commandRequest)).thenReturn(new StringCommandDefault());
+        when(handler.handleCommand(commandRequest)).thenReturn(expectedCommandResult);
+
 
         //Create a new TCP server
         TCPServer server = new TCPServer();
-        server.setICommandFactory(factory);
+        server.setCommandHandler(handler);
         new Thread(server).start();
         Socket clientSocket = new Socket();
         clientSocket.setSoTimeout(2000);
@@ -55,7 +56,6 @@ public class TCPServerTest {
 
         //Verify correctness
         CommandResult actualCommandResult = Serializer.deserialize(resultData, CommandResult.class);
-        CommandResult expectedCommandResult = new CommandResult("I can talk!!");
         assertEquals(expectedCommandResult, actualCommandResult);
         server.stop();
         clientSocket.close();
