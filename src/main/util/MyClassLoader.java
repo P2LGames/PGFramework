@@ -99,8 +99,17 @@ public class MyClassLoader extends ClassLoader {
         writer.write(updateRequest.getFileContents());
         writer.close();
 
-        ProcessBuilder builder = new ProcessBuilder("CMD", "/C", "javac " + file.getName()).directory(new File(System.getProperty("user.dir")));
-        //for mac first param is "/bin/bash", and second param "-c"
+        String osName = System.getProperty("os.name").toLowerCase();
+        boolean isMacOs = osName.startsWith("mac os x");
+
+        ProcessBuilder builder;
+        if(isMacOs)
+        {
+            builder = new ProcessBuilder("/bin/bash", "-c", "javac " + file.getName()).directory(new File(System.getProperty("user.dir")));
+        }
+        else {
+            builder = new ProcessBuilder("CMD", "/C", "javac " + file.getName()).directory(new File(System.getProperty("user.dir")));
+        }
         Process compilation = builder.start();
         compilation.waitFor();
     }

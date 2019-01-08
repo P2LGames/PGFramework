@@ -2,7 +2,7 @@ package test.command;
 
 import command.CommandResult;
 import command.StringCommandDefault;
-import main.command.CommandException;
+import communication.ServerException;
 import main.command.CommandFactory;
 import main.command.CommandHandler;
 import main.communication.request.CommandRequest;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.*;
 public class CommandHandlerTest {
 
     @Test
-    public void testHandleCommand() throws CommandException {
+    public void testHandleCommand() throws ServerException {
         //Setup mock of command factory
         CommandFactory factory = mock(CommandFactory.class);
         CommandRequest commandRequest = new CommandRequest();

@@ -1,6 +1,7 @@
 package main.command;
 
 import command.Command;
+import communication.ServerException;
 import main.entity.EntityMap;
 import main.communication.request.CommandRequest;
 import entity.Entity;
@@ -19,24 +20,19 @@ public class CommandFactory {
      * @return
      *  the command that satisfies the request
      */
-    public Command getCommand(CommandRequest request) throws CommandException {
-        //Create the commandResult
+    public Command getCommand(CommandRequest request) throws ServerException {
+        Command command;
 
-        Command command = null;
-
+        EntityMap entities = EntityMap.getInstance();
+        Entity entity = entities.get(request.getEntityID());
+        if(entity == null) {
+            throw new ServerException("Invalid Entity ID");
+        }
         if(request.getHasParameter()) {
-            EntityMap entities = EntityMap.getInstance();
-            Entity entity = entities.get(request.getEntityID());
             command = entity.getCommand(request.getCommand(), request.getSerializedParameter());
-
         }
         else {
-            EntityMap entities = EntityMap.getInstance();
-            Entity entity = entities.get(request.getEntityID());
             command = entity.getCommand(request.getCommand());
-        }
-        if(command == null) {
-            throw new CommandException("That entity cannot preform that action");
         }
         return command;
     }

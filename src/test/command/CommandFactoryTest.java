@@ -2,11 +2,12 @@ package test.command;
 
 import command.*;
 import command.parameter.Input;
-import main.command.CommandException;
+import communication.ServerException;
 import main.command.CommandFactory;
 import main.entity.EntityMap;
 import main.communication.request.CommandRequest;
 import entity.TestEntity;
+import org.junit.After;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;
@@ -17,8 +18,14 @@ import static org.junit.Assert.*;
 
 public class CommandFactoryTest {
 
+    @After
+    public void tearDown() {
+        EntityMap entities = EntityMap.getInstance();
+        entities.clear();
+    }
+
     @Test
-    public void testTalk() throws NoSuchMethodException, CommandException {
+    public void testTalk() throws NoSuchMethodException, ServerException {
         CommandRequest request = new CommandRequest("testID", "talk", false, null);
         EntityMap entities = EntityMap.getInstance();
         Map<String, Constructor> constructorInstances = new HashMap<>();
@@ -32,14 +39,21 @@ public class CommandFactoryTest {
     }
 
     @Test
-    public void testInputCommand() throws CommandException {
+    public void testInputCommand() throws ServerException {
         CommandRequest request = new CommandRequest("testID", "input", true, "{\"string\":\"blah blah blah\", \"integer\":10}");
         EntityMap entities = EntityMap.getInstance();
         TestEntity entity = new TestEntity(request.getEntityID());
         entities.put(entity.getEntityID(), entity);
-        CommandFactory router = new CommandFactory();
-        Command command = router.getCommand(request);
+        CommandFactory factory = new CommandFactory();
+        Command command = factory.getCommand(request);
         assertEquals(command, new InputCommandDefault(new Input("blah blah blah", 10)));
+    }
+
+    @Test (expected = ServerException.class)
+    public void testBadEntityID() throws ServerException {
+        CommandRequest request = new CommandRequest("testID", "talk", false, null);
+        CommandFactory factory = new CommandFactory();
+        Command command = factory.getCommand(request);
     }
 
 }

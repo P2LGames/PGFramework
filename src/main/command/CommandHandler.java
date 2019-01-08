@@ -1,10 +1,9 @@
 package main.command;
 
 import command.Command;
+import communication.ServerException;
 import main.communication.request.CommandRequest;
 import command.CommandResult;
-
-import java.lang.reflect.Constructor;
 
 /**
  * This class handles command requests given by the client
@@ -34,7 +33,7 @@ public class CommandHandler {
         Command command;
         try {
             command = commandFactory.getCommand(request);
-        } catch (CommandException e) {
+        } catch (ServerException e) {
             return new CommandResult(e.getMessage(), false);
         }
         return command.run();

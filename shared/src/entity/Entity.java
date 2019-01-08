@@ -1,6 +1,7 @@
 package entity;
 
 import command.Command;
+import communication.ServerException;
 import util.Serializer;
 
 import java.lang.reflect.Constructor;
@@ -38,10 +39,13 @@ public abstract class Entity {
      * @return
      *  the instance that implements the correct command interface
      */
-    public Command getCommand(String commandName, String serializedParameter) {
+    public Command getCommand(String commandName, String serializedParameter) throws ServerException {
         Class<?> parameterClass = this.getParameterClassNames().get(commandName);
         Object parameter = Serializer.deserialize(serializedParameter, parameterClass);
         Constructor constructor = this.getConstructorInstances().get(commandName);
+        if(constructor == null) {
+            throw new ServerException("That entity cannot preform that action");
+        }
         Command command;
         try {
             command = (Command) constructor.newInstance(parameter);
