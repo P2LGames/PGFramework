@@ -11,7 +11,6 @@ public class EntityLoaderTest {
 
     @Test
     public void testRegisterEntity() {
-        System.out.println(System.getProperty("os.name"));
         EntityRequest request = new EntityRequest("entity.TestEntity");
         EntityLoader loader = new EntityLoader();
         EntityResult result = loader.registerEntity(request);

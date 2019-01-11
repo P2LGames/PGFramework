@@ -3,10 +3,10 @@ package test.command;
 import command.*;
 import command.parameter.Input;
 import communication.ServerException;
+import entity.TestEntity;
 import main.command.CommandFactory;
 import main.entity.EntityMap;
 import main.communication.request.CommandRequest;
-import entity.TestEntity;
 import org.junit.After;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class CommandFactoryTest {
 

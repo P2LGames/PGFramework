@@ -7,8 +7,11 @@ import main.entity.EntityMap;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Loads classes that do not exist when server is run
@@ -17,6 +20,8 @@ public class MyClassLoader extends ClassLoader {
 
     private UpdateResult result;
     private ClassLoader parent;
+    Set<String> loadedClasses = new HashSet<>();
+    Set<String> unavaiClasses = new HashSet<>();
 
     public MyClassLoader() {
         super(MyClassLoader.class.getClassLoader());
@@ -27,24 +32,33 @@ public class MyClassLoader extends ClassLoader {
     /**
      * Tries to load the class with the provided name with the parent class loader, then loads it with our class loader
      *
-     * @param name
-     *  the name of the class to be loaded
-     * @return
-     *  the class object of the class that was loaded
+     * @param name the name of the class to be loaded
+     * @return the class object of the class that was loaded
      */
     @Override
     public Class loadClass(String name) {
+        loadedClasses.remove(name);
         Class resultClass = null;
-
         try {
-            resultClass = parent.loadClass(name);
+            if (loadedClasses.contains(name) || unavaiClasses.contains(name)) {
+                return super.loadClass(name); // Use default CL cache
+            }
+            else {
+                throw new ClassNotFoundException();
+            }
         } catch (ClassNotFoundException ex) {
             try {
                 // Get the file path
-                String filePath = System.getProperty("user.dir") + File.separator + name + ".class";
+                //String filePath = System.getProperty("user.dir") + File.separator + name + ".class";
+                URL url = ClassLoader.getSystemResource(name + ".class");
+                if(url == null) {
+                    unavaiClasses.add(name);
+                    return super.loadClass(name);
+                }
+                File file = new File(url.toURI());
 
                 // Create a file with the path and get the URL
-                File file = new File(filePath);
+                //File file = new File(filePath);
                 URL myUrl = file.toURI().toURL();
 
                 // Get a connection to the file at the URL
@@ -70,29 +84,28 @@ public class MyClassLoader extends ClassLoader {
 
                 // Define our new loaded class by the name, the data, and the length of that data, return that as a class
                 resultClass = defineClass(name, classData, 0, classData.length);
+                loadedClasses.add(name);
 
-            } catch (IOException e) {
+            } catch (IOException | URISyntaxException | ClassNotFoundException e) {
+                e.printStackTrace();
                 result.setSuccess(false);
                 result.setErrorMessage(e.getMessage());
             }
         }
-
         return resultClass;
     }
 
     /**
      * Creates the .class file for the file that we will load
      *
-     * @param updateRequest
-     *  the request holding the data needed to create the class
-     * @throws Exception
-     *  IO and Process exceptions
+     * @param updateRequest the request holding the data needed to create the class
+     * @throws Exception IO and Process exceptions
      */
     private void createClassFile(UpdateRequest updateRequest) throws Exception {
         String fileName = System.getProperty("user.dir") + File.separator + updateRequest.getCommand() + ".java";
         File file = new File(fileName);
 
-        if(!file.exists()) {
+        if (!file.exists()) {
             file.createNewFile();
         }
         PrintWriter writer = new PrintWriter(file);
@@ -102,12 +115,19 @@ public class MyClassLoader extends ClassLoader {
         String osName = System.getProperty("os.name").toLowerCase();
         boolean isMacOs = osName.startsWith("mac os x");
 
-        ProcessBuilder builder;
-        if(isMacOs)
-        {
-            builder = new ProcessBuilder("/bin/bash", "-c", "javac " + file.getName()).directory(new File(System.getProperty("user.dir")));
+        URL url = ClassLoader.getSystemResource( updateRequest.getCommand() + ".class");
+        File classFile = new File(url.toURI());
+
+        if(classFile.exists()) {
+            if(classFile.delete()) {
+                System.out.println("Deleted class file");
+            }
         }
-        else {
+
+        ProcessBuilder builder;
+        if (isMacOs) {
+            builder = new ProcessBuilder("/bin/bash", "-c", "javac " + file.getName()).directory(new File(System.getProperty("user.dir")));
+        } else {
             builder = new ProcessBuilder("CMD", "/C", "javac " + file.getName()).directory(new File(System.getProperty("user.dir")));
         }
         Process compilation = builder.start();
@@ -117,30 +137,29 @@ public class MyClassLoader extends ClassLoader {
     /**
      * Updates the class instance held in an Entity object retrieved from the entities list
      *
-     * @param request
-     *  the request holding the data needed to update the clas
-     * @return
-     *  returns the result of updating the class
+     * @param request the request holding the data needed to update the clas
+     * @return returns the result of updating the class
      */
     public UpdateResult updateClass(UpdateRequest request) {
         try {
             createClassFile(request);
             Class<?> loadedClass = loadClass(request.getCommand());
-            if(!result.getSuccess()) {
+            if (!result.getSuccess()) {
                 return result;
             }
             Constructor constructor;
-            if(request.getHasParameter()) {
+            if (request.getHasParameter()) {
                 Class<?> parameterClassObject = Class.forName(request.getParameterClassName());
                 constructor = loadedClass.getDeclaredConstructor(parameterClassObject);
-            }
-            else {
+            } else {
                 constructor = loadedClass.getConstructor();
             }
             EntityMap entities = EntityMap.getInstance();
             Entity entity = entities.get(request.getEntityID());
             entity.replaceConstructor(request.getCommand(), constructor);
+            System.out.println("test");
         } catch (Exception e) {
+            e.printStackTrace();
             result.setSuccess(false);
             result.setErrorMessage(e.getMessage());
         }
