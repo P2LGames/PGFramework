@@ -11,7 +11,7 @@ public class InMemoryJavaCompiler {
 	private JavaCompiler javac;
 	private DynamicClassLoader classLoader;
 	private Iterable<String> options;
-	boolean ignoreWarnings = false;
+	boolean ignoreWarnings = true;
 
 	private Map<String, SourceCode> sourceCodes = new HashMap<String, SourceCode>();
 

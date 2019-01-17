@@ -12,10 +12,10 @@ public class inputComm extends command.InputCommand {
 
 
     @Override
-    public <T> T runOnInput() {
+    public command.returns.Output runOnInput() {
         command.returns.Output output = new command.returns.Output();
         output.setInteger(input.getInteger());
         output.setString("it worked");
-        return (T) output;
+        return output;
     }
 }
