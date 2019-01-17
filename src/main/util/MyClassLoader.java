@@ -38,6 +38,8 @@ public class MyClassLoader extends ClassLoader {
     @Override
     public Class loadClass(String name) {
         loadedClasses.remove(name);
+        EntityMap map = EntityMap.getInstance();
+        map.remove(name);
         Class resultClass = null;
         try {
             if (loadedClasses.contains(name) || unavaiClasses.contains(name)) {
@@ -85,6 +87,12 @@ public class MyClassLoader extends ClassLoader {
                 // Define our new loaded class by the name, the data, and the length of that data, return that as a class
                 resultClass = defineClass(name, classData, 0, classData.length);
                 loadedClasses.add(name);
+                if (resultClass != null) {
+                    if (resultClass.getPackage() == null) {
+                        definePackage(name.replaceAll("\\.\\w+$", ""), null, null, null, null, null, null, null);
+                    }
+                    resolveClass(resultClass);
+                }
 
             } catch (IOException | URISyntaxException | ClassNotFoundException e) {
                 e.printStackTrace();
@@ -118,12 +126,6 @@ public class MyClassLoader extends ClassLoader {
         URL url = ClassLoader.getSystemResource( updateRequest.getCommand() + ".class");
         File classFile = new File(url.toURI());
 
-        if(classFile.exists()) {
-            if(classFile.delete()) {
-                System.out.println("Deleted class file");
-            }
-        }
-
         ProcessBuilder builder;
         if (isMacOs) {
             builder = new ProcessBuilder("/bin/bash", "-c", "javac " + file.getName()).directory(new File(System.getProperty("user.dir")));
@@ -141,28 +143,28 @@ public class MyClassLoader extends ClassLoader {
      * @return returns the result of updating the class
      */
     public UpdateResult updateClass(UpdateRequest request) {
-        try {
-            createClassFile(request);
-            Class<?> loadedClass = loadClass(request.getCommand());
-            if (!result.getSuccess()) {
-                return result;
-            }
-            Constructor constructor;
-            if (request.getHasParameter()) {
-                Class<?> parameterClassObject = Class.forName(request.getParameterClassName());
-                constructor = loadedClass.getDeclaredConstructor(parameterClassObject);
-            } else {
-                constructor = loadedClass.getConstructor();
-            }
-            EntityMap entities = EntityMap.getInstance();
-            Entity entity = entities.get(request.getEntityID());
-            entity.replaceConstructor(request.getCommand(), constructor);
-            System.out.println("test");
-        } catch (Exception e) {
-            e.printStackTrace();
-            result.setSuccess(false);
-            result.setErrorMessage(e.getMessage());
-        }
+//        try {
+//            createClassFile(request);
+//            Class<?> loadedClass = loadClass(request.getCommand());
+//            if (!result.getSuccess()) {
+//                return result;
+//            }
+//            Constructor constructor;
+//            if (request.getHasParameter()) {
+//                Class<?> parameterClassObject = Class.forName(request.getParameterClassName());
+//                constructor = loadedClass.getDeclaredConstructor(parameterClassObject);
+//            } else {
+//                constructor = loadedClass.getConstructor();
+//            }
+//            EntityMap entities = EntityMap.getInstance();
+//            Entity entity = entities.get(request.getEntityID());
+//            entity.replaceConstructor(request.getCommand(), constructor);
+//            System.out.println("test");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            result.setSuccess(false);
+//            result.setErrorMessage(e.getMessage());
+//        }
         return result;
     }
 

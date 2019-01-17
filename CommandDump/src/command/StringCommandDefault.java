@@ -9,8 +9,4 @@ public class StringCommandDefault extends StringCommand {
         return "I can talk!!";
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof StringCommandDefault;
-    }
 }
