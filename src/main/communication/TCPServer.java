@@ -8,7 +8,7 @@ import main.communication.request.UpdateRequest;
 import command.Result;
 import main.entity.EntityLoader;
 import main.util.FileGetter;
-import main.util.MyClassLoader;
+import main.util.InMemoryClassLoader;
 import util.Serializer;
 
 import java.io.BufferedReader;
@@ -61,7 +61,7 @@ public class TCPServer implements Runnable {
                 else if(clientBundle.getType() == RequestType.FILE_UPDATE){
                     //If it is a update request then deserialize it accordingly, reload the new class and update it
                     UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), UpdateRequest.class);
-                    MyClassLoader loader = new MyClassLoader();
+                    InMemoryClassLoader loader = new InMemoryClassLoader();
                     result = loader.updateClass(updateRequest);
                 }
                 else if (clientBundle.getType() == RequestType.ENTITY){
