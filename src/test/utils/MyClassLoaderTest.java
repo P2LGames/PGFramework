@@ -8,6 +8,7 @@ import main.entity.EntityMap;
 import main.communication.request.UpdateRequest;
 import main.communication.result.UpdateResult;
 import entity.Entity;
+import main.util.InMemoryClassLoader;
 import main.util.MyClassLoader;
 import org.junit.After;
 import org.junit.Test;
@@ -91,9 +92,12 @@ public class MyClassLoaderTest {
         Entity entity = new TestEntity(request.getEntityID());
         entities.put(entity.getEntityID(), entity);
 
-        MyClassLoader loader = new MyClassLoader();
+//        MyClassLoader loader = new MyClassLoader();
+//
+        InMemoryClassLoader loader = new InMemoryClassLoader();
 
         UpdateResult result = loader.updateClass(request);
+
 
         assertNull(result.getErrorMessage());
         assertTrue(result.getSuccess());
@@ -129,7 +133,8 @@ public class MyClassLoaderTest {
         request.setEntityID(entity.getEntityID());
         request.setHasParameter(false);
 
-        MyClassLoader loader = new MyClassLoader();
+//        MyClassLoader loader = new MyClassLoader();
+        InMemoryClassLoader loader = new InMemoryClassLoader();
         UpdateResult updateResult = loader.updateClass(request);
         System.out.println(updateResult.getErrorMessage());
 
