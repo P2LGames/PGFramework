@@ -23,7 +23,7 @@ public class EntityLoader {
             Class<?> loadedClass = Class.forName(request.getEntityType());
             entity = (Entity) loadedClass.newInstance();
         } catch (Exception e) {
-            System.out.println("Fatal error");
+            System.out.println(e.getMessage());
             return new EntityResult(false, e.getMessage());
         }
         EntityMap entityMap = EntityMap.getInstance();

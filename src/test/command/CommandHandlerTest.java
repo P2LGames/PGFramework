@@ -21,7 +21,7 @@ public class CommandHandlerTest {
         CommandFactory factory = mock(CommandFactory.class);
         CommandRequest commandRequest = new CommandRequest();
         commandRequest.setCommand("testCommand");
-        commandRequest.setEntityID("testID");
+        commandRequest.setEntityId("testID");
         commandRequest.setHasParameter(false);
         when(factory.getCommand(commandRequest)).thenReturn(new StringCommandDefault());
 

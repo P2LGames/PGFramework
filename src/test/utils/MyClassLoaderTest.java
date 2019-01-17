@@ -43,11 +43,11 @@ public class MyClassLoaderTest {
                 "\n" +
                 "}\n");
         request.setCommand("talk");
-        request.setEntityID("testID1");
+        request.setEntityId("testID1");
         request.setHasParameter(false);
 
         EntityMap entities = EntityMap.getInstance();
-        Entity entity = new TestEntity(request.getEntityID());
+        Entity entity = new TestEntity(request.getEntityId());
         entities.put(entity.getEntityID(), entity);
 
         InMemoryClassLoader loader = new InMemoryClassLoader();
@@ -83,12 +83,12 @@ public class MyClassLoaderTest {
                 "    }\n" +
                 "}");
         request.setCommand("inputComm");
-        request.setEntityID("testID2");
+        request.setEntityId("testID2");
         request.setHasParameter(true);
         request.setParameterClassName("command.parameter.Input");
 
         EntityMap entities = EntityMap.getInstance();
-        Entity entity = new TestEntity(request.getEntityID());
+        Entity entity = new TestEntity(request.getEntityId());
         entities.put(entity.getEntityID(), entity);
         InMemoryClassLoader loader = new InMemoryClassLoader();
 
@@ -126,18 +126,18 @@ public class MyClassLoaderTest {
                 "\n" +
                 "}\n");
         request.setCommand("talk");
-        request.setEntityID(entity.getEntityID());
+        request.setEntityId(entity.getEntityID());
         request.setHasParameter(false);
 
 //        MyClassLoader loader = new MyClassLoader();
         InMemoryClassLoader loader = new InMemoryClassLoader();
         UpdateResult updateResult = loader.updateClass(request);
-        System.out.println(updateResult.getErrorMessage());
+        System.out.println("Error Message: " + updateResult.getErrorMessage());
 
         // Get the command and the return value
         CommandRequest commandRequest = new CommandRequest();
         commandRequest.setCommand("talk");
-        commandRequest.setEntityID(entity.getEntityID());
+        commandRequest.setEntityId(entity.getEntityID());
         commandRequest.setHasParameter(false);
 
         CommandHandler handler = new CommandHandler();

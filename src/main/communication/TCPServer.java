@@ -120,13 +120,13 @@ public class TCPServer implements Runnable {
                     CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), CommandRequest.class);
                     result = commandHandler.handleCommand(commandRequest);
                 }
-                else if(clientBundle.getType() == RequestType.FILE_UPDATE){
+                else if(clientBundle.getType() == RequestType.FILE_UPDATE) {
                     // If it is a update request then deserialize it accordingly, reload the new class and update it
                     UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), UpdateRequest.class);
                     InMemoryClassLoader loader = new InMemoryClassLoader();
                     result = loader.updateClass(updateRequest);
                 }
-                else if (clientBundle.getType() == RequestType.ENTITY){
+                else if (clientBundle.getType() == RequestType.ENTITY) {
                     // If it is a entity request then deserialize it accordingly, register the entity with the server
                     EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), EntityRequest.class);
                     EntityLoader loader = new EntityLoader();

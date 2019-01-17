@@ -12,7 +12,7 @@ public class SerializerTest {
     public void testSerialize(){
         //Test command request serialization
         CommandRequest request = new CommandRequest();
-        request.setEntityID("testID");
+        request.setEntityId("testID");
         request.setCommand("testCommand");
         String serializerRequestString = Serializer.serialize(request);
         String actualRequestString = "{\"entityID\":\"testID\",\"command\":\"testCommand\"}";
@@ -35,7 +35,7 @@ public class SerializerTest {
     public void testDeserialize() {
         //Test command request deserialization
         CommandRequest request = new CommandRequest();
-        request.setEntityID("testID");
+        request.setEntityId("testID");
         request.setCommand("testCommand");
         String requestToDeserialize = "{\"entityID\":\"testID\",\"command\":\"testCommand\"}";
         CommandRequest deserializedRequest = Serializer.deserialize(requestToDeserialize, CommandRequest.class);

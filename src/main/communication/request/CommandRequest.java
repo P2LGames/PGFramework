@@ -8,7 +8,7 @@ public class CommandRequest extends Request {
     private String serializedParameter;
 
     public CommandRequest( String entityID, String command, Boolean hasParameter, String serializedParameter) {
-        this.setEntityID(entityID);
+        this.setEntityId(entityID);
         this.setCommand(command);
         this.hasParameter = hasParameter;
         this.serializedParameter = serializedParameter;
@@ -24,7 +24,7 @@ public class CommandRequest extends Request {
         if(!this.getCommand().equals(that.getCommand())) {
             return false;
         }
-        return this.getEntityID().equals(that.getEntityID());
+        return this.getEntityId().equals(that.getEntityId());
     }
 
     public Boolean getHasParameter() {

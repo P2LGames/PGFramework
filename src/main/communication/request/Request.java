@@ -4,15 +4,15 @@ package main.communication.request;
  * Super class of file and command requests
  */
 public abstract class Request {
-    private String entityID;
+    private String entityId;
     private String command;
 
-    public String getEntityID() {
-        return entityID;
+    public String getEntityId() {
+        return entityId;
     }
 
-    public void setEntityID(String entityID) {
-        this.entityID = entityID;
+    public void setEntityId(String entityId) {
+        this.entityId = entityId;
     }
 
     public String getCommand() {

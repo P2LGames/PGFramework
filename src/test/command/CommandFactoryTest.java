@@ -31,7 +31,7 @@ public class CommandFactoryTest {
         Map<String, Constructor> constructorInstances = new HashMap<>();
         constructorInstances.put("talk", StringCommandDefault.class.getConstructor());
         Map<String, Class> parameterClassNames = new HashMap<>();
-        TestEntity entity = new TestEntity(request.getEntityID(), constructorInstances, parameterClassNames);
+        TestEntity entity = new TestEntity(request.getEntityId(), constructorInstances, parameterClassNames);
         entities.put(entity.getEntityID(), entity);
         CommandFactory factory = new CommandFactory();
         Command command = factory.getCommand(request);
@@ -42,7 +42,7 @@ public class CommandFactoryTest {
     public void testInputCommand() throws ServerException {
         CommandRequest request = new CommandRequest("testID", "input", true, "{\"string\":\"blah blah blah\", \"integer\":10}");
         EntityMap entities = EntityMap.getInstance();
-        TestEntity entity = new TestEntity(request.getEntityID());
+        TestEntity entity = new TestEntity(request.getEntityId());
         entities.put(entity.getEntityID(), entity);
         CommandFactory factory = new CommandFactory();
         Command command = factory.getCommand(request);

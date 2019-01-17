@@ -13,6 +13,8 @@ public class InMemoryClassLoader {
         UpdateResult result = new UpdateResult();
         InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance();
 
+        System.out.println(request.getFileContents());
+
         try {
             Class<?> loadedClass = compiler.compile(request.getCommand(), request.getFileContents());
             if (!result.getSuccess()) {
@@ -26,7 +28,7 @@ public class InMemoryClassLoader {
                 constructor = loadedClass.getConstructor();
             }
             EntityMap entities = EntityMap.getInstance();
-            Entity entity = entities.get(request.getEntityID());
+            Entity entity = entities.get(request.getEntityId());
             entity.replaceConstructor(request.getCommand(), constructor);
         } catch (Exception e) {
             e.printStackTrace();
