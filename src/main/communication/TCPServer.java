@@ -9,7 +9,6 @@ import command.Result;
 import main.entity.EntityLoader;
 import main.util.FileGetter;
 import main.util.InMemoryClassLoader;
-import main.util.MyClassLoader;
 import util.Serializer;
 
 import java.io.BufferedReader;
