@@ -5,6 +5,10 @@ import main.communication.request.UpdateRequest;
 import main.communication.result.UpdateResult;
 import main.entity.EntityMap;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 
 public class InMemoryClassLoader {
@@ -20,6 +24,7 @@ public class InMemoryClassLoader {
             if (!result.getSuccess()) {
                 return result;
             }
+            this.saveSourceCode(request, loadedClass);
             Constructor constructor;
             if (request.getHasParameter()) {
                 Class<?> parameterClassObject = Class.forName(request.getParameterClassName());
@@ -36,5 +41,22 @@ public class InMemoryClassLoader {
             result.setErrorMessage(e.getMessage());
         }
         return result;
+    }
+
+    private void saveSourceCode(UpdateRequest request, Class<?> loadedClass) {
+        String packageName = loadedClass.getPackageName();
+        if (packageName.equals("")) {
+            packageName = "NoPackage";
+        }
+        String path = System.getProperty("user.dir") + File.separator + "UserFiles" + File.separator + packageName;
+        new File(path).mkdirs();
+        String fileName = path + File.separator + loadedClass.getSimpleName() + ".java";
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
+            writer.write(request.getFileContents());
+            writer.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
