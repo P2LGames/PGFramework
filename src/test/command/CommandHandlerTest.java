@@ -28,7 +28,7 @@ public class CommandHandlerTest {
         CommandHandler handler = new CommandHandler();
         handler.setCommandFactory(factory);
         CommandResult result = handler.handleCommand(commandRequest);
-        CommandResult expectedCommandResult = new CommandResult("I can talk!!");
+        CommandResult expectedCommandResult = new CommandResult("I can talk, yay!!");
 
 
         assertEquals(result, expectedCommandResult);
