@@ -17,8 +17,6 @@ public class InMemoryClassLoader {
         UpdateResult result = new UpdateResult();
         InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance();
 
-        System.out.println(request.getFileContents());
-
         try {
             Class<?> loadedClass = compiler.compile(request.getCommand(), request.getFileContents());
             if (!result.getSuccess()) {
@@ -48,6 +46,7 @@ public class InMemoryClassLoader {
         if (packageName.equals("")) {
             packageName = "NoPackage";
         }
+        packageName = packageName.replace('.', File.separatorChar);
         String path = System.getProperty("user.dir") + File.separator + "UserFiles" + File.separator + packageName;
         new File(path).mkdirs();
         String fileName = path + File.separator + loadedClass.getSimpleName() + ".java";

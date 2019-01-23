@@ -12,6 +12,7 @@ import main.util.InMemoryClassLoader;
 import org.junit.After;
 import org.junit.Test;
 
+import java.io.*;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -98,6 +99,53 @@ public class MyClassLoaderTest {
         assertNull(result.getErrorMessage());
         assertTrue(result.getSuccess());
     }
+
+    @Test
+    public void packagedClassTest() {
+        UpdateRequest request = new UpdateRequest();
+        request.setFileContents("\n" +
+                "package test.location;" +
+                "\n" +
+                "import command.StringCommand;\n" +
+                "\n" +
+                "/**\n" +
+                " * An example implementation of the Talk command\n" +
+                " */\n" +
+                "public class talk extends command.StringCommand {\n" +
+                "    @Override\n" +
+                "    public String getString() {\n" +
+                "        return \"I can talk!!\";\n" +
+                "    }\n" +
+                "\n" +
+                "\n" +
+                "}\n");
+        request.setCommand("test.location.talk");
+        request.setEntityId("testID1");
+        request.setHasParameter(false);
+
+        EntityMap entities = EntityMap.getInstance();
+        Entity entity = new TestEntity(request.getEntityId());
+        entities.put(entity.getEntityID(), entity);
+        InMemoryClassLoader loader = new InMemoryClassLoader();
+
+        UpdateResult result = loader.updateClass(request);
+
+        assertNull(result.getErrorMessage());
+        assertTrue(result.getSuccess());
+
+        try {
+            String expectedFileName = System.getProperty("user.dir") + File.separator + "UserFiles" + File.separator
+                    + "test" + File.separator + "location" + File.separator + "talk.java";
+            BufferedReader reader = new BufferedReader(new FileReader(expectedFileName));
+            reader.readLine();
+            assertEquals("package test.location;", reader.readLine());
+        } catch (FileNotFoundException e) {
+            fail("Java file was not created in the expected location");
+        } catch (IOException e) {
+            fail("Could not read Java file");
+        }
+    }
+
 
     @Test
     public void updateClassReturnTest() throws ServerException {
