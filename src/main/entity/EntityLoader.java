@@ -21,7 +21,7 @@ public class EntityLoader {
         Entity entity;
         try {
             Class<?> loadedClass = Class.forName(request.getEntityType());
-            entity = (Entity) loadedClass.newInstance();
+            entity = (Entity) loadedClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return new EntityResult(false, e.getMessage());
