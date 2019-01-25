@@ -22,8 +22,15 @@ public class FileGetter {
      *  the data structure holding the success of the operation and the file contents if it was successful
      */
     public FileResult getFile(FileRequest request) {
-        String fileName = System.getProperty("user.dir") + File.separator + request.getCommandName() + ".java";
-        File file = new File(fileName);
+        String fileName = request.getCommandName();
+        if (fileName.contains(".")) {
+            fileName = fileName.replace('.', File.separatorChar);
+        } else {
+            fileName = "NoPackage" + File.separator + fileName;
+        }
+        fileName += ".java";
+        String fileLocation = System.getProperty("user.dir") + File.separator + "UserFiles" + File.separator;
+        File file = new File(fileLocation + fileName);
         Scanner scanner;
         try {
             scanner = new Scanner(file).useDelimiter("\\Z");
