@@ -37,7 +37,7 @@ public class ExtendedStandardJavaFileManager extends
 	@Override
 	public JavaFileObject getJavaFileForOutput(
 			Location location, String className,
-			JavaFileObject.Kind kind, FileObject sibling) throws IOException {
+			JavaFileObject.Kind kind, FileObject sibling) {
 
 		try {
 			CompiledCode innerClass = new CompiledCode(className);

@@ -11,8 +11,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 
+
+/**
+ * A class loader that does not use .java files
+ */
 public class InMemoryClassLoader {
 
+    /**
+     * Attempts to compile and load a class and returns the result
+     *
+     * @param request
+     *   The request object containing the class name and source code
+     * @return
+     *   The result object the reports a failure or contains the loaded class
+     */
     public UpdateResult updateClass(UpdateRequest request) {
         UpdateResult result = new UpdateResult();
         InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance();
@@ -41,6 +53,13 @@ public class InMemoryClassLoader {
         return result;
     }
 
+    /**
+     * Saves the source code for a compiled class in a .java file for reference
+     * @param request
+     *    The request object containing the class name and source code
+     * @param loadedClass
+     *    The compiled class object
+     */
     private void saveSourceCode(UpdateRequest request, Class<?> loadedClass) {
         String packageName = loadedClass.getPackageName();
         if (packageName.equals("")) {

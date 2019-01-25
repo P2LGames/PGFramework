@@ -24,6 +24,13 @@ public class InMemoryJavaCompiler {
 		this.classLoader = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
 	}
 
+	/**
+	 * Changes the classloader used internally
+	 * @param parent
+	 * 	 The parent classloader
+	 * @return
+	 *   The InMemoryJavaCompiler that uses the new classloader
+	 */
 	public InMemoryJavaCompiler useParentClassLoader(ClassLoader parent) {
 		this.classLoader = new DynamicClassLoader(parent);
 		return this;
@@ -40,7 +47,9 @@ public class InMemoryJavaCompiler {
 	 * Options used by the compiler, e.g. '-Xlint:unchecked'.
 	 *
 	 * @param options
+	 *   The new options to use
 	 * @return
+	 *   The InMemoryJavaCompiler that uses the new classloader
 	 */
 	public InMemoryJavaCompiler useOptions(String... options) {
 		this.options = Arrays.asList(options);
@@ -52,6 +61,7 @@ public class InMemoryJavaCompiler {
 	 * warnings.
 	 *
 	 * @return
+	 *    The InMemoryJavaCompiler that ignores warnings
 	 */
 	public InMemoryJavaCompiler ignoreWarnings() {
 		ignoreWarnings = true;
@@ -63,6 +73,7 @@ public class InMemoryJavaCompiler {
 	 *
 	 * @return Map containing instances of all compiled classes
 	 * @throws Exception
+	 *    Throws exception if code is unable to be compiled
 	 */
 	public Map<String, Class<?>> compileAll() throws Exception {
 		if (sourceCodes.size() == 0) {
