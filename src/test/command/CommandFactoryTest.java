@@ -3,10 +3,10 @@ package test.command;
 import command.*;
 import command.parameter.Input;
 import communication.ServerException;
+import entity.TestEntity;
 import main.command.CommandFactory;
 import main.entity.EntityMap;
 import main.communication.request.CommandRequest;
-import entity.TestEntity;
 import org.junit.After;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class CommandFactoryTest {
 
@@ -31,7 +31,7 @@ public class CommandFactoryTest {
         Map<String, Constructor> constructorInstances = new HashMap<>();
         constructorInstances.put("talk", StringCommandDefault.class.getConstructor());
         Map<String, Class> parameterClassNames = new HashMap<>();
-        TestEntity entity = new TestEntity(request.getEntityID(), constructorInstances, parameterClassNames);
+        TestEntity entity = new TestEntity(request.getEntityId(), constructorInstances, parameterClassNames);
         entities.put(entity.getEntityID(), entity);
         CommandFactory factory = new CommandFactory();
         Command command = factory.getCommand(request);
@@ -42,7 +42,7 @@ public class CommandFactoryTest {
     public void testInputCommand() throws ServerException {
         CommandRequest request = new CommandRequest("testID", "input", true, "{\"string\":\"blah blah blah\", \"integer\":10}");
         EntityMap entities = EntityMap.getInstance();
-        TestEntity entity = new TestEntity(request.getEntityID());
+        TestEntity entity = new TestEntity(request.getEntityId());
         entities.put(entity.getEntityID(), entity);
         CommandFactory factory = new CommandFactory();
         Command command = factory.getCommand(request);

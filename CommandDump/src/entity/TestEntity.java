@@ -1,14 +1,14 @@
 package entity;
 
-import command.parameter.Input;
 import command.InputCommandDefault;
 import command.StringCommandDefault;
+import command.parameter.Input;
 
 import java.lang.reflect.Constructor;
 import java.util.Map;
 
 /**
- * An example of a concrete implementation of the
+ * An example of a concrete implementation of the entity class
  */
 public class TestEntity extends Entity {
     /**

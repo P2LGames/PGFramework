@@ -6,11 +6,14 @@ package command;
 public class StringCommandDefault extends StringCommand {
     @Override
     public String getString() {
-        return "I can talk!!";
+        return "I can talk, yay!!";
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof StringCommandDefault;
+        if(obj instanceof StringCommandDefault) {
+            return true;
+        }
+        return false;
     }
 }

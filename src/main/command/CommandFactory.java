@@ -24,7 +24,7 @@ public class CommandFactory {
         Command command;
 
         EntityMap entities = EntityMap.getInstance();
-        Entity entity = entities.get(request.getEntityID());
+        Entity entity = entities.get(request.getEntityId());
         if(entity == null) {
             throw new ServerException("Invalid Entity ID");
         }

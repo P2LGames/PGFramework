@@ -29,7 +29,7 @@ public class TCPServerTest {
         CommandResult expectedCommandResult = new CommandResult("I can talk!!");
         CommandRequest commandRequest = new CommandRequest();
         commandRequest.setCommand("testCommand");
-        commandRequest.setEntityID("testID");
+        commandRequest.setEntityId("testID");
         commandRequest.setHasParameter(false);
         when(handler.handleCommand(commandRequest)).thenReturn(expectedCommandResult);
 
