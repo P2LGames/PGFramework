@@ -2,13 +2,10 @@ package entity;
 
 import command.StringCommandDefault;
 
-import java.lang.reflect.Constructor;
-import java.util.Map;
-
 /**
  * An example of a concrete implementation of the
  */
-public class TalkingEntity extends GenericCommandEntity {
+public class TalkingEntity extends GenericEntity {
     /**
      * This constructor will initialize the defaults for any entity of this type
      *

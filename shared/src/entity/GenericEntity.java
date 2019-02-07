@@ -1,6 +1,5 @@
 package entity;
 
-import command.Command;
 import command.GenericCommand;
 import communication.ServerException;
 
@@ -8,15 +7,18 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class GenericCommandEntity {
+/**
+ * The class representing a reprogrammable entity
+ */
+public abstract class GenericEntity {
     private String entityID;
     private Map<String, GenericCommand> commandMap;
 
-    GenericCommandEntity() {
+    GenericEntity() {
         this.commandMap = new HashMap<>();
     }
 
-    GenericCommandEntity(String entityID) {
+    GenericEntity(String entityID) {
         this.entityID = entityID;
         this.commandMap = new HashMap<>();
     }
@@ -25,6 +27,15 @@ public abstract class GenericCommandEntity {
         return entityID;
     }
 
+    /**
+     * Gets the command with the name provided
+     *
+     * @param commandName the name of the command to be retrieved
+     *
+     * @return the generic command object described by the name
+     *
+     * @throws ServerException thrown when a deep copy of the command is unable to be made
+     */
     public GenericCommand getCommand(String commandName) throws ServerException {
         try {
             return commandMap.get(commandName).clone();
@@ -33,13 +44,26 @@ public abstract class GenericCommandEntity {
         }
     }
 
+    /**
+     * Updates the current implementation of a command
+     *
+     * @param commandName the name of the command to be updated
+     * @param command the generic command instance to update it to
+     */
     public void updateCommand(String commandName, GenericCommand command) {
         commandMap.put(commandName, command);
     }
 
+    /**
+     * Makes a default implementation for a command
+     *
+     * @param commandName the name of the command
+     * @param commandMethod the method to be run with that command
+     */
     public void makeDefault(String commandName, Method commandMethod) {
         GenericCommand command = new GenericCommand();
         command.setMethod(commandMethod);
+        command.setEntity(this);
         commandMap.put(commandName, command);
     }
 }

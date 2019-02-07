@@ -1,8 +1,7 @@
 package main.util;
 
-import command.Command;
 import command.GenericCommand;
-import entity.GenericCommandEntity;
+import entity.GenericEntity;
 import main.communication.request.UpdateRequest;
 import main.communication.result.UpdateResult;
 import main.entity.GenericEntityMap;
@@ -33,7 +32,8 @@ public class GenericInMemoryClassLoader {
             command.setMethod(loadedClass.getMethod(request.getMethodName(), request.getParameterTypes()));
             command.setClassObject(loadedClass.getConstructor().newInstance());
             GenericEntityMap entities = GenericEntityMap.getInstance();
-            GenericCommandEntity entity = entities.get(request.getEntityId());
+            GenericEntity entity = entities.get(request.getEntityId());
+            command.setEntity(entity);
             entity.updateCommand(request.getCommand(), command);
         } catch (Exception e) {
             result.setSuccess(false);

@@ -1,6 +1,6 @@
 package test.utils;
 
-import entity.GenericCommandEntity;
+import entity.GenericEntity;
 import entity.TestEntity;
 import main.communication.request.FileRequest;
 import main.communication.request.UpdateRequest;
@@ -68,9 +68,9 @@ public class FileGetterTest {
         messyRequest.setEntityId("test3");
 
         GenericEntityMap entities = GenericEntityMap.getInstance();
-        GenericCommandEntity packageEntity = new TestEntity(packageRequest.getEntityId());
-        GenericCommandEntity nonPackageEntity = new TestEntity(nonPackageRequest.getEntityId());
-        GenericCommandEntity messyEntity = new TestEntity(messyRequest.getEntityId());
+        GenericEntity packageEntity = new TestEntity(packageRequest.getEntityId());
+        GenericEntity nonPackageEntity = new TestEntity(nonPackageRequest.getEntityId());
+        GenericEntity messyEntity = new TestEntity(messyRequest.getEntityId());
         entities.put(packageEntity.getEntityID(), packageEntity);
         entities.put(nonPackageEntity.getEntityID(), nonPackageEntity);
         entities.put(messyEntity.getEntityID(), messyEntity);

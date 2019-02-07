@@ -1,7 +1,7 @@
 package test.utils;
 import command.CommandResult;
 import communication.ServerException;
-import entity.GenericCommandEntity;
+import entity.GenericEntity;
 import entity.TestEntity;
 import main.command.GenericCommandHandler;
 import main.communication.request.CommandRequest;
@@ -50,7 +50,7 @@ public class MyClassLoaderTest {
         request.setParameterTypes(new Class<?>[0]);
 
         GenericEntityMap entities = GenericEntityMap.getInstance();
-        GenericCommandEntity entity = new TestEntity(request.getEntityId());
+        GenericEntity entity = new TestEntity(request.getEntityId());
         entities.put(entity.getEntityID(), entity);
 
         GenericInMemoryClassLoader loader = new GenericInMemoryClassLoader();
@@ -91,7 +91,7 @@ public class MyClassLoaderTest {
 //        request.setParameterClassName("command.parameter.Input");
 //
 //        GenericEntityMap entities = GenericEntityMap.getInstance();
-//        GenericCommandEntity entity = new TestEntity(request.getEntityId());
+//        GenericEntity entity = new TestEntity(request.getEntityId());
 //        entities.put(entity.getEntityID(), entity);
 //        GenericInMemoryClassLoader loader = new GenericInMemoryClassLoader();
 //
@@ -129,7 +129,7 @@ public class MyClassLoaderTest {
 
 
         GenericEntityMap entities = GenericEntityMap.getInstance();
-        GenericCommandEntity entity = new TestEntity(request.getEntityId());
+        GenericEntity entity = new TestEntity(request.getEntityId());
         entities.put(entity.getEntityID(), entity);
         GenericInMemoryClassLoader loader = new GenericInMemoryClassLoader();
 
@@ -156,7 +156,7 @@ public class MyClassLoaderTest {
     public void updateClassReturnTest() throws ServerException {
 
         GenericEntityMap entities = GenericEntityMap.getInstance();
-        GenericCommandEntity entity = new TestEntity("testID3");
+        GenericEntity entity = new TestEntity("testID3");
         entities.put(entity.getEntityID(), entity);
 
         Random random = new Random();

@@ -1,13 +1,18 @@
 package command;
 
+import entity.GenericEntity;
+
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * A generic command class that defines behavior for a command
+ */
 public class GenericCommand implements Command, Cloneable {
     private Object classObject;
     private Method method;
     private Object[] _paramValues;
+    private GenericEntity entity;
 
     public GenericCommand() {
 
@@ -21,10 +26,23 @@ public class GenericCommand implements Command, Cloneable {
         this.method = method;
     }
 
-    public void set_paramValues(Object[] _paramValues) {
-        this._paramValues = _paramValues;
+    public void setParameters(Object[] parameters) {
+        _paramValues = parameters;
     }
 
+    public void setEntity(GenericEntity entity) {
+        this.entity = entity;
+    }
+
+    public GenericEntity getEntity() {
+        return entity;
+    }
+
+    /**
+     * Uses the generic definition of a command and the provided parameter values to run the command
+     *
+     * @return the result of the command being run
+     */
     @Override
     public CommandResult run() {
         CommandResult result = new CommandResult();
@@ -37,10 +55,6 @@ public class GenericCommand implements Command, Cloneable {
             result.setSuccess(false);
         }
         return result;
-    }
-
-    public void setParameters(Object[] parameters) {
-        _paramValues = parameters;
     }
 
     public GenericCommand clone() throws CloneNotSupportedException {

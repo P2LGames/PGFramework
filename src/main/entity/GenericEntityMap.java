@@ -1,11 +1,13 @@
 package main.entity;
 
-import entity.Entity;
-import entity.GenericCommandEntity;
+import entity.GenericEntity;
 
 import java.util.HashMap;
 
-public class GenericEntityMap extends HashMap<String, GenericCommandEntity> {
+/**
+ * A class to map entity ids to their entity object
+ */
+public class GenericEntityMap extends HashMap<String, GenericEntity> {
     private static GenericEntityMap instance;
 
     private GenericEntityMap() {

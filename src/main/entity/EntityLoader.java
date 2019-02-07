@@ -1,6 +1,6 @@
 package main.entity;
 
-import entity.GenericCommandEntity;
+import entity.GenericEntity;
 import main.communication.request.EntityRequest;
 import main.communication.result.EntityResult;
 
@@ -18,10 +18,10 @@ public class EntityLoader {
      *  the data structure holding the success of the operation and the entity id if it was successful
      */
     public synchronized EntityResult registerEntity(EntityRequest request) {
-        GenericCommandEntity entity;
+        GenericEntity entity;
         try {
             Class<?> loadedClass = Class.forName(request.getEntityType());
-            entity = (GenericCommandEntity) loadedClass.getDeclaredConstructor().newInstance();
+            entity = (GenericEntity) loadedClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return new EntityResult(false, e.getMessage());
