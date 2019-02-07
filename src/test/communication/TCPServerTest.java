@@ -1,6 +1,6 @@
 package test.communication;
 
-import main.command.CommandHandler;
+import main.command.GenericCommandHandler;
 import main.communication.ClientBundle;
 import main.communication.RequestType;
 import command.CommandResult;
@@ -25,12 +25,11 @@ public class TCPServerTest {
     @Test
     public void testConnection() throws Exception {
         //Mock the command factory
-        CommandHandler handler = mock(CommandHandler.class);
+        GenericCommandHandler handler = mock(GenericCommandHandler.class);
         CommandResult expectedCommandResult = new CommandResult("I can talk!!");
         CommandRequest commandRequest = new CommandRequest();
         commandRequest.setCommand("testCommand");
         commandRequest.setEntityId("testID");
-        commandRequest.setHasParameter(false);
         when(handler.handleCommand(commandRequest)).thenReturn(expectedCommandResult);
 
 

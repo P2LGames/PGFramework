@@ -1,6 +1,6 @@
 package main.communication;
 
-import main.command.CommandHandler;
+import main.command.GenericCommandHandler;
 import main.communication.request.CommandRequest;
 import main.communication.request.EntityRequest;
 import main.communication.request.FileRequest;
@@ -8,7 +8,7 @@ import main.communication.request.UpdateRequest;
 import command.Result;
 import main.entity.EntityLoader;
 import main.util.FileGetter;
-import main.util.InMemoryClassLoader;
+import main.util.GenericInMemoryClassLoader;
 import util.Serializer;
 
 import java.io.BufferedReader;
@@ -24,14 +24,14 @@ import java.net.Socket;
 public class TCPServer implements Runnable {
 
     private Boolean shouldRun;
-    private CommandHandler commandHandler;
+    private GenericCommandHandler commandHandler;
 
     public TCPServer() {
         this.shouldRun = true;
-        this.commandHandler = new CommandHandler();
+        this.commandHandler = new GenericCommandHandler();
     }
 
-    public void setCommandHandler(CommandHandler commandHandler) {
+    public void setCommandHandler(GenericCommandHandler commandHandler) {
         this.commandHandler = commandHandler;
     }
 
@@ -123,7 +123,7 @@ public class TCPServer implements Runnable {
                 else if(clientBundle.getType() == RequestType.FILE_UPDATE) {
                     // If it is a update request then deserialize it accordingly, reload the new class and update it
                     UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), UpdateRequest.class);
-                    InMemoryClassLoader loader = new InMemoryClassLoader();
+                    GenericInMemoryClassLoader loader = new GenericInMemoryClassLoader();
                     result = loader.updateClass(updateRequest);
                 }
                 else if (clientBundle.getType() == RequestType.ENTITY) {

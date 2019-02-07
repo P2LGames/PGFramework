@@ -4,14 +4,17 @@ package main.communication.request;
  * The request for a command from the client
  */
 public class CommandRequest extends Request {
-    private Boolean hasParameter;
-    private String serializedParameter;
+    private Object[] parameters;
 
-    public CommandRequest( String entityID, String command, Boolean hasParameter, String serializedParameter) {
+    public CommandRequest( String entityID, String command) {
         this.setEntityId(entityID);
         this.setCommand(command);
-        this.hasParameter = hasParameter;
-        this.serializedParameter = serializedParameter;
+    }
+
+    public CommandRequest( String entityID, String command, Object[] parameters) {
+        this.setEntityId(entityID);
+        this.setCommand(command);
+        this.parameters = parameters;
     }
 
     public CommandRequest() {}
@@ -27,15 +30,11 @@ public class CommandRequest extends Request {
         return this.getEntityId().equals(that.getEntityId());
     }
 
-    public Boolean getHasParameter() {
-        return hasParameter;
+    public void setParameters(Object[] parameters) {
+        this.parameters = parameters;
     }
 
-    public String getSerializedParameter() {
-        return serializedParameter;
-    }
-
-    public void setHasParameter(Boolean hasParameter) {
-        this.hasParameter = hasParameter;
+    public Object[] getParameters() {
+        return parameters;
     }
 }

@@ -1,21 +1,18 @@
 package main.util;
 
-import entity.Entity;
+import command.Command;
+import command.GenericCommand;
+import entity.GenericCommandEntity;
 import main.communication.request.UpdateRequest;
 import main.communication.result.UpdateResult;
-import main.entity.EntityMap;
+import main.entity.GenericEntityMap;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 
-
-/**
- * A class loader that does not use .java files
- */
-public class InMemoryClassLoader {
+public class GenericInMemoryClassLoader {
 
     /**
      * Attempts to compile and load a class and returns the result
@@ -30,23 +27,15 @@ public class InMemoryClassLoader {
         InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance();
 
         try {
-            Class<?> loadedClass = compiler.compile(request.getCommand(), request.getFileContents());
-            if (!result.getSuccess()) {
-                return result;
-            }
+            Class<?> loadedClass = compiler.compile(request.getClassName(), request.getFileContents());
             this.saveSourceCode(request, loadedClass);
-            Constructor constructor;
-            if (request.getHasParameter()) {
-                Class<?> parameterClassObject = Class.forName(request.getParameterClassName());
-                constructor = loadedClass.getDeclaredConstructor(parameterClassObject);
-            } else {
-                constructor = loadedClass.getConstructor();
-            }
-            EntityMap entities = EntityMap.getInstance();
-            Entity entity = entities.get(request.getEntityId());
-            entity.replaceConstructor(request.getCommand(), constructor);
+            GenericCommand command = new GenericCommand();
+            command.setMethod(loadedClass.getMethod(request.getMethodName(), request.getParameterTypes()));
+            command.setClassObject(loadedClass.getConstructor().newInstance());
+            GenericEntityMap entities = GenericEntityMap.getInstance();
+            GenericCommandEntity entity = entities.get(request.getEntityId());
+            entity.updateCommand(request.getCommand(), command);
         } catch (Exception e) {
-            e.printStackTrace();
             result.setSuccess(false);
             result.setErrorMessage(e.getMessage());
         }
@@ -77,4 +66,5 @@ public class InMemoryClassLoader {
             System.out.println(e.getMessage());
         }
     }
+
 }

@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * An example of a concrete implementation of the
  */
-public class TalkingEntity extends Entity {
+public class TalkingEntity extends GenericCommandEntity {
     /**
      * This constructor will initialize the defaults for any entity of this type
      *
@@ -16,21 +16,17 @@ public class TalkingEntity extends Entity {
     public TalkingEntity() {
         super();
         try {
-            this.makeDefault("talk", StringCommandDefault.class); } catch (Exception e) {
-            System.out.println("Fatal Error");
+            this.makeDefault("talk", StringCommandDefault.class.getMethod("getString")); } catch (Exception e) {
+            System.out.println("Unable to create TalkingEntity\n" + e.getMessage());
         }
     }
 
     public TalkingEntity(String entityID) {
         super(entityID);
         try {
-            this.replaceConstructor("talk", StringCommandDefault.class.getConstructor());
+            this.makeDefault("talk", StringCommandDefault.class.getMethod("getString"));
         } catch (Exception e) {
-            System.out.println("Fatal Error");
+            System.out.println("Unable to create testEntity\n" + e.getMessage());
         }
-    }
-
-    public TalkingEntity(String entityID, Map<String, Constructor> constructorInstances, Map<String, Class> parameterClassNames) {
-        super(entityID, constructorInstances, parameterClassNames);
     }
 }

@@ -4,9 +4,9 @@ import command.*;
 import command.parameter.Input;
 import communication.ServerException;
 import entity.TestEntity;
-import main.command.CommandFactory;
-import main.entity.EntityMap;
+import main.command.GenericCommandFactory;
 import main.communication.request.CommandRequest;
+import main.entity.GenericEntityMap;
 import org.junit.After;
 import org.junit.Test;
 
@@ -20,39 +20,38 @@ public class CommandFactoryTest {
 
     @After
     public void tearDown() {
-        EntityMap entities = EntityMap.getInstance();
+        GenericEntityMap entities = GenericEntityMap.getInstance();
         entities.clear();
     }
 
     @Test
     public void testTalk() throws NoSuchMethodException, ServerException {
-        CommandRequest request = new CommandRequest("testID", "talk", false, null);
-        EntityMap entities = EntityMap.getInstance();
-        Map<String, Constructor> constructorInstances = new HashMap<>();
-        constructorInstances.put("talk", StringCommandDefault.class.getConstructor());
-        Map<String, Class> parameterClassNames = new HashMap<>();
-        TestEntity entity = new TestEntity(request.getEntityId(), constructorInstances, parameterClassNames);
-        entities.put(entity.getEntityID(), entity);
-        CommandFactory factory = new CommandFactory();
-        Command command = factory.getCommand(request);
-        assertEquals(command, new StringCommandDefault());
-    }
-
-    @Test
-    public void testInputCommand() throws ServerException {
-        CommandRequest request = new CommandRequest("testID", "input", true, "{\"string\":\"blah blah blah\", \"integer\":10}");
-        EntityMap entities = EntityMap.getInstance();
+        CommandRequest request = new CommandRequest("testID", "talk");
+        GenericEntityMap entities = GenericEntityMap.getInstance();
         TestEntity entity = new TestEntity(request.getEntityId());
         entities.put(entity.getEntityID(), entity);
-        CommandFactory factory = new CommandFactory();
+        GenericCommandFactory factory = new GenericCommandFactory();
         Command command = factory.getCommand(request);
-        assertEquals(command, new InputCommandDefault(new Input("blah blah blah", 10)));
+        GenericCommand expectedCommand = new GenericCommand();
+        expectedCommand.setMethod(StringCommandDefault.class.getMethod("getString"));
+        assertEquals(command, expectedCommand);
     }
+
+//    @Test
+//    public void testInputCommand() throws ServerException {
+//        CommandRequest request = new CommandRequest("testID", "input", true, "{\"string\":\"blah blah blah\", \"integer\":10}");
+//        GenericEntityMap entities = GenericEntityMap.getInstance();
+//        TestEntity entity = new TestEntity(request.getEntityId());
+//        entities.put(entity.getEntityID(), entity);
+//        GenericCommandFactory factory = new GenericCommandFactory();
+//        Command command = factory.getCommand(request);
+//        assertEquals(command, new InputCommandDefault(new Input("blah blah blah", 10)));
+//    }
 
     @Test (expected = ServerException.class)
     public void testBadEntityID() throws ServerException {
-        CommandRequest request = new CommandRequest("testID", "talk", false, null);
-        CommandFactory factory = new CommandFactory();
+        CommandRequest request = new CommandRequest("testID", "talk");
+        GenericCommandFactory factory = new GenericCommandFactory();
         Command command = factory.getCommand(request);
     }
 

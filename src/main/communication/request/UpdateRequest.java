@@ -5,30 +5,39 @@ package main.communication.request;
  */
 public class UpdateRequest extends Request {
     private String fileContents;
-    private Boolean hasParameter;
-    private String parameterClassName;
+    private String className;
+    private String methodName;
+    private Class<?>[] parameterTypes;
 
     public String getFileContents() {
         return fileContents;
     }
 
-    public Boolean getHasParameter() {
-        return hasParameter;
+    public String getClassName() {
+        return className;
     }
 
-    public String getParameterClassName() {
-        return parameterClassName;
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public Class<?>[] getParameterTypes() {
+        return parameterTypes;
     }
 
     public void setFileContents(String fileContents) {
         this.fileContents = fileContents;
     }
 
-    public void setHasParameter(Boolean hasParameter) {
-        this.hasParameter = hasParameter;
+    public void setClassName(String className) {
+        this.className = className;
     }
 
-    public void setParameterClassName(String parameterClassName) {
-        this.parameterClassName = parameterClassName;
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+
+    public void setParameterTypes(Class<?>[] parameterTypes) {
+        this.parameterTypes = parameterTypes;
     }
 }

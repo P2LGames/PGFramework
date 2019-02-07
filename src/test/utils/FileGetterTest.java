@@ -1,14 +1,13 @@
 package test.utils;
 
-import entity.Entity;
+import entity.GenericCommandEntity;
 import entity.TestEntity;
 import main.communication.request.FileRequest;
 import main.communication.request.UpdateRequest;
 import main.communication.result.FileResult;
-import main.communication.result.UpdateResult;
-import main.entity.EntityMap;
+import main.entity.GenericEntityMap;
 import main.util.FileGetter;
-import main.util.InMemoryClassLoader;
+import main.util.GenericInMemoryClassLoader;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,7 +29,6 @@ public class FileGetterTest {
                         "}");
         packageRequest.setCommand("test.location.TestClass");
         packageRequest.setEntityId("test1");
-        packageRequest.setHasParameter(false);
 
         UpdateRequest nonPackageRequest = new UpdateRequest();
         nonPackageRequest.setFileContents(
@@ -41,7 +39,6 @@ public class FileGetterTest {
                         "}");
         nonPackageRequest.setCommand("TestClass");
         nonPackageRequest.setEntityId("test2");
-        nonPackageRequest.setHasParameter(false);
 
         UpdateRequest messyRequest = new UpdateRequest();
         messyRequest.setFileContents("import java.util.Map;\n" +
@@ -69,17 +66,16 @@ public class FileGetterTest {
 
         messyRequest.setCommand("MessyClass");
         messyRequest.setEntityId("test3");
-        messyRequest.setHasParameter(false);
 
-        EntityMap entities = EntityMap.getInstance();
-        Entity packageEntity = new TestEntity(packageRequest.getEntityId());
-        Entity nonPackageEntity = new TestEntity(nonPackageRequest.getEntityId());
-        Entity messyEntity = new TestEntity(messyRequest.getEntityId());
+        GenericEntityMap entities = GenericEntityMap.getInstance();
+        GenericCommandEntity packageEntity = new TestEntity(packageRequest.getEntityId());
+        GenericCommandEntity nonPackageEntity = new TestEntity(nonPackageRequest.getEntityId());
+        GenericCommandEntity messyEntity = new TestEntity(messyRequest.getEntityId());
         entities.put(packageEntity.getEntityID(), packageEntity);
         entities.put(nonPackageEntity.getEntityID(), nonPackageEntity);
         entities.put(messyEntity.getEntityID(), messyEntity);
 
-        InMemoryClassLoader loader = new InMemoryClassLoader();
+        GenericInMemoryClassLoader loader = new GenericInMemoryClassLoader();
 
         loader.updateClass(packageRequest);
         loader.updateClass(nonPackageRequest);
