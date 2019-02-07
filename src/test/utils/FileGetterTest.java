@@ -7,7 +7,7 @@ import main.communication.request.UpdateRequest;
 import main.communication.result.FileResult;
 import main.entity.GenericEntityMap;
 import main.util.FileGetter;
-import main.util.GenericInMemoryClassLoader;
+import main.util.InMemoryClassLoader;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -75,7 +75,7 @@ public class FileGetterTest {
         entities.put(nonPackageEntity.getEntityID(), nonPackageEntity);
         entities.put(messyEntity.getEntityID(), messyEntity);
 
-        GenericInMemoryClassLoader loader = new GenericInMemoryClassLoader();
+        InMemoryClassLoader loader = new InMemoryClassLoader();
 
         loader.updateClass(packageRequest);
         loader.updateClass(nonPackageRequest);

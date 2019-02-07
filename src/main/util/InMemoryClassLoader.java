@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class GenericInMemoryClassLoader {
+public class InMemoryClassLoader {
 
     /**
      * Attempts to compile and load a class and returns the result
@@ -35,6 +35,7 @@ public class GenericInMemoryClassLoader {
             GenericEntity entity = entities.get(request.getEntityId());
             command.setEntity(entity);
             entity.updateCommand(request.getCommand(), command);
+            entity.addCommandClass(request.getClassName());
         } catch (Exception e) {
             result.setSuccess(false);
             result.setErrorMessage(e.getMessage());

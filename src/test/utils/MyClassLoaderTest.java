@@ -8,7 +8,7 @@ import main.communication.request.CommandRequest;
 import main.communication.request.UpdateRequest;
 import main.communication.result.UpdateResult;
 import main.entity.GenericEntityMap;
-import main.util.GenericInMemoryClassLoader;
+import main.util.InMemoryClassLoader;
 import org.junit.After;
 import org.junit.Test;
 
@@ -53,7 +53,7 @@ public class MyClassLoaderTest {
         GenericEntity entity = new TestEntity(request.getEntityId());
         entities.put(entity.getEntityID(), entity);
 
-        GenericInMemoryClassLoader loader = new GenericInMemoryClassLoader();
+        InMemoryClassLoader loader = new InMemoryClassLoader();
 
         UpdateResult result = loader.updateClass(request);
 
@@ -93,7 +93,7 @@ public class MyClassLoaderTest {
 //        GenericEntityMap entities = GenericEntityMap.getInstance();
 //        GenericEntity entity = new TestEntity(request.getEntityId());
 //        entities.put(entity.getEntityID(), entity);
-//        GenericInMemoryClassLoader loader = new GenericInMemoryClassLoader();
+//        InMemoryClassLoader loader = new InMemoryClassLoader();
 //
 //        UpdateResult result = loader.updateClass(request);
 //
@@ -131,7 +131,7 @@ public class MyClassLoaderTest {
         GenericEntityMap entities = GenericEntityMap.getInstance();
         GenericEntity entity = new TestEntity(request.getEntityId());
         entities.put(entity.getEntityID(), entity);
-        GenericInMemoryClassLoader loader = new GenericInMemoryClassLoader();
+        InMemoryClassLoader loader = new InMemoryClassLoader();
 
         UpdateResult result = loader.updateClass(request);
 
@@ -185,7 +185,7 @@ public class MyClassLoaderTest {
         request.setParameterTypes(new Class<?>[0]);
 
 //        MyClassLoader loader = new MyClassLoader();
-        GenericInMemoryClassLoader loader = new GenericInMemoryClassLoader();
+        InMemoryClassLoader loader = new InMemoryClassLoader();
         UpdateResult updateResult = loader.updateClass(request);
         System.out.println("Error Message: " + updateResult.getErrorMessage());
 

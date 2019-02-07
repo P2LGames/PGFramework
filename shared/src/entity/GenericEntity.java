@@ -4,7 +4,9 @@ import command.GenericCommand;
 import communication.ServerException;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,14 +15,17 @@ import java.util.Map;
 public abstract class GenericEntity {
     private String entityID;
     private Map<String, GenericCommand> commandMap;
+    private List<String> commandClasses;
 
     GenericEntity() {
         this.commandMap = new HashMap<>();
+        this.commandClasses = new ArrayList<>();
     }
 
     GenericEntity(String entityID) {
         this.entityID = entityID;
         this.commandMap = new HashMap<>();
+        this.commandClasses = new ArrayList<>();
     }
 
     public String getEntityID() {
@@ -65,5 +70,10 @@ public abstract class GenericEntity {
         command.setMethod(commandMethod);
         command.setEntity(this);
         commandMap.put(commandName, command);
+        addCommandClass(commandMethod.getDeclaringClass().getName());
+    }
+
+    public void addCommandClass(String className) {
+        commandClasses.add(className);
     }
 }
