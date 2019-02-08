@@ -1,6 +1,7 @@
 package test.command;
 
 import command.CommandResult;
+import command.GenericCommand;
 import command.StringCommandDefault;
 import communication.ServerException;
 import main.command.GenericCommandFactory;
@@ -16,18 +17,24 @@ import static org.mockito.Mockito.*;
 public class CommandHandlerTest {
 
     @Test
-    public void testHandleCommand() throws ServerException {
+    public void testHandleCommand() throws ServerException, NoSuchMethodException {
         //Setup mock of command factory
         GenericCommandFactory factory = mock(GenericCommandFactory.class);
         CommandRequest commandRequest = new CommandRequest();
         commandRequest.setCommand("testCommand");
         commandRequest.setEntityId("testID");
-        when(factory.getCommand(commandRequest)).thenReturn(new StringCommandDefault());
+        GenericCommand command = new GenericCommand();
+        StringCommandDefault stringCommandDefault = new StringCommandDefault();
+        command.setClassObject(stringCommandDefault);
+        command.setMethod(StringCommandDefault.class.getMethod("getString"));
+        command.setParameters(new Object[0]);
+        when(factory.getCommand(commandRequest)).thenReturn(command);
 
         GenericCommandHandler handler = new GenericCommandHandler();
         handler.setCommandFactory(factory);
         CommandResult result = handler.handleCommand(commandRequest);
         CommandResult expectedCommandResult = new CommandResult("I can talk, yay!!");
+        expectedCommandResult.setSuccess(true);
 
 
         assertEquals(result, expectedCommandResult);
