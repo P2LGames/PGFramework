@@ -6,6 +6,7 @@ import main.communication.request.EntityRequest;
 import main.communication.request.FileRequest;
 import main.communication.request.UpdateRequest;
 import command.Result;
+import main.communication.result.UnknownResult;
 import main.entity.EntityLoader;
 import main.util.FileGetter;
 import main.util.InMemoryClassLoader;
@@ -132,11 +133,14 @@ public class TCPServer implements Runnable {
                     EntityLoader loader = new EntityLoader();
                     result = loader.registerEntity(entityRequest);
                 }
-                else {
+                else if (clientBundle.getType() == RequestType.FILE_GET) {
                     // If it is a get file request then deserialize it accordingly and get the file contents for the provided command name
                     FileRequest fileRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), FileRequest.class);
                     FileGetter fileGetter = new FileGetter();
                     result = fileGetter.getFile(fileRequest);
+                }
+                else {
+                    result = new UnknownResult();
                 }
 
                 // Write the result to the client
