@@ -2,9 +2,9 @@ package main.communication.result;
 
 import command.Result;
 
-public class UnknownResult extends Result {
+public class UnknownRequestResult extends Result {
 
-    public UnknownResult() {
+    public UnknownRequestResult() {
         this.setErrorMessage("Unknown request type");
         this.setSuccess(false);
     }

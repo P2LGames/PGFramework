@@ -6,7 +6,7 @@ import main.communication.request.EntityRequest;
 import main.communication.request.FileRequest;
 import main.communication.request.UpdateRequest;
 import command.Result;
-import main.communication.result.UnknownResult;
+import main.communication.result.UnknownRequestResult;
 import main.entity.EntityLoader;
 import main.util.FileGetter;
 import main.util.InMemoryClassLoader;
@@ -140,7 +140,7 @@ public class TCPServer implements Runnable {
                     result = fileGetter.getFile(fileRequest);
                 }
                 else {
-                    result = new UnknownResult();
+                    result = new UnknownRequestResult();
                 }
 
                 // Write the result to the client
