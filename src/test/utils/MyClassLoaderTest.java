@@ -30,13 +30,11 @@ public class MyClassLoaderTest {
         UpdateRequest request = new UpdateRequest();
         request.setFileContents("\n" +
                 "\n" +
-                "import command.StringCommand;\n" +
                 "\n" +
                 "/**\n" +
                 " * An example implementation of the Talk command\n" +
                 " */\n" +
-                "public class Talk extends command.StringCommand {\n" +
-                "    @Override\n" +
+                "public class Talk {\n" +
                 "    public String getString() {\n" +
                 "        return \"I can talk!!\";\n" +
                 "    }\n" +
@@ -61,46 +59,83 @@ public class MyClassLoaderTest {
         assertTrue(result.getSuccess());
     }
 
-//    @Test
-//    public void updateClassTestWithParameters() {
-//        UpdateRequest request = new UpdateRequest();
-//        request.setFileContents("\n" +
-//                "\n" +
-//                "import command.InputCommand;\n" +
-//                "import command.parameter.Input;\n" +
-//                "import command.returns.Output;\n" +
-//                "public class inputComm extends command.InputCommand {\n" +
-//                "    private command.parameter.Input input;\n" +
-//                "\n" +
-//                "    public inputComm(command.parameter.Input input) {\n" +
-//                "        this.input = input;\n" +
-//                "    }\n" +
-//                "\n" +
-//                "\n" +
-//                "    @Override\n" +
-//                "    public command.returns.Output runOnInput() {\n" +
-//                "        command.returns.Output output = new command.returns.Output();\n" +
-//                "        output.setInteger(input.getInteger());\n" +
-//                "        output.setString(\"it worked\");\n" +
-//                "        return output;\n" +
-//                "    }\n" +
-//                "}");
-//        request.setCommand("inputComm");
-//        request.setEntityId("testID2");
-//        request.setHasParameter(true);
-//        request.setParameterClassName("command.parameter.Input");
-//
-//        GenericEntityMap entities = GenericEntityMap.getInstance();
-//        GenericEntity entity = new TestEntity(request.getEntityId());
-//        entities.put(entity.getEntityID(), entity);
-//        InMemoryClassLoader loader = new InMemoryClassLoader();
-//
-//        UpdateResult result = loader.updateClass(request);
-//
-//
-//        assertNull(result.getErrorMessage());
-//        assertTrue(result.getSuccess());
-//    }
+    @Test
+    public void updateClassWithParametersTest() {
+        UpdateRequest request = new UpdateRequest();
+        request.setFileContents("" +
+                "\n" +
+                "public class ParameterCommand {\n" +
+                "\n" +
+                "    public String addString(String inputString) {\n" +
+                "        return inputString + \"yooooooo\";\n" +
+                "    }\n" +
+                "\n" +
+                "}\n");
+        request.setCommand("params");
+        request.setClassName("ParameterCommand");
+        request.setMethodName("addString");
+        request.setEntityId("testId");
+        Class<?>[] paramTypes = {String.class};
+        request.setParameterTypes(paramTypes);
+
+        GenericEntityMap entities = GenericEntityMap.getInstance();
+        GenericEntity entity = new TestEntity(request.getEntityId());
+        entities.put(entity.getEntityID(), entity);
+        InMemoryClassLoader loader = new InMemoryClassLoader();
+        UpdateResult result = loader.updateClass(request);
+
+        assertNull(result.getErrorMessage());
+        assertTrue(result.getSuccess());
+    }
+
+    @Test
+    public void updateClassWithParametersReturnTest() {
+        Random random = new Random();
+        Integer randInt = random.nextInt();
+
+        UpdateRequest request = new UpdateRequest();
+        request.setFileContents("" +
+                "\n" +
+                "public class ParameterCommand {\n" +
+                "\n" +
+                "    public String addString(String inputString) {\n" +
+                "        return inputString + \"yooooooo\";\n" +
+                "    }\n" +
+                "\n" +
+                "}\n");
+        request.setCommand("params");
+        request.setClassName("ParameterCommand");
+        request.setMethodName("addString");
+        request.setEntityId("testId");
+        Class<?>[] paramTypes = {String.class};
+        request.setParameterTypes(paramTypes);
+
+        GenericEntityMap entities = GenericEntityMap.getInstance();
+        GenericEntity entity = new TestEntity(request.getEntityId());
+        entities.put(entity.getEntityID(), entity);
+        InMemoryClassLoader loader = new InMemoryClassLoader();
+        UpdateResult result = loader.updateClass(request);
+
+        assertNull(result.getErrorMessage());
+        assertTrue(result.getSuccess());
+
+        CommandRequest commandRequest = new CommandRequest();
+        Object[] params = {randInt.toString()};
+        commandRequest.setParameters(params);
+        commandRequest.setCommand("params");
+        commandRequest.setEntityId(request.getEntityId());
+
+        GenericCommandHandler handler = new GenericCommandHandler();
+        CommandResult commandResult = handler.handleCommand(commandRequest);
+        CommandResult expectedResult = new CommandResult(randInt + "yooooooo");
+
+        expectedResult.setSuccess(true);
+
+        System.out.println(expectedResult.getValue());
+        System.out.println(commandResult.getValue());
+
+        assertEquals(expectedResult.getValue(), commandResult.getValue());
+    }
 
     @Test
     public void packagedClassTest() {
@@ -108,13 +143,11 @@ public class MyClassLoaderTest {
         request.setFileContents("\n" +
                 "package test.location;" +
                 "\n" +
-                "import command.StringCommand;\n" +
                 "\n" +
                 "/**\n" +
                 " * An example implementation of the Talk command\n" +
                 " */\n" +
-                "public class talk extends command.StringCommand {\n" +
-                "    @Override\n" +
+                "public class talk {\n" +
                 "    public String getString() {\n" +
                 "        return \"I can talk!!\";\n" +
                 "    }\n" +
@@ -165,13 +198,11 @@ public class MyClassLoaderTest {
         UpdateRequest request = new UpdateRequest();
         request.setFileContents("\n" +
                 "\n" +
-                "import command.StringCommand;\n" +
                 "\n" +
                 "/**\n" +
                 " * An example implementation of the Talk command\n" +
                 " */\n" +
-                "public class Talk extends command.StringCommand {\n" +
-                "    @Override\n" +
+                "public class Talk {\n" +
                 "    public String getString() {\n" +
                 "        return \"I can talk: " + randInt + "\";\n" +
                 "    }\n" +
@@ -184,7 +215,6 @@ public class MyClassLoaderTest {
         request.setMethodName("getString");
         request.setParameterTypes(new Class<?>[0]);
 
-//        MyClassLoader loader = new MyClassLoader();
         InMemoryClassLoader loader = new InMemoryClassLoader();
         UpdateResult updateResult = loader.updateClass(request);
         System.out.println("Error Message: " + updateResult.getErrorMessage());
@@ -196,41 +226,13 @@ public class MyClassLoaderTest {
         commandRequest.setParameters(new Object[0]);
 
         GenericCommandHandler handler = new GenericCommandHandler();
-//        handler.setCommandFactory(factory);
         CommandResult commandResult = handler.handleCommand(commandRequest);
         CommandResult expectedCommandResult = new CommandResult("I can talk: " + randInt);
+        expectedCommandResult.setSuccess(true);
 
         System.out.println(expectedCommandResult.getValue());
         System.out.println(commandResult.getValue());
 
         assertEquals(expectedCommandResult.getValue(), commandResult.getValue());
-
-//        request = new UpdateRequest();
-//        request.setFileContents("\n" +
-//                "\n" +
-//                "import command.StringCommand;\n" +
-//                "\n" +
-//                "/**\n" +
-//                " * An example implementation of the Talk command\n" +
-//                " */\n" +
-//                "public class talk extends command.StringCommand {\n" +
-//                "    @Override\n" +
-//                "    public String getString() {\n" +
-//                "        return \"I can talk too!!\";\n" +
-//                "    }\n" +
-//                "\n" +
-//                "\n" +
-//                "}\n");
-//        request.setCommand("talk");
-//        request.setEntityId("testID");
-//        request.setHasParameter(false);
-//
-//        updateResult = loader.updateClass(request);
-//
-//        // Get the command and the return value
-//        commandResult = handler.handleCommand(commandRequest);
-//        expectedCommandResult = new CommandResult("I can talk too!!");
-//
-//        assertEquals(expectedCommandResult.getValue(), commandResult.getValue());
     }
 }
