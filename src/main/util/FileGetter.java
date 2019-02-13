@@ -1,15 +1,17 @@
 package main.util;
 
+import command.CommandData;
+import command.GenericCommand;
+import entity.GenericEntity;
 import main.communication.request.FileRequest;
 import main.communication.request.FileRequestType;
 import main.communication.result.FileResult;
+import main.entity.GenericEntityMap;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +19,35 @@ import java.util.regex.Pattern;
  * Used for retrieving a file for the user playing the game
  */
 public class FileGetter {
+
+    /**
+     * Get data for all the commands associated with a given entity
+     * @param entityId - ID of entity you want
+     * @return Data for each of the commands associated with a given entity
+     */
+    public List<CommandData> getCommandsForEntity(String entityId) {
+        List<CommandData> allCommandData = new ArrayList<>();
+        GenericEntityMap entityMap = GenericEntityMap.getInstance();
+        GenericEntity entity = entityMap.get(entityId);
+        for (String commandClass : entity.getCommandClasses()) {
+            String className;
+            GenericCommand command;
+            try {
+                command = entity.getCommand(commandClass);
+                className = command.getClass().getName();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                continue;
+            }
+            FileResult fileResult = this.getFile(new FileRequest(commandClass));
+            if (fileResult.getSuccess()) {
+                CommandData commandData = new CommandData(commandClass, className, fileResult.getFileContents());
+                allCommandData.add(commandData);
+            }
+        }
+
+        return allCommandData;
+    }
 
     /**
      * Gets the file corresponding to the specified command and returns its contents

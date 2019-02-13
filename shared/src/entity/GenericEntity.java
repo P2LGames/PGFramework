@@ -76,4 +76,6 @@ public abstract class GenericEntity {
     public void addCommandClass(String className) {
         commandClasses.add(className);
     }
+
+    public List<String> getCommandClasses() { return commandClasses; }
 }
