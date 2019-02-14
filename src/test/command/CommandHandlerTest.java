@@ -33,7 +33,7 @@ public class CommandHandlerTest {
         GenericCommandHandler handler = new GenericCommandHandler();
         handler.setCommandFactory(factory);
         CommandResult result = handler.handleCommand(commandRequest);
-        CommandResult expectedCommandResult = new CommandResult("I can talk, yay!!");
+        CommandResult expectedCommandResult = new CommandResult("I can talk, yay!!", commandRequest.getEntityId());
         expectedCommandResult.setSuccess(true);
 
 

@@ -127,7 +127,7 @@ public class MyClassLoaderTest {
 
         GenericCommandHandler handler = new GenericCommandHandler();
         CommandResult commandResult = handler.handleCommand(commandRequest);
-        CommandResult expectedResult = new CommandResult(randInt + "yooooooo");
+        CommandResult expectedResult = new CommandResult(randInt + "yooooooo", commandRequest.getEntityId());
 
         expectedResult.setSuccess(true);
 
@@ -227,7 +227,7 @@ public class MyClassLoaderTest {
 
         GenericCommandHandler handler = new GenericCommandHandler();
         CommandResult commandResult = handler.handleCommand(commandRequest);
-        CommandResult expectedCommandResult = new CommandResult("I can talk: " + randInt);
+        CommandResult expectedCommandResult = new CommandResult("I can talk: " + randInt, commandRequest.getEntityId());
         expectedCommandResult.setSuccess(true);
 
         System.out.println(expectedCommandResult.getValue());

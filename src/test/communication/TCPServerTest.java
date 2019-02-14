@@ -26,7 +26,7 @@ public class TCPServerTest {
     public void testConnection() throws Exception {
         //Mock the command factory
         GenericCommandHandler handler = mock(GenericCommandHandler.class);
-        CommandResult expectedCommandResult = new CommandResult("I can talk!!");
+        CommandResult expectedCommandResult = new CommandResult("I can talk!!", "testID");
         CommandRequest commandRequest = new CommandRequest();
         commandRequest.setCommand("testCommand");
         commandRequest.setEntityId("testID");
