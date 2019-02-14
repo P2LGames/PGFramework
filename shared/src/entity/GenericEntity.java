@@ -1,5 +1,7 @@
 package entity;
 
+import annotations.Command;
+import annotations.Entity;
 import command.GenericCommand;
 import communication.ServerException;
 
@@ -17,15 +19,17 @@ public abstract class GenericEntity {
     private Map<String, GenericCommand> commandMap;
     private List<String> commandClasses;
 
-    GenericEntity() {
+    GenericEntity() throws ServerException {
         this.commandMap = new HashMap<>();
         this.commandClasses = new ArrayList<>();
+        makeDefaults();
     }
 
-    GenericEntity(String entityID) {
+    GenericEntity(String entityID) throws ServerException {
         this.entityID = entityID;
         this.commandMap = new HashMap<>();
         this.commandClasses = new ArrayList<>();
+        makeDefaults();
     }
 
     public String getEntityID() {
@@ -61,16 +65,26 @@ public abstract class GenericEntity {
 
     /**
      * Makes a default implementation for a command
-     *
-     * @param commandName the name of the command
-     * @param commandMethod the method to be run with that command
      */
-    public void makeDefault(String commandName, Method commandMethod) {
-        GenericCommand command = new GenericCommand();
-        command.setMethod(commandMethod);
-        command.setEntity(this);
-        commandMap.put(commandName, command);
-        addCommandClass(commandMethod.getDeclaringClass().getName());
+    private void makeDefaults() throws ServerException {
+
+        Class<?> thisClass = this.getClass();
+        if(!thisClass.isAnnotationPresent(Entity.class)) {
+            throw new ServerException("This entity is missing the @Entity annotation");
+        }
+        else {
+            Class<?> defaultCommandsClass = thisClass.getAnnotation(Entity.class).defaultCommands();
+            for (Method commandMethod : defaultCommandsClass.getDeclaredMethods()) {
+                if (commandMethod.isAnnotationPresent(Command.class)) {
+                    String commandName = commandMethod.getAnnotation(Command.class).commandName();
+                    GenericCommand command = new GenericCommand();
+                    command.setMethod(commandMethod);
+                    command.setEntity(this);
+                    commandMap.put(commandName, command);
+                    addCommandClass(commandMethod.getDeclaringClass().getName());
+                }
+            }
+        }
     }
 
     public void addCommandClass(String className) {

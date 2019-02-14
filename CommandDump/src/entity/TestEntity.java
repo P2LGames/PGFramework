@@ -1,30 +1,52 @@
 package entity;
 
-import command.StringCommandDefault;
+import annotations.Entity;
+import command.TestDefault;
+import communication.ServerException;
 
 /**
  * An example of a concrete implementation of the entity class
  */
+@Entity(defaultCommands = TestDefault.class)
 public class TestEntity extends GenericEntity {
+
+    private int runSpeed;
+    private int xPos;
+    private int yPos;
+
     /**
      * This constructor will initialize the defaults for any entity of this type
      *
      */
-    public TestEntity() {
+    public TestEntity() throws ServerException {
         super();
-        try {
-            this.makeDefault("talk", StringCommandDefault.class.getMethod("getString"));
-        } catch (Exception e) {
-            System.out.println("Unable to create testEntity\n" + e.getMessage());
-        }
     }
 
-    public TestEntity(String entityID) {
+    public TestEntity(String entityID) throws ServerException {
         super(entityID);
-        try {
-            this.makeDefault("talk", StringCommandDefault.class.getMethod("getString"));
-        } catch (Exception e) {
-            System.out.println("Unable to create testEntity\n" + e.getMessage());
-        }
+    }
+
+    public int getRunSpeed() {
+        return runSpeed;
+    }
+
+    public void setRunSpeed(int runSpeed) {
+        this.runSpeed = runSpeed;
+    }
+
+    public int getxPos() {
+        return xPos;
+    }
+
+    public void setxPos(int xPos) {
+        this.xPos = xPos;
+    }
+
+    public int getyPos() {
+        return yPos;
+    }
+
+    public void setyPos(int yPos) {
+        this.yPos = yPos;
     }
 }
