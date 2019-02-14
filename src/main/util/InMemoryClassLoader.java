@@ -4,7 +4,7 @@ import command.GenericCommand;
 import entity.GenericEntity;
 import main.communication.request.UpdateRequest;
 import main.communication.result.UpdateResult;
-import main.entity.GenericEntityMap;
+import entity.GenericEntityMap;
 
 import java.io.BufferedWriter;
 import java.io.File;

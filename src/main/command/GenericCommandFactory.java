@@ -4,7 +4,7 @@ import command.GenericCommand;
 import communication.ServerException;
 import entity.GenericEntity;
 import main.communication.request.CommandRequest;
-import main.entity.GenericEntityMap;
+import entity.GenericEntityMap;
 
 /**
  * Class used to retrieve a command to be run

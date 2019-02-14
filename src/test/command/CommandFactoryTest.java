@@ -5,7 +5,7 @@ import communication.ServerException;
 import entity.TestEntity;
 import main.command.GenericCommandFactory;
 import main.communication.request.CommandRequest;
-import main.entity.GenericEntityMap;
+import entity.GenericEntityMap;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;

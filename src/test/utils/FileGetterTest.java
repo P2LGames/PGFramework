@@ -1,12 +1,11 @@
 package test.utils;
 
-import communication.ServerException;
 import entity.GenericEntity;
 import entity.TestEntity;
 import main.communication.request.FileRequest;
 import main.communication.request.UpdateRequest;
 import main.communication.result.FileResult;
-import main.entity.GenericEntityMap;
+import entity.GenericEntityMap;
 import main.util.FileGetter;
 import main.util.InMemoryClassLoader;
 import org.junit.Assert;

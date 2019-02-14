@@ -1,6 +1,7 @@
 package command;
 
 import entity.GenericEntity;
+import entity.GenericEntityMap;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -15,7 +16,7 @@ public class GenericCommand implements Command, Cloneable {
     private GenericEntity entity;
 
     public GenericCommand() {
-
+        _paramValues = new Object[0];
     }
 
     public void setClassObject(Object classObject) {
@@ -45,6 +46,18 @@ public class GenericCommand implements Command, Cloneable {
      */
     @Override
     public CommandResult run() {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        assert(parameterTypes.length == _paramValues.length);
+        for(int i = 0; i < parameterTypes.length; i++) {
+            Class classType = parameterTypes[i];
+            if(classType.isInstance(GenericEntity.class)) {
+                assert(_paramValues[i] instanceof String);
+                String id = (String) _paramValues[i];
+                GenericEntityMap entityMap = GenericEntityMap.getInstance();
+                GenericEntity entity = entityMap.get(id);
+                _paramValues[i] = entity;
+            }
+        }
         CommandResult result = new CommandResult();
         try {
             result.setValue(method.invoke(classObject, _paramValues));

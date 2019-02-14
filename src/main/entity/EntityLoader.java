@@ -1,6 +1,7 @@
 package main.entity;
 
 import entity.GenericEntity;
+import entity.GenericEntityMap;
 import main.communication.request.EntityRequest;
 import main.communication.result.EntityResult;
 

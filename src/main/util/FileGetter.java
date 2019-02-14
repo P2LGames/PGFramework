@@ -6,7 +6,7 @@ import entity.GenericEntity;
 import main.communication.request.FileRequest;
 import main.communication.request.FileRequestType;
 import main.communication.result.FileResult;
-import main.entity.GenericEntityMap;
+import entity.GenericEntityMap;
 
 import java.io.File;
 import java.io.FileNotFoundException;

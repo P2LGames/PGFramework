@@ -7,7 +7,7 @@ import main.command.GenericCommandHandler;
 import main.communication.request.CommandRequest;
 import main.communication.request.UpdateRequest;
 import main.communication.result.UpdateResult;
-import main.entity.GenericEntityMap;
+import entity.GenericEntityMap;
 import main.util.InMemoryClassLoader;
 import org.junit.After;
 import org.junit.Assert;

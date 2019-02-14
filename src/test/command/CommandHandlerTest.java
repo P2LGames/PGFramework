@@ -25,6 +25,7 @@ public class CommandHandlerTest {
             CommandRequest commandRequest = new CommandRequest();
             commandRequest.setCommand("testCommand");
             commandRequest.setEntityId("testID");
+            commandRequest.setParameters(new Object[0]);
             GenericCommand command = new GenericCommand();
             StringCommandDefault stringCommandDefault = new StringCommandDefault();
             command.setClassObject(stringCommandDefault);
