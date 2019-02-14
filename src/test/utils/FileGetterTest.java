@@ -170,5 +170,14 @@ public class FileGetterTest {
         FileResult result3 = fileGetter.getFile(request3);
         assertFalse(result3.getSuccess());
         assertEquals(result3.getErrorMessage(), "Function name does not appear in the requested file");
+
+        FileRequest request4 = new FileRequest("MessyClass", "public void GreatFunction2(int   num,  String  )");
+        FileResult result4 = fileGetter.getFile(request4);
+        FileResult expectedResult4 = new FileResult("  public\n" +
+                "  void    GreatFunction2(int   number,  String\n" +
+                "        word ) {\n" +
+                "    word = \"Great job, you found me!\";\n" +
+                "  }");
+        assertEquals(result4, expectedResult4);
     }
 }
