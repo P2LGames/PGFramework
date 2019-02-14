@@ -22,7 +22,7 @@ public class InMemoryClassLoader {
      *   The result object the reports a failure or contains the loaded class
      */
     public UpdateResult updateClass(UpdateRequest request) {
-        UpdateResult result = new UpdateResult();
+        UpdateResult result = new UpdateResult(request.getEntityId());
         InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance();
 
         try {
