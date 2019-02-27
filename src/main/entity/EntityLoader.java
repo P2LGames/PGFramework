@@ -30,7 +30,7 @@ public class EntityLoader {
         GenericEntityMap entityMap = GenericEntityMap.getInstance();
         String entityId = getEntityId(request.getEntityType(), entityMap.size());
         entityMap.put(entityId, entity);
-        return new EntityResult(entityId);
+        return new EntityResult(entityId, request.getPlaceholderId());
     }
 
     /**

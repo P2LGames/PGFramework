@@ -5,12 +5,16 @@ package main.communication.request;
  */
 public class EntityRequest {
     private String entityType;
+    private String placeholderId;
 
-    public EntityRequest(String entityType) {
+    public EntityRequest(String entityType, String placeholderId) {
         this.entityType = entityType;
+        this.placeholderId = placeholderId;
     }
 
     public String getEntityType() {
         return entityType;
     }
+
+    public String getPlaceholderId() { return placeholderId; }
 }
