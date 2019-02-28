@@ -47,7 +47,7 @@ public class MyClassLoaderTest {
             request.setEntityId("testID1");
             request.setClassName("Talk");
             request.setMethodName("getString");
-            request.setParameterTypes(new Class<?>[0]);
+            request.setParameterTypesStrings(new String[0]);
 
             GenericEntityMap entities = GenericEntityMap.getInstance();
             GenericEntity entity = new TestEntity(request.getEntityId());
@@ -82,8 +82,8 @@ public class MyClassLoaderTest {
             request.setClassName("ParameterCommand");
             request.setMethodName("addString");
             request.setEntityId("testId");
-            Class<?>[] paramTypes = {String.class};
-            request.setParameterTypes(paramTypes);
+            String[] paramTypes = {"java.lang.String"};
+            request.setParameterTypesStrings(paramTypes);
 
             GenericEntityMap entities = GenericEntityMap.getInstance();
             GenericEntity entity = new TestEntity(request.getEntityId());
@@ -119,8 +119,8 @@ public class MyClassLoaderTest {
             request.setClassName("ParameterCommand");
             request.setMethodName("addString");
             request.setEntityId("testId");
-            Class<?>[] paramTypes = {String.class};
-            request.setParameterTypes(paramTypes);
+            String[] paramTypes = {"java.lang.String"};
+            request.setParameterTypesStrings(paramTypes);
 
             GenericEntityMap entities = GenericEntityMap.getInstance();
             GenericEntity entity = new TestEntity(request.getEntityId());
@@ -175,7 +175,7 @@ public class MyClassLoaderTest {
             request.setEntityId("testID1");
             request.setClassName("test.location.talk");
             request.setMethodName("getString");
-            request.setParameterTypes(new Class<?>[0]);
+            request.setParameterTypesStrings(new String[0]);
 
 
             GenericEntityMap entities = GenericEntityMap.getInstance();
@@ -234,7 +234,7 @@ public class MyClassLoaderTest {
             request.setEntityId(entity.getEntityID());
             request.setClassName("Talk");
             request.setMethodName("getString");
-            request.setParameterTypes(new Class<?>[0]);
+            request.setParameterTypesStrings(new String[0]);
 
             InMemoryClassLoader loader = new InMemoryClassLoader();
             UpdateResult updateResult = loader.updateClass(request);

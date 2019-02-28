@@ -7,7 +7,7 @@ public class UpdateRequest extends Request {
     private String fileContents;
     private String className;
     private String methodName;
-    private Class<?>[] parameterTypes;
+    private String[] parameterTypesStrings;
 
     public String getFileContents() {
         return fileContents;
@@ -21,8 +21,8 @@ public class UpdateRequest extends Request {
         return methodName;
     }
 
-    public Class<?>[] getParameterTypes() {
-        return parameterTypes;
+    public String[] getParameterTypesStrings() {
+        return parameterTypesStrings;
     }
 
     public void setFileContents(String fileContents) {
@@ -37,7 +37,7 @@ public class UpdateRequest extends Request {
         this.methodName = methodName;
     }
 
-    public void setParameterTypes(Class<?>[] parameterTypes) {
-        this.parameterTypes = parameterTypes;
+    public void setParameterTypesStrings(String[] parameterTypesStrings) {
+        this.parameterTypesStrings = parameterTypesStrings;
     }
 }

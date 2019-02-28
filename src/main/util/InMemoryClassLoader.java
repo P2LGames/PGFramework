@@ -29,7 +29,12 @@ public class InMemoryClassLoader {
             Class<?> loadedClass = compiler.compile(request.getClassName(), request.getFileContents());
             this.saveSourceCode(request, loadedClass);
             GenericCommand command = new GenericCommand();
-            command.setMethod(loadedClass.getMethod(request.getMethodName(), request.getParameterTypes()));
+            String[] paramTypesStrings = request.getParameterTypesStrings();
+            Class<?>[] paramTypes = new Class<?>[paramTypesStrings.length];
+            for(int i = 0; i < paramTypesStrings.length; i++) {
+                paramTypes[i] = Class.forName(paramTypesStrings[i]);
+            }
+            command.setMethod(loadedClass.getMethod(request.getMethodName(), paramTypes));
             command.setClassObject(loadedClass.getConstructor().newInstance());
             GenericEntityMap entities = GenericEntityMap.getInstance();
             GenericEntity entity = entities.get(request.getEntityId());

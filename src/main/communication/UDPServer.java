@@ -3,6 +3,8 @@ package main.communication;
 import command.Result;
 import main.command.GenericCommandHandler;
 import main.communication.request.CommandRequest;
+import main.communication.request.EntityUpdateRequest;
+import main.entity.EntityUpdater;
 import util.Serializer;
 
 import java.io.IOException;
@@ -11,6 +13,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
+/**
+ * The UDP server for handling non-essential frequent command or other update requests
+ */
 public class UDPServer {
     private DatagramSocket socket;
     private boolean running;
@@ -38,8 +43,26 @@ public class UDPServer {
             packet = new DatagramPacket(buf, buf.length, address, port);
             String received = new String(packet.getData(), 0, packet.getLength());
 
-            CommandRequest request = Serializer.deserialize(received, CommandRequest.class);
-            Result result = commandHandler.handleCommand(request);
+            ClientBundle clientBundle = Serializer.deserialize(received, ClientBundle.class);
+            if(clientBundle == null) {
+                continue;
+            }
+
+            Result result;
+
+            if(clientBundle.getType() == RequestType.COMMAND) {
+                CommandRequest request = Serializer.deserialize(received, CommandRequest.class);
+                result = commandHandler.handleCommand(request);
+            }
+            else if(clientBundle.getType() == RequestType.ENTITY_UPDATE) {
+                EntityUpdateRequest request = Serializer.deserialize(received, EntityUpdateRequest.class);
+                EntityUpdater updater = new EntityUpdater();
+                result = updater.updateEntity(request);
+            }
+            else {
+                System.out.println("Bad request type for UDP server");
+                continue;
+            }
             String resultString = Serializer.serialize(result);
             byte[] resultData = resultString.getBytes();
             DatagramPacket response = new DatagramPacket(resultData, resultData.length);
