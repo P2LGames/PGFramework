@@ -1,6 +1,8 @@
 package entity;
 
 import annotations.Entity;
+import annotations.Getter;
+import annotations.Setter;
 import command.TestDefault;
 import communication.ServerException;
 
@@ -26,26 +28,32 @@ public class TestEntity extends GenericEntity {
         super(entityID);
     }
 
+    @Getter(fieldName = "runSpeed")
     public int getRunSpeed() {
         return runSpeed;
     }
 
+    @Setter(fieldName = "runSpeed", type = Integer.class)
     public void setRunSpeed(int runSpeed) {
         this.runSpeed = runSpeed;
     }
 
+    @Getter(fieldName = "xPos")
     public int getxPos() {
         return xPos;
     }
 
+    @Setter(fieldName =  "xPos", type = Integer.class)
     public void setxPos(int xPos) {
         this.xPos = xPos;
     }
 
+    @Getter(fieldName = "yPos")
     public int getyPos() {
         return yPos;
     }
 
+    @Setter(fieldName = "yPos", type = Integer.class)
     public void setyPos(int yPos) {
         this.yPos = yPos;
     }

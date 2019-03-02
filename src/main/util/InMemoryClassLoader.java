@@ -38,7 +38,6 @@ public class InMemoryClassLoader {
             command.setClassObject(loadedClass.getConstructor().newInstance());
             GenericEntityMap entities = GenericEntityMap.getInstance();
             GenericEntity entity = entities.get(request.getEntityId());
-            command.setEntity(entity);
             entity.updateCommand(request.getCommand(), command);
             entity.addCommandClass(request.getClassName());
         } catch (Exception e) {

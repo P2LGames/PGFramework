@@ -13,10 +13,15 @@ public class GenericCommand implements Command, Cloneable {
     private Object classObject;
     private Method method;
     private Object[] _paramValues;
-    private GenericEntity entity;
 
     public GenericCommand() {
         _paramValues = new Object[0];
+    }
+
+    public GenericCommand(Object classObject, Method method, Object[] _paramValues) {
+        this.classObject = classObject;
+        this.method = method;
+        this._paramValues = _paramValues;
     }
 
     public void setClassObject(Object classObject) {
@@ -29,14 +34,6 @@ public class GenericCommand implements Command, Cloneable {
 
     public void setParameters(Object[] parameters) {
         _paramValues = parameters;
-    }
-
-    public void setEntity(GenericEntity entity) {
-        this.entity = entity;
-    }
-
-    public GenericEntity getEntity() {
-        return entity;
     }
 
     /**

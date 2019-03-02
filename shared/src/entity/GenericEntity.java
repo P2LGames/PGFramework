@@ -79,7 +79,6 @@ public abstract class GenericEntity {
                     String commandName = commandMethod.getAnnotation(Command.class).commandName();
                     GenericCommand command = new GenericCommand();
                     command.setMethod(commandMethod);
-                    command.setEntity(this);
                     commandMap.put(commandName, command);
                     addCommandClass(commandMethod.getDeclaringClass().getName());
                 }
