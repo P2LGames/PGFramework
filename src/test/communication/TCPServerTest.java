@@ -32,6 +32,9 @@ public class TCPServerTest {
             CommandRequest commandRequest = new CommandRequest();
             commandRequest.setCommand("testCommand");
             commandRequest.setEntityId("testID");
+            ClientBundle expectedClientBundle = new ClientBundle();
+            expectedClientBundle.setSerializedData(Serializer.serialize(expectedCommandResult));
+            expectedClientBundle.setType(RequestType.COMMAND);
             when(handler.handleCommand(commandRequest)).thenReturn(expectedCommandResult);
 
 
@@ -46,7 +49,7 @@ public class TCPServerTest {
             //Create the data and write it over
             ClientBundle clientBundle = new ClientBundle();
             clientBundle.setType(RequestType.COMMAND);
-            clientBundle.setSerializedRequest(Serializer.serialize(commandRequest));
+            clientBundle.setSerializedData(Serializer.serialize(commandRequest));
             String requestData = Serializer.serialize(clientBundle);
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
             outToServer.writeBytes(requestData + "\n");
@@ -56,8 +59,8 @@ public class TCPServerTest {
             String resultData = inFromServer.readLine();
 
             //Verify correctness
-            CommandResult actualCommandResult = Serializer.deserialize(resultData, CommandResult.class);
-            assertEquals(expectedCommandResult, actualCommandResult);
+            ClientBundle actualClientBundle = Serializer.deserialize(resultData, ClientBundle.class);
+            assertEquals(expectedClientBundle, actualClientBundle);
             server.stop();
             clientSocket.close();
         } catch(Exception e) {

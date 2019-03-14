@@ -56,24 +56,24 @@ public class TCPServer implements Runnable {
 //                }
 //                if(clientBundle.getType() == RequestType.COMMAND) {
 //                    //If it is a command request then deserialize it accordingly and give it to the ICommandFactory
-//                    CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), CommandRequest.class);
+//                    CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedData(), CommandRequest.class);
 //                    result = commandHandler.handleCommand(commandRequest);
 //                }
 //                else if(clientBundle.getType() == RequestType.FILE_UPDATE){
 //                    //If it is a update request then deserialize it accordingly, reload the new class and update it
-//                    UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), UpdateRequest.class);
+//                    UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedData(), UpdateRequest.class);
 //                    InMemoryClassLoader loader = new InMemoryClassLoader();
 //                    result = loader.updateClass(updateRequest);
 //                }
 //                else if (clientBundle.getType() == RequestType.ENTITY){
 //                    //If it is a entity request then deserialize it accordingly, register the entity with the server
-//                    EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), EntityRequest.class);
+//                    EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedData(), EntityRequest.class);
 //                    EntityLoader loader = new EntityLoader();
 //                    result = loader.registerEntity(entityRequest);
 //                }
 //                else {
 //                    //If it is a get file request then deserialize it accordingly and get the file contents for the provided command name
-//                    FileRequest fileRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), FileRequest.class);
+//                    FileRequest fileRequest = Serializer.deserialize(clientBundle.getSerializedData(), FileRequest.class);
 //                    FileGetter fileGetter = new FileGetter();
 //                    result = fileGetter.getFile(fileRequest);
 //                }
@@ -117,24 +117,24 @@ public class TCPServer implements Runnable {
                 }
                 if(clientBundle.getType() == RequestType.COMMAND) {
                     // If it is a command request then deserialize it accordingly and give it to the ICommandFactory
-                    CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), CommandRequest.class);
+                    CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedData(), CommandRequest.class);
                     result = commandHandler.handleCommand(commandRequest);
                 }
                 else if(clientBundle.getType() == RequestType.FILE_UPDATE) {
                     // If it is a update request then deserialize it accordingly, reload the new class and update it
-                    UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), UpdateRequest.class);
+                    UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedData(), UpdateRequest.class);
                     InMemoryClassLoader loader = new InMemoryClassLoader();
                     result = loader.updateClass(updateRequest);
                 }
                 else if (clientBundle.getType() == RequestType.ENTITY) {
                     // If it is a entity request then deserialize it accordingly, register the entity with the server
-                    EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), EntityRequest.class);
+                    EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedData(), EntityRequest.class);
                     EntityLoader loader = new EntityLoader();
                     result = loader.registerEntity(entityRequest);
                 }
                 else {
                     // If it is a get file request then deserialize it accordingly and get the file contents for the provided command name
-                    FileRequest fileRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), FileRequest.class);
+                    FileRequest fileRequest = Serializer.deserialize(clientBundle.getSerializedData(), FileRequest.class);
                     FileGetter fileGetter = new FileGetter();
                     result = fileGetter.getFile(fileRequest);
                 }
@@ -142,7 +142,7 @@ public class TCPServer implements Runnable {
                 // Write the result to the client
                 ClientBundle response = new ClientBundle();
                 String resultData = Serializer.serialize(result);
-                response.setSerializedRequest(resultData);
+                response.setSerializedData(resultData);
                 response.setType(clientBundle.getType());
                 String responseData = Serializer.serialize(response);
                 System.out.println("Writing Response: " + responseData);

@@ -65,7 +65,7 @@ public class UDPServer {
             }
             ClientBundle response = new ClientBundle();
             String resultString = Serializer.serialize(result);
-            clientBundle.setSerializedRequest(resultString);
+            clientBundle.setSerializedData(resultString);
             clientBundle.setType(clientBundle.getType());
             String responseString = Serializer.serialize(response);
             byte[] resultData = responseString.getBytes();
