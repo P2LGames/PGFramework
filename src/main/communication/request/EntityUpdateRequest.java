@@ -1,9 +1,11 @@
 package main.communication.request;
 
+import java.util.Map;
+
 public class EntityUpdateRequest {
     private String entityId;
     private String entityClass;
-    private String serializedEntity;
+    private Map<String, Object> fieldsToUpdate;
 
     public String getEntityId() {
         return entityId;
@@ -21,11 +23,11 @@ public class EntityUpdateRequest {
         this.entityClass = entityClass;
     }
 
-    public String getSerializedEntity() {
-        return serializedEntity;
+    public Map<String, Object> getFieldsToUpdate() {
+        return fieldsToUpdate;
     }
 
-    public void setSerializedEntity(String serializedEntity) {
-        this.serializedEntity = serializedEntity;
+    public void setFieldsToUpdate(Map<String, Object> fieldsToUpdate) {
+        this.fieldsToUpdate = fieldsToUpdate;
     }
 }

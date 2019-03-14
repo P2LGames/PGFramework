@@ -8,6 +8,9 @@ import main.entity.EntityUpdater;
 import org.junit.Test;
 import util.Serializer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static junit.framework.Assert.assertEquals;
 
 public class EntityUpdaterTest {
@@ -25,7 +28,9 @@ public class EntityUpdaterTest {
         entity.setRunSpeed(5);
 
         EntityUpdateRequest request = new EntityUpdateRequest();
-        request.setSerializedEntity(Serializer.serialize(entity));
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("runSpeed", 5);
+        request.setFieldsToUpdate(updates);
         request.setEntityClass("TestEntity");
         request.setEntityId("testEntity");
 

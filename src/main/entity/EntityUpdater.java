@@ -11,6 +11,7 @@ import main.communication.result.EntityUpdateResult;
 import util.Serializer;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 public class EntityUpdater {
 
@@ -19,13 +20,11 @@ public class EntityUpdater {
         GenericEntity entity = GenericEntityMap.getInstance().get(request.getEntityId());
         try {
             Class<?> entityClass = Class.forName(request.getEntityClass());
-            Object updateEntity = Serializer.deserialize(request.getSerializedEntity(), entityClass);
+            Map<String, Object> updates = request.getFieldsToUpdate();
             for(Method getterMethod : entityClass.getMethods()) {
                 if(getterMethod.isAnnotationPresent(Getter.class)) {
                     String getterFieldName = getterMethod.getAnnotation(Getter.class).fieldName();
-                    GenericCommand getterCommand = new GenericCommand(updateEntity, getterMethod, new Class<?>[0]);
-                    CommandResult commandResult = getterCommand.run();
-                    if(commandResult.getValue() != null) {
+                    if(updates.containsKey(getterFieldName)) {
                         for(Method setterMethod : entityClass.getMethods()) {
                             if(setterMethod.isAnnotationPresent(Setter.class)) {
                                 String setterFieldName = setterMethod.getAnnotation(Setter.class).fieldName();
@@ -34,7 +33,7 @@ public class EntityUpdater {
                                     Class<?>[] params = new Class<?>[1];
                                     params[0] = paramType;
                                     GenericCommand setterCommand = new GenericCommand(entity, setterMethod, params);
-                                    setterCommand.setParameters(new Object[]{commandResult.getValue()});
+                                    setterCommand.setParameters(new Object[]{updates.get(setterFieldName)});
                                     setterCommand.run();
                                 }
                             }
