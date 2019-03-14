@@ -140,9 +140,13 @@ public class TCPServer implements Runnable {
                 }
 
                 // Write the result to the client
+                ClientBundle response = new ClientBundle();
                 String resultData = Serializer.serialize(result);
-                System.out.println("Writing Response: " + resultData);
-                outToClient.writeBytes(resultData + '\n');
+                response.setSerializedRequest(resultData);
+                response.setType(clientBundle.getType());
+                String responseData = Serializer.serialize(response);
+                System.out.println("Writing Response: " + responseData);
+                outToClient.writeBytes(responseData + '\n');
             }
             welcomeSocket.close();
         } catch (Exception e) {

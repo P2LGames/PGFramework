@@ -63,11 +63,15 @@ public class UDPServer {
                 System.out.println("Bad request type for UDP server");
                 continue;
             }
+            ClientBundle response = new ClientBundle();
             String resultString = Serializer.serialize(result);
-            byte[] resultData = resultString.getBytes();
-            DatagramPacket response = new DatagramPacket(resultData, resultData.length);
+            clientBundle.setSerializedRequest(resultString);
+            clientBundle.setType(clientBundle.getType());
+            String responseString = Serializer.serialize(response);
+            byte[] resultData = responseString.getBytes();
+            DatagramPacket responsePacket = new DatagramPacket(resultData, resultData.length);
 
-            socket.send(response);
+            socket.send(responsePacket);
         }
         socket.close();
     }
