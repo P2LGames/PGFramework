@@ -30,6 +30,6 @@ public class EntityResult extends Result {
         if (this == o) return true;
         if (!(o instanceof EntityResult)) return false;
         EntityResult that = (EntityResult) o;
-        return Objects.equals(entityId, that.entityId);
+        return Objects.equals(entityId, that.entityId) && Objects.equals(placeholderId, that.placeholderId);
     }
 }

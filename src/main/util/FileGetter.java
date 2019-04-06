@@ -1,15 +1,17 @@
 package main.util;
 
+import command.CommandData;
+import command.GenericCommand;
+import entity.GenericEntity;
 import main.communication.request.FileRequest;
 import main.communication.request.FileRequestType;
 import main.communication.result.FileResult;
+import entity.GenericEntityMap;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +19,35 @@ import java.util.regex.Pattern;
  * Used for retrieving a file for the user playing the game
  */
 public class FileGetter {
+
+    /**
+     * Get data for all the commands associated with a given entity
+     * @param entityId - ID of entity you want
+     * @return Data for each of the commands associated with a given entity
+     */
+    public List<CommandData> getCommandsForEntity(String entityId) {
+        List<CommandData> allCommandData = new ArrayList<>();
+        GenericEntityMap entityMap = GenericEntityMap.getInstance();
+        GenericEntity entity = entityMap.get(entityId);
+        for (String commandClass : entity.getCommandClasses()) {
+            String className;
+            GenericCommand command;
+            try {
+                command = entity.getCommand(commandClass);
+                className = command.getClass().getName();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                continue;
+            }
+            FileResult fileResult = this.getFile(new FileRequest(commandClass));
+            if (fileResult.getSuccess()) {
+                CommandData commandData = new CommandData(commandClass, className, fileResult.getFileContents());
+                allCommandData.add(commandData);
+            }
+        }
+
+        return allCommandData;
+    }
 
     /**
      * Gets the file corresponding to the specified command and returns its contents
@@ -45,35 +76,34 @@ public class FileGetter {
         }
         if (request.getRequestType() == FileRequestType.FILE) {
             return new FileResult(scanner.next());
-        } else if (request.getRequestType() == FileRequestType.FUNCTION) {
+        } else {
             try {
-                String functionCode = this.getFunctionFromFile(scanner.next(), request.getFunctionName());
-                return new FileResult(functionCode);
-            } catch (IOException e) {
-                return new FileResult(false, e.getMessage());
-            }
-        } else if (request.getRequestType() == FileRequestType.LINE_RANGE) {
-            try {
-                String lineCode = this.getLinesFromFile(scanner, request.getFirstLine(), request.getLastLine());
-                return new FileResult(lineCode);
-            } catch (IOException e) {
+                if (request.getRequestType() == FileRequestType.FUNCTION) {
+                    String functionCode = this.getFunctionFromFile(scanner.next(), request.getFunctionName());
+                    return new FileResult(functionCode);
+                } else if (request.getRequestType() == FileRequestType.LINE_RANGE) {
+                    String lineCode = this.getLinesFromFile(scanner, request.getFirstLine(), request.getLastLine());
+                    return new FileResult(lineCode);
+                }
+            } catch (IOException e ) {
                 return new FileResult(false, e.getMessage());
             }
         }
         return new FileResult(false, "Unknown Request Type: " + request.getRequestType());
     }
 
+
+    /**
+     * Extracts a function from a file according to the function's name
+     * TODO: This doesn't work with overloaded functions
+     * @param fileContents contents of the entire file
+     * @param functionName the desired function, of the form: "public returnType functionName (parameters)"
+     * @return A string of the function with the same name and return type as the requested function
+     * @throws IOException
+     */
     private String getFunctionFromFile(String fileContents, String functionName) throws IOException {
-        /*
-            TODO:
-            This function needs some work. It behaves correctly in most instances,
-            but it is missing some functionality and a few safeguards.
-            -It isn't very robust for functions with parameters
-            -If the function name appears in the source code in a comment or string
-            before the actual function, this will find the wrong thing.
-         */
         String functionNameRegexString = getRegexForFunctionName(functionName + "{");
-        Pattern functionNameRegex = Pattern.compile(functionNameRegexString);
+        Pattern functionNameRegex = Pattern.compile(functionNameRegexString, Pattern.DOTALL);
         Matcher matcher = functionNameRegex.matcher(fileContents);
 
         if (matcher.find()) {
@@ -121,10 +151,7 @@ public class FileGetter {
 
     private String getRegexForFunctionName(String functionName) {
         Map<String, String> patterns = new LinkedHashMap<>();
-        patterns.put("\\)\\s*\\{", "\\)\\\\s*\\\\{");
-        patterns.put("\\(\\s*\\)","(\\\\s*\\\\)");
-        patterns.put("\\s*\\(", "\\\\s*\\\\(");
-        patterns.put(" \\)", "\\\\)");
+        patterns.put("\\s*\\(.*?\\)\\s*\\{", "\\\\s*\\\\(.*?\\\\)\\\\s*\\\\{");
         patterns.put("\\s*<\\s*", "\\\\s*<\\\\s*");
         patterns.put("\\s*>", "\\\\s*>");
         patterns.put("\\s*\\[", "\\\\s*\\\\[");
@@ -132,7 +159,7 @@ public class FileGetter {
         patterns.put("\\s+", "\\\\s+");
 
         for (String key : patterns.keySet()) {
-            Pattern compiledPattern = Pattern.compile(key);
+            Pattern compiledPattern = Pattern.compile(key, Pattern.DOTALL);
             functionName = compiledPattern.matcher(functionName).replaceAll(patterns.get(key));
         }
         return "[\\t ]*" + functionName;

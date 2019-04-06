@@ -16,6 +16,10 @@ public class FileResult extends Result {
         this.fileContents = fileContents;
     }
 
+    public String getFileContents() {
+        return fileContents;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

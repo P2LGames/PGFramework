@@ -3,6 +3,7 @@ package command;
 import java.util.Objects;
 
 public class CommandResult extends Result {
+    private String entityId;
     private Object value;
 
     public CommandResult() {
@@ -13,7 +14,8 @@ public class CommandResult extends Result {
         super(errorMessage, success);
     }
 
-    public CommandResult(Object value) {
+    public CommandResult(Object value, String entityId) {
+        this.entityId = entityId;
         this.value = value;
     }
 

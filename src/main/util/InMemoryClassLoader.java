@@ -1,20 +1,16 @@
 package main.util;
 
-import entity.Entity;
+import command.GenericCommand;
+import entity.GenericEntity;
 import main.communication.request.UpdateRequest;
 import main.communication.result.UpdateResult;
-import main.entity.EntityMap;
+import entity.GenericEntityMap;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 
-
-/**
- * A class loader that does not use .java files
- */
 public class InMemoryClassLoader {
 
     /**
@@ -26,27 +22,25 @@ public class InMemoryClassLoader {
      *   The result object the reports a failure or contains the loaded class
      */
     public UpdateResult updateClass(UpdateRequest request) {
-        UpdateResult result = new UpdateResult();
+        UpdateResult result = new UpdateResult(request.getEntityId());
         InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance();
 
         try {
-            Class<?> loadedClass = compiler.compile(request.getCommand(), request.getFileContents());
-            if (!result.getSuccess()) {
-                return result;
-            }
+            Class<?> loadedClass = compiler.compile(request.getClassName(), request.getFileContents());
             this.saveSourceCode(request, loadedClass);
-            Constructor constructor;
-            if (request.getHasParameter()) {
-                Class<?> parameterClassObject = Class.forName(request.getParameterClassName());
-                constructor = loadedClass.getDeclaredConstructor(parameterClassObject);
-            } else {
-                constructor = loadedClass.getConstructor();
+            GenericCommand command = new GenericCommand();
+            String[] paramTypesStrings = request.getParameterTypesStrings();
+            Class<?>[] paramTypes = new Class<?>[paramTypesStrings.length];
+            for(int i = 0; i < paramTypesStrings.length; i++) {
+                paramTypes[i] = Class.forName(paramTypesStrings[i]);
             }
-            EntityMap entities = EntityMap.getInstance();
-            Entity entity = entities.get(request.getEntityId());
-            entity.replaceConstructor(request.getCommand(), constructor);
+            command.setMethod(loadedClass.getMethod(request.getMethodName(), paramTypes));
+            command.setClassObject(loadedClass.getConstructor().newInstance());
+            GenericEntityMap entities = GenericEntityMap.getInstance();
+            GenericEntity entity = entities.get(request.getEntityId());
+            entity.updateCommand(request.getCommand(), command);
+            entity.addCommandClass(request.getClassName());
         } catch (Exception e) {
-            e.printStackTrace();
             result.setSuccess(false);
             result.setErrorMessage(e.getMessage());
         }
@@ -77,4 +71,5 @@ public class InMemoryClassLoader {
             System.out.println(e.getMessage());
         }
     }
+
 }

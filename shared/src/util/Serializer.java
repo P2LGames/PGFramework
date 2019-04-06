@@ -1,6 +1,9 @@
 package util;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.lang.reflect.Modifier;
 
 /**
  * Serializes and deserializes objects sent to and from the client
@@ -9,8 +12,11 @@ import com.google.gson.Gson;
  */
 public class Serializer {
 
+
     public static String serialize(Object obj) {
-        Gson gson = new Gson();
+        final Gson gson = new GsonBuilder()
+
+                .create();
         return gson.toJson(obj);
     }
 
