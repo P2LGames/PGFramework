@@ -54,46 +54,46 @@ public class TCPServer implements Runnable {
 
             while (shouldRun) {
                 System.out.println("Reading Input");
-                /*String requestData = */ readJsonObject(inFromClient);
-//                System.out.println("Request Data: " + requestData);
-//                ClientBundle clientBundle = Serializer.deserialize(requestData, ClientBundle.class);
+                String requestData = readJsonObject(inFromClient);
+                System.out.println("Request Data: " + requestData);
+                ClientBundle clientBundle = Serializer.deserialize(requestData, ClientBundle.class);
 //
-//                Result result;
-//
-//                if(clientBundle == null) {
-//                    continue;
-//                }
-//                if(clientBundle.getType() == RequestType.COMMAND) {
-//                    // If it is a command request then deserialize it accordingly and give it to the ICommandFactory
-//                    CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), CommandRequest.class);
-//                    result = commandHandler.handleCommand(commandRequest);
-//                }
-//                else if(clientBundle.getType() == RequestType.FILE_UPDATE) {
-//                    // If it is a update request then deserialize it accordingly, reload the new class and update it
-//                    UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), UpdateRequest.class);
-//                    InMemoryClassLoader loader = new InMemoryClassLoader();
-//                    result = loader.updateClass(updateRequest);
-//                }
-//                else if (clientBundle.getType() == RequestType.ENTITY) {
-//                    // If it is a entity request then deserialize it accordingly, register the entity with the server
-//                    EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), EntityRequest.class);
-//                    EntityLoader loader = new EntityLoader();
-//                    result = loader.registerEntity(entityRequest);
-//                }
-//                else if (clientBundle.getType() == RequestType.FILE_GET) {
-//                    // If it is a get file request then deserialize it accordingly and get the file contents for the provided command name
-//                    FileRequest fileRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), FileRequest.class);
-//                    FileGetter fileGetter = new FileGetter();
-//                    result = fileGetter.getFile(fileRequest);
-//                }
-//                else {
-//                    result = new UnknownRequestResult();
-//                }
-//
-//                // Write the result to the client
-//                String resultData = Serializer.serialize(result);
-//                System.out.println("Writing Response: " + resultData);
-//                outToClient.writeBytes(resultData + '\n');
+                Result result;
+
+                if(clientBundle == null) {
+                    continue;
+                }
+                if(clientBundle.getType() == RequestType.COMMAND) {
+                    // If it is a command request then deserialize it accordingly and give it to the ICommandFactory
+                    CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), CommandRequest.class);
+                    result = commandHandler.handleCommand(commandRequest);
+                }
+                else if(clientBundle.getType() == RequestType.FILE_UPDATE) {
+                    // If it is a update request then deserialize it accordingly, reload the new class and update it
+                    UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), UpdateRequest.class);
+                    InMemoryClassLoader loader = new InMemoryClassLoader();
+                    result = loader.updateClass(updateRequest);
+                }
+                else if (clientBundle.getType() == RequestType.ENTITY) {
+                    // If it is a entity request then deserialize it accordingly, register the entity with the server
+                    EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), EntityRequest.class);
+                    EntityLoader loader = new EntityLoader();
+                    result = loader.registerEntity(entityRequest);
+                }
+                else if (clientBundle.getType() == RequestType.FILE_GET) {
+                    // If it is a get file request then deserialize it accordingly and get the file contents for the provided command name
+                    FileRequest fileRequest = Serializer.deserialize(clientBundle.getSerializedRequest(), FileRequest.class);
+                    FileGetter fileGetter = new FileGetter();
+                    result = fileGetter.getFile(fileRequest);
+                }
+                else {
+                    result = new UnknownRequestResult();
+                }
+
+                // Write the result to the client
+                String resultData = Serializer.serialize(result);
+                System.out.println("Writing Response: " + resultData);
+                outToClient.writeBytes(resultData + '\n');
             }
             welcomeSocket.close();
         } catch (Exception e) {
@@ -102,18 +102,22 @@ public class TCPServer implements Runnable {
         }
     }
 
-    public void readJsonObject(BufferedReader in) throws IOException {
+    public String readJsonObject(BufferedReader in) throws IOException {
         StringBuilder jsonObj = new StringBuilder();
 
         int bracketCount = 0;
         int quoteCount = 0;
 
         while (true) {
-            // Read in the next line
+            // Read in the next character
             char received = (char)in.read();
 
-            // Add the received to the json obj string
-            jsonObj.append(received);
+            // If we are in a bracket, append it, otherwise, only append if it is an opening bracket
+            if (bracketCount > 0 || received == '{') {
+                // Add the received to the json obj string
+                jsonObj.append(received);
+            }
+
 
             // If we received only a new line, continue
             if (received == '\n') {
@@ -126,9 +130,9 @@ public class TCPServer implements Runnable {
 
                 // If the bracket count it 0, stop! =)
                 if (bracketCount == 0 && !jsonObj.toString().equals("\n")) {
-                    System.out.println("New JSON: " + jsonObj.toString());
-                    jsonObj = new StringBuilder();
-//                break;
+//                    System.out.println("New JSON: " + jsonObj.toString());
+//                    return jsonObj.toString();s
+                    break;
                 }
             }
 //            else if (received == '"') {
@@ -140,7 +144,7 @@ public class TCPServer implements Runnable {
 
         }
 
-//        return jsonObj;
+        return jsonObj.toString();
     }
 
     /**
