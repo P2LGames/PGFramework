@@ -8,10 +8,12 @@ import java.util.Objects;
 
 public class EntityResult extends Result {
     private String entityId;
+    private String placeholderId;
 
-    public EntityResult(String entityId) {
+    public EntityResult(String entityId, String placeholderId) {
         super(null, true);
         this.entityId = entityId;
+        this.placeholderId = placeholderId;
     }
 
     public EntityResult(Boolean success, String errorMessage) {
@@ -21,6 +23,7 @@ public class EntityResult extends Result {
     public String getEntityId() {
         return entityId;
     }
+    public String getPlaceholderId() { return placeholderId; }
 
     @Override
     public boolean equals(Object o) {
