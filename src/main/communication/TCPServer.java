@@ -35,7 +35,7 @@ public class TCPServer implements Runnable {
     public void setCommandHandler(GenericCommandHandler commandHandler) {
         this.commandHandler = commandHandler;
     }
-    
+
     /**
      * Runs the server including routing different types of requests to the right place
      */
