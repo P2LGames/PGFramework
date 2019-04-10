@@ -24,14 +24,11 @@ public class EntityUpdaterTest {
         entity.setyPos(10);
         genericEntityMap.put("testEntity", entity);
 
-        TestEntity updateEntity = new TestEntity();
-        entity.setRunSpeed(5);
-
         EntityUpdateRequest request = new EntityUpdateRequest();
         Map<String, Object> updates = new HashMap<>();
         updates.put("runSpeed", 5);
         request.setFieldsToUpdate(updates);
-        request.setEntityClass("TestEntity");
+        request.setEntityClass("entity.TestEntity");
         request.setEntityId("testEntity");
 
         EntityUpdater updater = new EntityUpdater();
