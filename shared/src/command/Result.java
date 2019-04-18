@@ -1,5 +1,8 @@
 package command;
 
+/**
+ * The result that is returned for any command
+ */
 public abstract class Result {
     String errorMessage;
     Boolean success;

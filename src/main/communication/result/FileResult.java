@@ -4,6 +4,9 @@ import command.Result;
 
 import java.util.Objects;
 
+/**
+ * The result from requesting a files contents
+ */
 public class FileResult extends Result {
     private String fileContents;
 

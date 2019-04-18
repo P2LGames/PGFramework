@@ -1,5 +1,8 @@
 package command;
 
+/**
+ * Holds the data needed to update a command
+ */
 public class CommandData {
     String commandName;
     String className;

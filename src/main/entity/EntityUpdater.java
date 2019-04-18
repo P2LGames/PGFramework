@@ -13,8 +13,21 @@ import util.Serializer;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+/**
+ * Updates entity
+ */
 public class EntityUpdater {
 
+    /**
+     * Updates the supplied fields in the entity
+     *
+     * @param request
+     *  the request holding the necessary info to update an entity
+     *
+     * @return
+     *  the result of the entity being updated
+     *
+     */
     public EntityUpdateResult updateEntity(EntityUpdateRequest request) {
         EntityUpdateResult result;
         GenericEntity entity = GenericEntityMap.getInstance().get(request.getEntityId());

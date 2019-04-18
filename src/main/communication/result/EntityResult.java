@@ -5,7 +5,9 @@ import command.Result;
 import java.util.Objects;
 
 
-
+/**
+ * The result from registering a new entity
+ */
 public class EntityResult extends Result {
     private String entityId;
     private String placeholderId;
