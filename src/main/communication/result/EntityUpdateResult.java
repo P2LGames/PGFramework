@@ -2,6 +2,9 @@ package main.communication.result;
 
 import command.Result;
 
+/**
+ * The result from updating an entities fields
+ */
 public class EntityUpdateResult extends Result {
     private String entityId;
 

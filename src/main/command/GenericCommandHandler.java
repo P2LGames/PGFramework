@@ -21,7 +21,6 @@ public class GenericCommandHandler {
     }
 
     /**
-     *
      * Takes a command request and using the factory to retrieve the correct command and run it
      *
      * @param request the request holding the data for the command to be run

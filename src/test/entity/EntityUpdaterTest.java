@@ -6,7 +6,6 @@ import entity.TestEntity;
 import main.communication.request.EntityUpdateRequest;
 import main.entity.EntityUpdater;
 import org.junit.Test;
-import util.Serializer;
 
 import java.util.HashMap;
 import java.util.Map;

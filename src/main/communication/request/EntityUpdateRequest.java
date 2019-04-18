@@ -2,6 +2,9 @@ package main.communication.request;
 
 import java.util.Map;
 
+/**
+ * The request used for updating an entities data fields
+ */
 public class EntityUpdateRequest {
     private String entityId;
     private String entityClass;

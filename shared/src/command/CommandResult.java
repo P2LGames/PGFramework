@@ -2,6 +2,9 @@ package command;
 
 import java.util.Objects;
 
+/**
+ * The result of executing a command
+ */
 public class CommandResult extends Result {
     private String entityId;
     private Object value;
