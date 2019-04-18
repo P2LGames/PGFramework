@@ -41,68 +41,84 @@ public class TCPServer implements Runnable {
      */
     @Override
     public void run() {
-        ServerSocket welcomeSocket;
-        try {
-            //Initialize the socket
-            System.out.println("Initializing Socket");
-            welcomeSocket = new ServerSocket(6789);
-            //Accept input and process it
-            System.out.println("Accepting Connection");
-            Socket connectionSocket = welcomeSocket.accept();
-            BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-            DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
 
-            while (shouldRun) {
-                System.out.println("Reading Input");
-                String requestData = readJsonObject(inFromClient);
-                System.out.println("Request Data: " + requestData);
-                ClientBundle clientBundle = Serializer.deserialize(requestData, ClientBundle.class);
+        while (true) {
+
+            ServerSocket welcomeSocket = null;
+            Socket connectionSocket = null;
+            BufferedReader inFromClient = null;
+            DataOutputStream outToClient = null;
+            try {
+                //Initialize the socket
+                System.out.println("Initializing Socket");
+                welcomeSocket = new ServerSocket(6789);
+                //Accept input and process it
+                System.out.println("Accepting Connection");
+                connectionSocket = welcomeSocket.accept();
+                inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                outToClient = new DataOutputStream(connectionSocket.getOutputStream());
+
+                while (shouldRun) {
+                    System.out.println("Reading Input");
+                    String requestData = readJsonObject(inFromClient);
+                    System.out.println("Request Data: " + requestData);
+                    ClientBundle clientBundle = Serializer.deserialize(requestData, ClientBundle.class);
 //
-                Result result;
+                    Result result;
 
-                if(clientBundle == null) {
-                    continue;
-                }
-                if(clientBundle.getType() == RequestType.COMMAND) {
-                    // If it is a command request then deserialize it accordingly and give it to the ICommandFactory
-                    CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedData(), CommandRequest.class);
-                    result = commandHandler.handleCommand(commandRequest);
-                }
-                else if(clientBundle.getType() == RequestType.FILE_UPDATE) {
-                    // If it is a update request then deserialize it accordingly, reload the new class and update it
-                    UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedData(), UpdateRequest.class);
-                    InMemoryClassLoader loader = new InMemoryClassLoader();
-                    result = loader.updateClass(updateRequest);
-                }
-                else if (clientBundle.getType() == RequestType.ENTITY) {
-                    // If it is a entity request then deserialize it accordingly, register the entity with the server
-                    EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedData(), EntityRequest.class);
-                    EntityLoader loader = new EntityLoader();
-                    result = loader.registerEntity(entityRequest);
-                }
-                else if (clientBundle.getType() == RequestType.FILE_GET) {
-                    // If it is a get file request then deserialize it accordingly and get the file contents for the provided command name
-                    FileRequest fileRequest = Serializer.deserialize(clientBundle.getSerializedData(), FileRequest.class);
-                    FileGetter fileGetter = new FileGetter();
-                    result = fileGetter.getFile(fileRequest);
-                }
-                else {
-                    result = new UnknownRequestResult();
-                }
+                    if (clientBundle == null) {
+                        continue;
+                    }
+                    if (clientBundle.getType() == RequestType.COMMAND) {
+                        // If it is a command request then deserialize it accordingly and give it to the ICommandFactory
+                        CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedData(), CommandRequest.class);
+                        result = commandHandler.handleCommand(commandRequest);
+                    } else if (clientBundle.getType() == RequestType.FILE_UPDATE) {
+                        // If it is a update request then deserialize it accordingly, reload the new class and update it
+                        UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedData(), UpdateRequest.class);
+                        InMemoryClassLoader loader = new InMemoryClassLoader();
+                        result = loader.updateClass(updateRequest);
+                    } else if (clientBundle.getType() == RequestType.ENTITY) {
+                        // If it is a entity request then deserialize it accordingly, register the entity with the server
+                        EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedData(), EntityRequest.class);
+                        EntityLoader loader = new EntityLoader();
+                        result = loader.registerEntity(entityRequest);
+                    } else if (clientBundle.getType() == RequestType.FILE_GET) {
+                        // If it is a get file request then deserialize it accordingly and get the file contents for the provided command name
+                        FileRequest fileRequest = Serializer.deserialize(clientBundle.getSerializedData(), FileRequest.class);
+                        FileGetter fileGetter = new FileGetter();
+                        result = fileGetter.getFile(fileRequest);
+                    } else {
+                        result = new UnknownRequestResult();
+                    }
 
-                // Write the result to the client
-                ClientBundle response = new ClientBundle();
-                String resultData = Serializer.serialize(result);
-                response.setSerializedData(resultData);
-                response.setType(clientBundle.getType());
-                String responseData = Serializer.serialize(response);
-                System.out.println("Writing Response: " + responseData);
-                outToClient.writeBytes(responseData + '\n');
+                    // Write the result to the client
+                    ClientBundle response = new ClientBundle();
+                    String resultData = Serializer.serialize(result);
+                    response.setSerializedData(resultData);
+                    response.setType(clientBundle.getType());
+                    String responseData = Serializer.serialize(response);
+                    System.out.println("Writing Response: " + responseData);
+                    outToClient.writeBytes(responseData + '\n');
+                }
+                welcomeSocket.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                // Try to close sockets, clean up connections
+                try {
+                    if (inFromClient != null) { inFromClient.close(); }
+                    if (outToClient != null) { outToClient.close(); }
+                    if (connectionSocket != null) { connectionSocket.close(); }
+                    if (welcomeSocket != null) { welcomeSocket.close(); }
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
             }
-            welcomeSocket.close();
-        } catch (Exception e) {
-            System.out.println("Failed to read");
-            e.printStackTrace();
+            catch (Exception e) {
+                System.out.println("Failed to read");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -112,7 +128,7 @@ public class TCPServer implements Runnable {
         int bracketCount = 0;
         int quoteCount = 0;
 
-        while (true) {
+        while (shouldRun) {
             // Read in the next character
             char received = (char)in.read();
 

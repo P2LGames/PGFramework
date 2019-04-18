@@ -25,7 +25,7 @@ public class EntityUpdaterTest {
         genericEntityMap.put("testEntity", entity);
 
         TestEntity updateEntity = new TestEntity();
-        entity.setRunSpeed(5);
+//        entity.setRunSpeed(5);
 
         EntityUpdateRequest request = new EntityUpdateRequest();
         Map<String, Object> updates = new HashMap<>();
