@@ -32,6 +32,7 @@ public class PathingEntityDefault {
         if(startX == desX && startY == desY) {
             return path;
         }
+
         map.get(startY).set(startX, 1);
         List<String> rPath = null;
         if(startX + 1 < map.get(0).size()) {
@@ -83,7 +84,7 @@ public class PathingEntityDefault {
             paths.add(uPath);
         }
 
-        if(paths.stream().mapToInt(List::size).min().isPresent()) {
+        if (paths.stream().mapToInt(List::size).min().isPresent()) {
             paths.stream().mapToInt(List::size).min().getAsInt();
             return paths.stream().min(Comparator.comparing(List::size)).get();
         }

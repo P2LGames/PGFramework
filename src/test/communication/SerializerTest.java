@@ -4,6 +4,8 @@ import main.communication.request.CommandRequest;
 import org.junit.Test;
 import util.Serializer;
 
+import java.util.HashMap;
+
 import static org.junit.Assert.*;
 
 public class SerializerTest {
@@ -52,6 +54,15 @@ public class SerializerTest {
         String numToDeserialize = "20.0";
         Double deserializedNum = Serializer.deserialize(numToDeserialize, Double.class);
         assertEquals(deserializedNum, num);
+
+        //Test Map
+        HashMap<String, Object> map = new HashMap<>();
+        String mapToDeserialize = "{\"test1\":20.0, \"test2\":1, \"test3\":\"here\"}";
+        map.put("test1", 20.0);
+        map.put("test2", 1.0);
+        map.put("test3", "here");
+        HashMap<String, Object> deserializedMap = Serializer.deserialize(mapToDeserialize, HashMap.class);
+        assertEquals(map, deserializedMap);
     }
 
 }

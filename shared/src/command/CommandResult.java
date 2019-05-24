@@ -7,20 +7,30 @@ import java.util.Objects;
  */
 public class CommandResult extends Result {
     private String entityId;
+    private String command;
     private Object value;
 
     public CommandResult() {
         super();
     }
 
-    public CommandResult(String errorMessage, Boolean success) {
+    public CommandResult(String errorMessage, Boolean success, String entityId) {
         super(errorMessage, success);
+        this.entityId = entityId;
     }
 
     public CommandResult(Object value, String entityId) {
         this.entityId = entityId;
         this.value = value;
     }
+
+    public String getEntityId() { return entityId; }
+
+    public void setEntityId(String entityId) { this.entityId = entityId; }
+
+    public String getCommand() { return command; }
+
+    public void setCommand(String command) { this.command = command; }
 
     public Object getValue() {
         return value;

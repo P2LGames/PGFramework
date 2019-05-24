@@ -2,6 +2,7 @@ package entity;
 
 import annotations.Command;
 import annotations.Entity;
+import annotations.SetEntity;
 import command.GenericCommand;
 import communication.ServerException;
 
@@ -68,22 +69,36 @@ public abstract class GenericEntity {
      */
     private void makeDefaults() throws ServerException {
 
-        Class<?> thisClass = this.getClass();
-        if(!thisClass.isAnnotationPresent(Entity.class)) {
-            throw new ServerException("This entity is missing the @Entity annotation");
-        }
-        else {
-            Class<?> defaultCommandsClass = thisClass.getAnnotation(Entity.class).defaultCommands();
-            for (Method commandMethod : defaultCommandsClass.getDeclaredMethods()) {
-                if (commandMethod.isAnnotationPresent(Command.class)) {
-                    String commandName = commandMethod.getAnnotation(Command.class).commandName();
-                    GenericCommand command = new GenericCommand();
-                    command.setMethod(commandMethod);
-                    commandMap.put(commandName, command);
-                    addCommandClass(commandMethod.getDeclaringClass().getName());
+        try {
+            Class<?> thisClass = this.getClass();
+            if(!thisClass.isAnnotationPresent(Entity.class)) {
+                throw new ServerException("This entity is missing the @Entity annotation");
+            }
+            else {
+                Class<?> defaultCommandsClass = thisClass.getAnnotation(Entity.class).defaultCommands();
+                Object classObject = defaultCommandsClass.getConstructor().newInstance();
+
+                for (Method commandMethod : defaultCommandsClass.getDeclaredMethods()) {
+                    if (commandMethod.isAnnotationPresent(Command.class)) {
+                        String commandName = commandMethod.getAnnotation(Command.class).commandName();
+                        GenericCommand command = new GenericCommand();
+
+                        command.setClassObject(classObject);
+
+                        command.setMethod(commandMethod);
+                        commandMap.put(commandName, command);
+                        addCommandClass(commandMethod.getDeclaringClass().getName());
+                    }
+                    else if (commandMethod.isAnnotationPresent(SetEntity.class)) {
+                        // Set the entity of our class oject
+                        commandMethod.invoke(classObject, this);
+                    }
                 }
             }
+        } catch (Exception e) {
+            throw new ServerException(e.getMessage());
         }
+
     }
 
     public void addCommandClass(String className) {

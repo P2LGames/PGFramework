@@ -3,6 +3,7 @@ package command;
 import entity.GenericEntity;
 import entity.GenericEntityMap;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
@@ -33,7 +34,7 @@ public class GenericCommand implements Command, Cloneable {
     }
 
     public void setParameters(Object[] parameters) {
-        _paramValues = parameters;
+        this._paramValues = parameters;
     }
 
     /**
@@ -45,9 +46,12 @@ public class GenericCommand implements Command, Cloneable {
     public CommandResult run() {
         Class<?>[] parameterTypes = method.getParameterTypes();
         assert(parameterTypes.length == _paramValues.length);
-        for(int i = 0; i < parameterTypes.length; i++) {
+
+        // If one of the parameters is the generic entity class, then one of the _paramValues should be an entity ID
+        for (int i = 0; i < parameterTypes.length; i++) {
+
             Class classType = parameterTypes[i];
-            if(classType.isInstance(GenericEntity.class)) {
+            if (classType.isInstance(GenericEntity.class)) {
                 assert(_paramValues[i] instanceof String);
                 String id = (String) _paramValues[i];
                 GenericEntityMap entityMap = GenericEntityMap.getInstance();
@@ -55,12 +59,31 @@ public class GenericCommand implements Command, Cloneable {
                 _paramValues[i] = entity;
             }
         }
+
         CommandResult result = new CommandResult();
         try {
+//            // If the method has parameters
+//            if (parameterTypes.length > 0) {
+//                // Then run the method with our passes parameters
+//
+//            }
+//            // Otherwise, run the method with not parameters
+//            else {
+//                result.setValue(method.invoke(classObject));
+//            }
             result.setValue(method.invoke(classObject, _paramValues));
             result.setSuccess(true);
         }
+        catch (InvocationTargetException e) {
+            e.printStackTrace();
+            Throwable cause = e.getCause();
+            System.out.println("Cause: " + cause.getMessage());
+            result.setErrorMessage(cause.getMessage());
+            result.setSuccess(false);
+        }
         catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Message: " + e.getMessage());
             result.setErrorMessage(e.getMessage());
             result.setSuccess(false);
         }

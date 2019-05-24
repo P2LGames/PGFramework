@@ -6,6 +6,7 @@ import entity.TestEntity;
 import main.communication.request.EntityUpdateRequest;
 import main.entity.EntityUpdater;
 import org.junit.Test;
+import util.Serializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +36,30 @@ public class EntityUpdaterTest {
         updater.updateEntity(request);
 
         assertEquals(5, entity.getRunSpeed());
+
+
+    }
+
+    @Test
+    public void testDeserializeEntityUpdateRequest() {
+        // Request Expected
+        EntityUpdateRequest requestExpected = new EntityUpdateRequest();
+//        requestExpected.setEntityId("entity.Robot1");
+//        requestExpected.setEntityClass("Robot");
+//        HashMap<String, Object> map = new HashMap<>();
+//        map.put("userInputMove", 0);
+//        map.put("userInputRotate", 0);
+//        requestExpected.setFieldsToUpdate(map);
+        // Serialized request
+        String serializedRequest = "{\"entityId\":\"entity.Robot1\",\"entityClass\":\"Robot\",\"fieldsToUpdate\":{\"userInputMove\":0,\"userInputRotate\":0}}";
+        EntityUpdateRequest request = Serializer.deserialize(serializedRequest, EntityUpdateRequest.class);
+
+        assertEquals("entity.Robot1", request.getEntityId());
+        assertEquals("Robot", request.getEntityClass());
+        assertEquals(0.0, request.getFieldsToUpdate().get("userInputMove"));
+        assertEquals(0.0, request.getFieldsToUpdate().get("userInputRotate"));
+
+
     }
 
 

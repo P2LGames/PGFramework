@@ -32,9 +32,15 @@ public class GenericCommandHandler {
         try {
             command = commandFactory.getCommand(request);
         } catch(ServerException e) {
-            return new CommandResult(e.getMessage(), false);
+            return new CommandResult(e.getMessage(), false, request.getEntityId());
         }
         command.setParameters(request.getParameters());
-        return command.run();
+        // Get the result of the command so the client knows what the value is from
+        CommandResult result = command.run();
+        // Set the entityId and command name in the result
+        result.setEntityId(request.getEntityId());
+        result.setCommand(request.getCommand());
+        // Return the result
+        return result;
     }
 }

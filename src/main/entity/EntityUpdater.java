@@ -2,13 +2,11 @@ package main.entity;
 
 import annotations.Getter;
 import annotations.Setter;
-import command.CommandResult;
 import command.GenericCommand;
 import entity.GenericEntity;
 import entity.GenericEntityMap;
 import main.communication.request.EntityUpdateRequest;
 import main.communication.result.EntityUpdateResult;
-import util.Serializer;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -30,18 +28,32 @@ public class EntityUpdater {
      */
     public EntityUpdateResult updateEntity(EntityUpdateRequest request) {
         EntityUpdateResult result;
+        // Get the entity via entityId
         GenericEntity entity = GenericEntityMap.getInstance().get(request.getEntityId());
+
         try {
+            // Get the entity's class
             Class<?> entityClass = Class.forName(request.getEntityClass());
+            // Get the fields that we want to update
             Map<String, Object> updates = request.getFieldsToUpdate();
+
+            // Loop through all of the methods in the entity's class
             for(Method getterMethod : entityClass.getMethods()) {
+                // If there is a getter annotation present
                 if(getterMethod.isAnnotationPresent(Getter.class)) {
+                    // Then we get the field name
                     String getterFieldName = getterMethod.getAnnotation(Getter.class).fieldName();
+                    // And check to see if our updates contains that key
                     if(updates.containsKey(getterFieldName)) {
+                        // If it does, then get look for a setter for that method
                         for(Method setterMethod : entityClass.getMethods()) {
+                            // If the setter exists
                             if(setterMethod.isAnnotationPresent(Setter.class)) {
+                                // We get the field name for it
                                 String setterFieldName = setterMethod.getAnnotation(Setter.class).fieldName();
+                                // And ensure that the getter and setter field names are in sync
                                 if(getterFieldName.equals(setterFieldName)) {
+                                    // Then we run the set command with our passed in updates
                                     Class<?> paramType = setterMethod.getAnnotation(Setter.class).type();
                                     Class<?>[] params = new Class<?>[1];
                                     params[0] = paramType;

@@ -1,13 +1,11 @@
 package main.communication;
 
 import main.command.GenericCommandHandler;
-import main.communication.request.CommandRequest;
-import main.communication.request.EntityRequest;
-import main.communication.request.FileRequest;
-import main.communication.request.UpdateRequest;
+import main.communication.request.*;
 import command.Result;
 import main.communication.result.UnknownRequestResult;
 import main.entity.EntityLoader;
+import main.entity.EntityUpdater;
 import main.util.FileGetter;
 import main.util.InMemoryClassLoader;
 import util.Serializer;
@@ -59,9 +57,9 @@ public class TCPServer implements Runnable {
                 outToClient = new DataOutputStream(connectionSocket.getOutputStream());
 
                 while (shouldRun) {
-                    System.out.println("Reading Input");
+//                    System.out.println("Reading Input");
                     String requestData = readJsonObject(inFromClient);
-                    System.out.println("Request Data: " + requestData);
+//                    System.out.println("Request Data: " + requestData);
                     ClientBundle clientBundle = Serializer.deserialize(requestData, ClientBundle.class);
 //
                     Result result;
@@ -69,25 +67,31 @@ public class TCPServer implements Runnable {
                     if (clientBundle == null) {
                         continue;
                     }
+
                     if (clientBundle.getType() == RequestType.COMMAND) {
                         // If it is a command request then deserialize it accordingly and give it to the ICommandFactory
                         CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedData(), CommandRequest.class);
                         result = commandHandler.handleCommand(commandRequest);
-                    } else if (clientBundle.getType() == RequestType.FILE_UPDATE) {
-                        // If it is a update request then deserialize it accordingly, reload the new class and update it
-                        UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedData(), UpdateRequest.class);
-                        InMemoryClassLoader loader = new InMemoryClassLoader();
-                        result = loader.updateClass(updateRequest);
                     } else if (clientBundle.getType() == RequestType.ENTITY) {
                         // If it is a entity request then deserialize it accordingly, register the entity with the server
                         EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedData(), EntityRequest.class);
                         EntityLoader loader = new EntityLoader();
                         result = loader.registerEntity(entityRequest);
+                    } else if(clientBundle.getType() == RequestType.ENTITY_UPDATE) {
+                        System.out.println(clientBundle.getSerializedData());
+                        EntityUpdateRequest request = Serializer.deserialize(clientBundle.getSerializedData(), EntityUpdateRequest.class);
+                        EntityUpdater updater = new EntityUpdater();
+                        result = updater.updateEntity(request);
                     } else if (clientBundle.getType() == RequestType.FILE_GET) {
                         // If it is a get file request then deserialize it accordingly and get the file contents for the provided command name
                         FileRequest fileRequest = Serializer.deserialize(clientBundle.getSerializedData(), FileRequest.class);
                         FileGetter fileGetter = new FileGetter();
                         result = fileGetter.getFile(fileRequest);
+                    } else if (clientBundle.getType() == RequestType.FILE_UPDATE) {
+                        // If it is a update request then deserialize it accordingly, reload the new class and update it
+                        UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedData(), UpdateRequest.class);
+                        InMemoryClassLoader loader = new InMemoryClassLoader();
+                        result = loader.updateClass(updateRequest);
                     } else {
                         result = new UnknownRequestResult();
                     }
@@ -98,7 +102,7 @@ public class TCPServer implements Runnable {
                     response.setSerializedData(resultData);
                     response.setType(clientBundle.getType());
                     String responseData = Serializer.serialize(response);
-                    System.out.println("Writing Response: " + responseData);
+//                    System.out.println("Writing Response: " + responseData);
                     outToClient.writeBytes(responseData + '\n');
                 }
                 welcomeSocket.close();
@@ -119,6 +123,7 @@ public class TCPServer implements Runnable {
                 System.out.println("Failed to read");
                 e.printStackTrace();
             }
+            break;
         }
     }
 

@@ -1,5 +1,7 @@
 package main.util;
 
+import annotations.Command;
+import annotations.SetEntity;
 import command.GenericCommand;
 import entity.GenericEntity;
 import main.communication.request.UpdateRequest;
@@ -10,6 +12,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 public class InMemoryClassLoader {
 
@@ -31,13 +34,31 @@ public class InMemoryClassLoader {
             GenericCommand command = new GenericCommand();
             String[] paramTypesStrings = request.getParameterTypesStrings();
             Class<?>[] paramTypes = new Class<?>[paramTypesStrings.length];
+
             for(int i = 0; i < paramTypesStrings.length; i++) {
                 paramTypes[i] = Class.forName(paramTypesStrings[i]);
             }
+
+            // Get the entity via the entity id
+            GenericEntity entity = GenericEntityMap.getInstance().get(request.getEntityId());
+
+            // Create a class object with the loaded class
+            Object classObject = loadedClass.getConstructor().newInstance();
+
+            // Loop through the methods in the loaded class
+            for (Method commandMethod : loadedClass.getDeclaredMethods()) {
+                // If we find a SetEntity method, we want to invoke it with the entity found via entityId
+                if (commandMethod.isAnnotationPresent(SetEntity.class)) {
+                    // Set the entity of our class object
+                    commandMethod.invoke(classObject, entity);
+                }
+            }
+
+            // Set the method and class object for this generic command
             command.setMethod(loadedClass.getMethod(request.getMethodName(), paramTypes));
-            command.setClassObject(loadedClass.getConstructor().newInstance());
-            GenericEntityMap entities = GenericEntityMap.getInstance();
-            GenericEntity entity = entities.get(request.getEntityId());
+            command.setClassObject(classObject);
+
+            // Update the command for the entity
             entity.updateCommand(request.getCommand(), command);
             entity.addCommandClass(request.getClassName());
         } catch (Exception e) {
