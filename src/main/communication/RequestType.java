@@ -1,5 +1,15 @@
 package main.communication;
 
 public enum RequestType {
-    FILE_UPDATE, COMMAND, ENTITY, FILE_GET, ENTITY_UPDATE;
+    ENTITY(1), COMMAND(2),  ENTITY_UPDATE(3), FILE_GET(4),  FILE_UPDATE(5);
+
+    private int numVal;
+
+    RequestType(int numVal) {
+        this.numVal = numVal;
+    }
+
+    public int getNumVal() {
+        return numVal;
+    }
 }

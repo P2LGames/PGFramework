@@ -29,9 +29,11 @@ public class FileGetter {
         List<CommandData> allCommandData = new ArrayList<>();
         GenericEntityMap entityMap = GenericEntityMap.getInstance();
         GenericEntity entity = entityMap.get(entityId);
+
         for (String commandClass : entity.getCommandClasses()) {
             String className;
             GenericCommand command;
+
             try {
                 command = entity.getCommand(commandClass);
                 className = command.getClass().getName();
@@ -39,7 +41,9 @@ public class FileGetter {
                 System.out.println(e.getMessage());
                 continue;
             }
+
             FileResult fileResult = this.getFile(new FileRequest(commandClass));
+
             if (fileResult.getSuccess()) {
                 CommandData commandData = new CommandData(commandClass, className, fileResult.getFileContents());
                 allCommandData.add(commandData);
@@ -59,29 +63,47 @@ public class FileGetter {
      *  the data structure holding the success of the operation and the file contents if it was successful
      */
     public FileResult getFile(FileRequest request) {
-        String fileName = request.getCommandName();
+
+        // Use the command name to get the file name
+        String fileName = request.getFileName();
+
+        // Replace all of the periods with slashes, since the command name is in package.file format
         if (fileName.contains(".")) {
             fileName = fileName.replace('.', File.separatorChar);
-        } else {
+        }
+        else {
             fileName = "NoPackage" + File.separator + fileName;
         }
+
+        // Add java to the end, since that is what we are looking for
         fileName += ".java";
+
+        // Setup the file location: UserDirectory/UserFiles/filename
         String fileLocation = System.getProperty("user.dir") + File.separator + "UserFiles" + File.separator;
         File file = new File(fileLocation + fileName);
         Scanner scanner;
+
+        // Scan through the file and get the desired parts
         try {
             scanner = new Scanner(file).useDelimiter("\\Z");
         } catch (FileNotFoundException e) {
+            // If the file didn't exist, tell the user
             return new FileResult(false, e.getMessage());
         }
         if (request.getRequestType() == FileRequestType.FILE) {
+            // If the user wanted the whole file, return it
             return new FileResult(scanner.next());
-        } else {
+        }
+        else {
             try {
+                // If the user wanted a function, get the function
                 if (request.getRequestType() == FileRequestType.FUNCTION) {
+                    // Get the function code and return it
                     String functionCode = this.getFunctionFromFile(scanner.next(), request.getFunctionName());
                     return new FileResult(functionCode);
-                } else if (request.getRequestType() == FileRequestType.LINE_RANGE) {
+                }
+                else if (request.getRequestType() == FileRequestType.LINE_RANGE) {
+                    // Get the lines in the file the user wanted and return them
                     String lineCode = this.getLinesFromFile(scanner, request.getFirstLine(), request.getLastLine());
                     return new FileResult(lineCode);
                 }

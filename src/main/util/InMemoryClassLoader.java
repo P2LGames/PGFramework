@@ -51,6 +51,8 @@ public class InMemoryClassLoader {
                 if (commandMethod.isAnnotationPresent(SetEntity.class)) {
                     // Set the entity of our class object
                     commandMethod.invoke(classObject, entity);
+                    // Exit the loop
+                    break;
                 }
             }
 
@@ -63,8 +65,9 @@ public class InMemoryClassLoader {
             entity.addCommandClass(request.getClassName());
         } catch (Exception e) {
             result.setSuccess(false);
-            result.setErrorMessage(e.getMessage());
+            result.setErrorMessage("Error: " + e.getLocalizedMessage());
         }
+
         return result;
     }
 
@@ -77,14 +80,28 @@ public class InMemoryClassLoader {
      */
     private void saveSourceCode(UpdateRequest request, Class<?> loadedClass) {
         String packageName = loadedClass.getPackageName();
+
+        // Get the package
         if (packageName.equals("")) {
             packageName = "NoPackage";
         }
+
+        // Replace periods with slashes
         packageName = packageName.replace('.', File.separatorChar);
+
+        // Get the path to the package folder
         String path = System.getProperty("user.dir") + File.separator + "UserFiles" + File.separator + packageName;
+
+        // Make the directories if they do not exist
         new File(path).mkdirs();
+
+        // Get the file path
         String fileName = path + File.separator + loadedClass.getSimpleName() + ".java";
+
+        System.out.println(request.getFileContents());
+
         try {
+            // Write the file with the file contents
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
             writer.write(request.getFileContents());
             writer.close();

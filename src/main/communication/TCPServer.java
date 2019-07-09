@@ -88,6 +88,7 @@ public class TCPServer implements Runnable {
                         FileGetter fileGetter = new FileGetter();
                         result = fileGetter.getFile(fileRequest);
                     } else if (clientBundle.getType() == RequestType.FILE_UPDATE) {
+                        System.out.println("Request Data: " + requestData);
                         // If it is a update request then deserialize it accordingly, reload the new class and update it
                         UpdateRequest updateRequest = Serializer.deserialize(clientBundle.getSerializedData(), UpdateRequest.class);
                         InMemoryClassLoader loader = new InMemoryClassLoader();
@@ -107,7 +108,8 @@ public class TCPServer implements Runnable {
                 }
                 welcomeSocket.close();
 
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 e.printStackTrace();
                 // Try to close sockets, clean up connections
                 try {

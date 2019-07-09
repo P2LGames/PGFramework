@@ -216,6 +216,18 @@ public class MyClassLoaderTest {
             Random random = new Random();
             int randInt = random.nextInt();
 
+            // Get the command and the return value
+            CommandRequest commandRequest = new CommandRequest();
+            commandRequest.setCommand("talk");
+            commandRequest.setEntityId(entity.getEntityID());
+            commandRequest.setParameters(new Object[0]);
+
+            // Setup the class loader
+            InMemoryClassLoader loader = new InMemoryClassLoader();
+            // Setup the command handler
+            GenericCommandHandler handler = new GenericCommandHandler();
+
+
             UpdateRequest request = new UpdateRequest();
             request.setFileContents("\n" +
                     "\n" +
@@ -236,24 +248,42 @@ public class MyClassLoaderTest {
             request.setMethodName("getString");
             request.setParameterTypesStrings(new String[0]);
 
-            InMemoryClassLoader loader = new InMemoryClassLoader();
+            // Request the update on the entity
             UpdateResult updateResult = loader.updateClass(request);
-            System.out.println("Error Message: " + updateResult.getErrorMessage());
 
-            // Get the command and the return value
-            CommandRequest commandRequest = new CommandRequest();
-            commandRequest.setCommand("talk");
-            commandRequest.setEntityId(entity.getEntityID());
-            commandRequest.setParameters(new Object[0]);
-
-            GenericCommandHandler handler = new GenericCommandHandler();
+            // Check if the values match for the first code
             CommandResult commandResult = handler.handleCommand(commandRequest);
             CommandResult expectedCommandResult = new CommandResult("I can talk: " + randInt, commandRequest.getEntityId());
             expectedCommandResult.setSuccess(true);
+            // ASSERT
+            assertEquals(expectedCommandResult.getValue(), commandResult.getValue());
 
-            System.out.println(expectedCommandResult.getValue());
-            System.out.println(commandResult.getValue());
+            // Get another random int
+            randInt = random.nextInt();
 
+            // Change the code
+            request.setFileContents("\n" +
+                    "\n" +
+                    "\n" +
+                    "/**\n" +
+                    " * An example implementation of the Talk command\n" +
+                    " */\n" +
+                    "public class Talk {\n" +
+                    "    public String getString() {\n" +
+                    "        return \"I can talk: " + randInt + "\";\n" +
+                    "    }\n" +
+                    "\n" +
+                    "\n" +
+                    "}\n");
+
+            // Request the update on the entity
+            updateResult = loader.updateClass(request);
+
+            // Check if the values match for the second code
+            commandResult = handler.handleCommand(commandRequest);
+            expectedCommandResult = new CommandResult("I can talk: " + randInt, commandRequest.getEntityId());
+            expectedCommandResult.setSuccess(true);
+            // ASSERT
             assertEquals(expectedCommandResult.getValue(), commandResult.getValue());
         } catch(Exception e) {
             System.out.println("Unexpected exception: " + e.getMessage());

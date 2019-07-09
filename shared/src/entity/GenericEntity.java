@@ -90,7 +90,7 @@ public abstract class GenericEntity {
                         addCommandClass(commandMethod.getDeclaringClass().getName());
                     }
                     else if (commandMethod.isAnnotationPresent(SetEntity.class)) {
-                        // Set the entity of our class oject
+                        // Set the entity of our class object
                         commandMethod.invoke(classObject, this);
                     }
                 }
@@ -102,6 +102,14 @@ public abstract class GenericEntity {
     }
 
     public void addCommandClass(String className) {
+        // Ensure no duplicates
+        for (int i = 0; i < commandClasses.size(); i++) {
+            if (className == commandClasses.get(i)) {
+                commandClasses.remove(i);
+                break;
+            }
+        }
+        // Add the class name
         commandClasses.add(className);
     }
 

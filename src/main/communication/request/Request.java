@@ -6,6 +6,7 @@ package main.communication.request;
 public abstract class Request {
     private String entityId;
     private String command;
+    private String udata;
 
     public String getEntityId() {
         return entityId;
@@ -22,4 +23,8 @@ public abstract class Request {
     public void setCommand(String command) {
         this.command = command;
     }
+
+    public String getUdata() { return this.udata; }
+
+    public void setUdata(String udata) { this.udata = udata; }
 }

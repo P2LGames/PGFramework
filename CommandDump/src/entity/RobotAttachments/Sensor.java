@@ -4,8 +4,8 @@ import entity.Robot;
 
 public class Sensor extends Attachment {
 
-    public Sensor(Robot robot) {
-        super(robot);
+    public Sensor(Robot robot, Robot.AttachmentPosition position) {
+        super(robot, position);
     }
 
 }

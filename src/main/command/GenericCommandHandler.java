@@ -40,6 +40,7 @@ public class GenericCommandHandler {
         // Set the entityId and command name in the result
         result.setEntityId(request.getEntityId());
         result.setCommand(request.getCommand());
+        result.setUdata(request.getUdata());
         // Return the result
         return result;
     }

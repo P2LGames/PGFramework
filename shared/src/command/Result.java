@@ -6,6 +6,7 @@ package command;
 public abstract class Result {
     String errorMessage;
     Boolean success;
+    String udata;
 
     public Result(String errorMessage, Boolean success) {
         this.errorMessage = errorMessage;
@@ -30,4 +31,6 @@ public abstract class Result {
     public void setSuccess(Boolean success) {
         this.success = success;
     }
+
+    public void setUdata(String udata) { this.udata = udata; }
 }

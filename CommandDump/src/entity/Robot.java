@@ -37,12 +37,12 @@ public class Robot extends GenericEntity {
 
     public Robot() throws ServerException {
         super();
-        this.addAttachment(new Wheels(this), AttachmentType.WHEELS);
+        this.addAttachment(new Wheels(this, AttachmentPosition.BASE), AttachmentType.WHEELS);
     }
 
     public Robot(String entityID) throws ServerException {
         super(entityID);
-        this.addAttachment(new Wheels(this), AttachmentType.WHEELS);
+        this.addAttachment(new Wheels(this, AttachmentPosition.BASE), AttachmentType.WHEELS);
     }
 
     @Getter(fieldName =  "xPos")
@@ -157,6 +157,8 @@ public class Robot extends GenericEntity {
 //        if (base instanceof Wheels) {
 //            return (Wheels)base;
 //        }
+        this.printMessage("NO WHEELS");
+
         return null;
     }
 
@@ -170,6 +172,7 @@ public class Robot extends GenericEntity {
 //        else if (armTwo instanceof Gun) {
 //            return (Gun)armTwo;
 //        }
+        this.printMessage("NO GUN");
 
         return null;
     }
@@ -181,11 +184,13 @@ public class Robot extends GenericEntity {
 //        if (head instanceof Sensor) {
 //            return (Sensor)head;
 //        }
+        this.printMessage("NO SENSOR");
+
         return null;
     }
 
     public void printMessage(String message) {
-        orders.add("PRINT:" + message);
+        orders.add("SELF|PRINT:" + message);
     }
 
     public class AttachmentInfo {
@@ -196,11 +201,11 @@ public class Robot extends GenericEntity {
     }
 
     public enum AttachmentPosition {
-        HEAD, BASE, ARM_ONE, ARM_TWO, FRONT, BACK
+        SELF, HEAD, BASE, ARM_ONE, ARM_TWO, FRONT, BACK
     }
 
     public enum AttachmentType {
-        ARM, GUN, SENSOR, WHEELS
+        ARM, GUN, SENSOR, WHEELS, BASE
     }
 
 
