@@ -18,10 +18,12 @@ import java.util.Map;
 public abstract class GenericEntity {
     private String entityID;
     private Map<String, GenericCommand> commandMap;
+    private Map<Integer, GenericCommand> commandMapId;
     private List<String> commandClasses;
 
     GenericEntity() throws ServerException {
         this.commandMap = new HashMap<>();
+        this.commandMapId = new HashMap<>();
         this.commandClasses = new ArrayList<>();
         makeDefaults();
     }
@@ -29,6 +31,7 @@ public abstract class GenericEntity {
     GenericEntity(String entityID) throws ServerException {
         this.entityID = entityID;
         this.commandMap = new HashMap<>();
+        this.commandMapId = new HashMap<>();
         this.commandClasses = new ArrayList<>();
         makeDefaults();
     }
@@ -49,6 +52,13 @@ public abstract class GenericEntity {
     public GenericCommand getCommand(String commandName) throws ServerException {
         try {
             return commandMap.get(commandName).clone();
+        } catch (CloneNotSupportedException e) {
+            throw new ServerException("Unable to clone command\n" + e.getMessage());
+        }
+    }
+    public GenericCommand getCommand(int commandId) throws ServerException {
+        try {
+            return commandMapId.get(commandId).clone();
         } catch (CloneNotSupportedException e) {
             throw new ServerException("Unable to clone command\n" + e.getMessage());
         }
@@ -80,13 +90,24 @@ public abstract class GenericEntity {
 
                 for (Method commandMethod : defaultCommandsClass.getDeclaredMethods()) {
                     if (commandMethod.isAnnotationPresent(Command.class)) {
+
+                        // Get the command name and id for the maps
                         String commandName = commandMethod.getAnnotation(Command.class).commandName();
+                        Integer commandId = commandMethod.getAnnotation(Command.class).id();
+                        System.out.println("CommandID: " + commandId);
+
+                        // Create a generic command
                         GenericCommand command = new GenericCommand();
 
+                        // Set the class object and method of the command
                         command.setClassObject(classObject);
-
                         command.setMethod(commandMethod);
+
+                        // Add the command to the maps
                         commandMap.put(commandName, command);
+                        commandMapId.put(commandId, command);
+
+                        // Add the command class to our list
                         addCommandClass(commandMethod.getDeclaringClass().getName());
                     }
                     else if (commandMethod.isAnnotationPresent(SetEntity.class)) {

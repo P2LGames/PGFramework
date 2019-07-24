@@ -14,12 +14,12 @@ import java.util.List;
 public class PathingEntityDefault {
     private PathingEntity pathingEntity;
 
-    @Command(commandName = "run")
+    @Command(commandName = "run", id = 0)
     public List<String> run(int x, int y) {
         return buildOrders(x, y);
     }
 
-    @Command(commandName = "setMap")
+    @Command(commandName = "setMap", id = 1)
     public void setMap(List<List<Integer>> map) {
         pathingEntity.setMap(map);
     }

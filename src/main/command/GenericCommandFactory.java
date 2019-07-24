@@ -29,4 +29,6 @@ public class GenericCommandFactory {
         return entity.getCommand(request.getCommand());
     }
 
+
+
 }

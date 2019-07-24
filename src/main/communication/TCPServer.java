@@ -72,7 +72,7 @@ public class TCPServer implements Runnable {
                         // If it is a command request then deserialize it accordingly and give it to the ICommandFactory
                         CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedData(), CommandRequest.class);
                         result = commandHandler.handleCommand(commandRequest);
-                    } else if (clientBundle.getType() == RequestType.ENTITY) {
+                    } else if (clientBundle.getType() == RequestType.ENTITY_REGISTER) {
                         // If it is a entity request then deserialize it accordingly, register the entity with the server
                         EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedData(), EntityRequest.class);
                         EntityLoader loader = new EntityLoader();

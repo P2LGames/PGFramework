@@ -5,11 +5,8 @@ import annotations.Command;
 import annotations.SetEntity;
 import entity.GenericEntity;
 import entity.Robot;
-import entity.RobotAttachments.Wheels;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,31 +15,21 @@ public class RobotDefault {
 
     //// *NOACCESS
 
-    static int TYPE_SELF = 1;
-    static int TYPE_WHEELS = 2;
-    static int TYPE_SENSORS = 3;
-
-    static int POSITION_SELF = 1;
-    static int POSITION_BASE = 2;
-
-    @Command(commandName = "setupAttachments")
-    public void setupAttachments(String attachments) {
-        this.robot.setupAttachments(attachments);
-    }
-
-    @Command(commandName = "process")
-    public List<String> process() {
+    @Command(commandName = "process", id = 0)
+    public byte[] process() {
         robot.clearOrders();
 
         giveOrders();
 
-        List<String> orders = robot.getOrders();
+//        List<String> orders = robot.getOrders();
+        byte[] orders = robot.getOrders();
+//        System.out.println(orders.length);
 
         return orders;
     }
 
-    @Command(commandName = "input")
-    public String input(byte[] bytes) {
+    @Command(commandName = "input", id = 1)
+    public byte[] input(byte[] bytes) {
         // Turn the bytes into a stream
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes));
 
@@ -54,10 +41,10 @@ public class RobotDefault {
             this.message = position + " " + type + " " + message;
         }
         catch (IOException e) {
-            return e.getMessage();
+            return e.getMessage().getBytes();
         }
 
-        return "";
+        return new byte[0];
     }
 
     @SetEntity
@@ -71,39 +58,41 @@ public class RobotDefault {
 
     public void giveOrders() {
 
-        // If the user want's to move, meaning input is -1 or 1
-        if (userMove() != 0) {
+        print("Do you understand?");
 
-            // We should move!
-            if (userMove() > 0) {
-                // Right now I can only move forward, can you fix me?
-                moveForward();
-            }
-
-        }
-        else {
-            // Use this if you want to stop the robot's movement
-            stopMoving();
-        }
-
-        // If the user wants to rotate, meaning input is -1 or 1
-        if (userRotate() != 0) {
-
-            // We should rotate
-            if (userRotate() < 0) {
-                // Right now I can only rotate to the right, can you fix me?
-                turnLeft();
-            }
-
-        }
-        else {
-            // Use this if you want tto stop the robot from turning
-            stopTurning();
-        }
-
-        if (message != "") {
-            print(message);
-        }
+//        // If the user want's to move, meaning input is -1 or 1
+//        if (userMove() != 0) {
+//
+//            // We should move!
+//            if (userMove() > 0) {
+//                // Right now I can only move forward, can you fix me?
+//                moveForward();
+//            }
+//
+//        }
+//        else {
+//            // Use this if you want to stop the robot's movement
+//            stopMoving();
+//        }
+//
+//        // If the user wants to rotate, meaning input is -1 or 1
+//        if (userRotate() != 0) {
+//
+//            // We should rotate
+//            if (userRotate() < 0) {
+//                // Right now I can only rotate to the right, can you fix me?
+//                turnLeft();
+//            }
+//
+//        }
+//        else {
+//            // Use this if you want tto stop the robot from turning
+//            stopTurning();
+//        }
+//
+//        if (message != "") {
+//            print(message);
+//        }
 
     }
 

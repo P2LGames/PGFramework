@@ -9,6 +9,7 @@ public class CommandResult extends Result {
     private String entityId;
     private String command;
     private Object value;
+    private byte[] bytes;
 
     public CommandResult() {
         super();
@@ -39,6 +40,10 @@ public class CommandResult extends Result {
     public void setValue(Object value) {
         this.value = value;
     }
+
+    public byte[] getBytes() { return bytes; }
+
+    public void setBytes(byte[] bytes) { this.bytes = bytes; }
 
     @Override
     public boolean equals(Object o) {

@@ -7,6 +7,7 @@ import command.PathingEntityDefault;
 import command.RobotDefault;
 import communication.ServerException;
 import entity.RobotAttachments.*;
+import util.ByteManager;
 import util.Serializer;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class Robot extends GenericEntity {
     private float yPos;
     private List<List<Integer>> map;
     private ArrayList<String> orders = new ArrayList<>();
+    private ArrayList<Byte> orderBytes = new ArrayList<>();
     private ArrayList<Attachment> attachments = new ArrayList<>();
     // A map from attachment type to the attachments of that type
     private HashMap<AttachmentType, ArrayList<Attachment>> typeToAttachments = new HashMap<>();
@@ -65,9 +67,12 @@ public class Robot extends GenericEntity {
         this.yPos = yPos;
     }
 
-    @Getter(fieldName =  "orders")
-    public List<String> getOrders() {
-        return orders;
+//    @Getter(fieldName =  "orders")
+//    public List<String> getOrders() {
+//        return orders;
+//    }
+    public byte[] getOrders() {
+        return ByteManager.convertArrayListToArray(this.orderBytes);
     }
 
     @Getter(fieldName = "map")
@@ -96,8 +101,11 @@ public class Robot extends GenericEntity {
         this.orders.add(order);
     }
 
+//    public void clearOrders() {
+//        this.orders.clear();
+//    }
     public void clearOrders() {
-        this.orders.clear();
+        this.orderBytes.clear();
     }
 
     /**
@@ -189,8 +197,24 @@ public class Robot extends GenericEntity {
         return null;
     }
 
+//    public void printMessage(String message) {
+//        orders.add("SELF|PRINT:" + message);
+//    }
     public void printMessage(String message) {
-        orders.add("SELF|PRINT:" + message);
+        // Integer to represent that the order is going to the robot
+        ByteManager.addIntToByteArray(AttachmentPosition.SELF.getNumVal(), this.orderBytes);
+
+        // The order to the robot
+        ByteManager.addIntToByteArray(OrderTypes.PRINT.getNumVal(), this.orderBytes);
+
+        // Turn the message into bytes
+        byte[] messageBytes = message.getBytes();
+
+        // Length of the message
+        ByteManager.addIntToByteArray(messageBytes.length, this.orderBytes);
+
+        // Add the message to the array
+        ByteManager.addBytesToArray(messageBytes, this.orderBytes);
     }
 
     public class AttachmentInfo {
@@ -201,11 +225,45 @@ public class Robot extends GenericEntity {
     }
 
     public enum AttachmentPosition {
-        SELF, HEAD, BASE, ARM_ONE, ARM_TWO, FRONT, BACK
+        SELF(0), HEAD(1), BASE(2), LEFT(3), RIGHT(4), FRONT(5), BACK(6);
+
+        private int numVal;
+
+        AttachmentPosition(int numVal) {
+            this.numVal = numVal;
+        }
+
+        public int getNumVal() {
+            return numVal;
+        }
+    }
+
+    public enum OrderTypes {
+        PRINT(0);
+
+        private int numVal;
+
+        OrderTypes(int numVal) {
+            this.numVal = numVal;
+        }
+
+        public int getNumVal() {
+            return numVal;
+        }
     }
 
     public enum AttachmentType {
-        ARM, GUN, SENSOR, WHEELS, BASE
+        SELF(0), ARM(1), GUN(2), SENSOR(3), WHEELS(4), BASE(5);
+
+        private int numVal;
+
+        AttachmentType(int numVal) {
+            this.numVal = numVal;
+        }
+
+        public int getNumVal() {
+            return numVal;
+        }
     }
 
 

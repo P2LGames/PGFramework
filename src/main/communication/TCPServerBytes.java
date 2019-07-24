@@ -5,6 +5,8 @@ import main.command.GenericCommandHandler;
 import main.communication.request.*;
 import main.communication.result.UnknownRequestResult;
 import main.entity.EntityLoader;
+import main.entity.EntitySetup;
+import main.entity.EntityTypeMap;
 import main.entity.EntityUpdater;
 import main.util.FileGetter;
 import main.util.InMemoryClassLoader;
@@ -55,32 +57,42 @@ public class TCPServerBytes implements Runnable {
                 inFromClient = new DataInputStream(connectionSocket.getInputStream());
 //                inFromClient = new Scanner(new InputStreamReader(connectionSocket.getInputStream()));
                 outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-                System.out.println("Got here");
 
                 while (shouldRun) {
+
                     // Read in the next byte from the client the int returned will be between 0-255
-                    int requestType = inFromClient.readByte();
+                    int requestType = inFromClient.readShort();
+//                    System.out.println(requestType);
+                    // Read in the byte count as an int from the client
                     int byteCount = inFromClient.readInt();
+//                    System.out.println(byteCount);
 
                     // Create a byte array with the number of bytes to read
                     byte[] bytes = new byte[byteCount];
 
                     // Read the bytes
-                    inFromClient.readFully(bytes);
+                    inFromClient.read(bytes);
 
-                    System.out.println(requestType);
-//
-//                    Result result;
-////
-//                    if (clientBundle.getType() == RequestType.COMMAND) {
-//                        // If it is a command request then deserialize it accordingly and give it to the ICommandFactory
-//                        CommandRequest commandRequest = Serializer.deserialize(clientBundle.getSerializedData(), CommandRequest.class);
-//                        result = commandHandler.handleCommand(commandRequest);
-//                    } else if (clientBundle.getType() == RequestType.ENTITY) {
-//                        // If it is a entity request then deserialize it accordingly, register the entity with the server
-//                        EntityRequest entityRequest = Serializer.deserialize(clientBundle.getSerializedData(), EntityRequest.class);
-//                        EntityLoader loader = new EntityLoader();
-//                        result = loader.registerEntity(entityRequest);
+                    // The byte result
+                    byte[] result = new byte[]{};
+
+                    if (requestType == RequestType.ENTITY_SETUP.getNumVal()) {
+                        // Get the result from the entity setup class
+                        result = new EntitySetup().setupEntitiesWithBytes(bytes);
+                    }
+                    // If we want to register an entity, do so.
+                    else if (requestType == RequestType.ENTITY_REGISTER.getNumVal()) {
+                        result = new EntityLoader().registerEntity(bytes);
+                    }
+                    // If we want to run a command, do so.
+                    else if (requestType == RequestType.COMMAND.getNumVal()) {
+                        result = new GenericCommandHandler().handleCommand(bytes);
+                    }
+
+                    // If the result has data to write, write it
+                    if (result.length > 0) {
+                        outToClient.write(result);
+                    }
 //                    } else if(clientBundle.getType() == RequestType.ENTITY_UPDATE) {
 //                        System.out.println(clientBundle.getSerializedData());
 //                        EntityUpdateRequest request = Serializer.deserialize(clientBundle.getSerializedData(), EntityUpdateRequest.class);
@@ -109,6 +121,7 @@ public class TCPServerBytes implements Runnable {
 //                    String responseData = Serializer.serialize(response);
 ////                    System.out.println("Writing Response: " + responseData);
 //                    outToClient.writeBytes(responseData + '\n');
+
                 }
                 welcomeSocket.close();
 

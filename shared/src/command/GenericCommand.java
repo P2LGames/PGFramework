@@ -37,6 +37,8 @@ public class GenericCommand implements Command, Cloneable {
         this._paramValues = parameters;
     }
 
+
+
     /**
      * Uses the generic definition of a command and the provided parameter values to run the command
      *
@@ -61,16 +63,8 @@ public class GenericCommand implements Command, Cloneable {
         }
 
         CommandResult result = new CommandResult();
+
         try {
-//            // If the method has parameters
-//            if (parameterTypes.length > 0) {
-//                // Then run the method with our passes parameters
-//
-//            }
-//            // Otherwise, run the method with not parameters
-//            else {
-//                result.setValue(method.invoke(classObject));
-//            }
             result.setValue(method.invoke(classObject, _paramValues));
             result.setSuccess(true);
         }
