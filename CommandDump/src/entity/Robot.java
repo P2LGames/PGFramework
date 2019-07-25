@@ -101,6 +101,16 @@ public class Robot extends GenericEntity {
         this.orders.add(order);
     }
 
+    public void addOrder(int attachmentPosition, int orderType, byte[] orderParameter) {
+        // 3 ints in the front for the position, type, and length, then the order parameter length
+        ByteManager.addIntToByteArray(attachmentPosition, this.orderBytes);
+        ByteManager.addIntToByteArray(orderType, this.orderBytes);
+        ByteManager.addIntToByteArray(orderParameter.length, this.orderBytes);
+
+        // Order parameter bytes
+        ByteManager.addBytesToArray(orderParameter, this.orderBytes);
+    }
+
 //    public void clearOrders() {
 //        this.orders.clear();
 //    }
@@ -266,6 +276,18 @@ public class Robot extends GenericEntity {
         }
     }
 
+    public enum InputType {
+        PLAYER(0);
 
+        private int numVal;
+
+        InputType(int numVal) {
+            this.numVal = numVal;
+        }
+
+        public int getNumVal() {
+            return numVal;
+        }
+    }
 
 }

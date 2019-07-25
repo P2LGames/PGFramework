@@ -4,6 +4,28 @@ import entity.Robot;
 
 public class Base extends Attachment {
 
+    public enum OrderTypes {
+        MOVE(0),
+        ROTATE_BY(1),
+        ROTATE_TO(2),
+        ROTATE_LEFT(3),
+        ROTATE_RIGHT(4),
+        STOP_ROTATION(5),
+        STOP_MOVEMENT(6);
+
+        private int numVal;
+
+        OrderTypes(int numVal) {
+            this.numVal = numVal;
+        }
+
+        public int getNumVal() {
+            return numVal;
+        }
+    }
+
+    static public final int BASE = 0;
+
     static public final String MOVE = "MOVE:"; // Needs an amount, positive is forward, negative is backwards
     static public final String ROTATE_TO = "ROTATE_TO:";
     static public final String ROTATE_BY = "ROTATE_BY:";

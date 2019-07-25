@@ -36,9 +36,7 @@ public class GenericCommand implements Command, Cloneable {
     public void setParameters(Object[] parameters) {
         this._paramValues = parameters;
     }
-
-
-
+    
     /**
      * Uses the generic definition of a command and the provided parameter values to run the command
      *

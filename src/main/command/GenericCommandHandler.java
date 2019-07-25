@@ -48,7 +48,6 @@ public class GenericCommandHandler {
         // Set the entityId and command name in the result
         result.setEntityId(request.getEntityId());
         result.setCommand(request.getCommand());
-        result.setUdata(request.getUdata());
         // Return the result
         return result;
     }
@@ -65,13 +64,12 @@ public class GenericCommandHandler {
         // If we have a parameter, parse it out, set out parameters with it
         if (hasParameter == 1) {
             commandParameter = new Object[1];
-            commandParameter[0] = Arrays.copyOfRange(requestBytes, 9, requestBytes.length);
+            commandParameter[0] = Arrays.copyOfRange(requestBytes, 10, requestBytes.length);
         }
 
         // Track success and error message
         boolean success = true;
         String errorMessage = "";
-        byte[] commandReturnValue = new byte[]{};
 
         GenericCommand command = null;
         try {
@@ -84,6 +82,7 @@ public class GenericCommandHandler {
         }
 
         CommandResult runResult = null;
+        byte[] commandReturnValue = new byte[]{};
 
         // If the command was initialized
         if (command != null) {

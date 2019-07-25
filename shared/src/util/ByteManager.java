@@ -9,11 +9,28 @@ public class ByteManager {
     /**
      * Turns an integer into an array of bytes in LITTLE_ENDIAN format.
      * @param toConvert
-     * @return The byte array representing and integer
+     * @return The byte array representing the integer
      */
     public static byte[] convertIntToByteArray(int toConvert) {
         // Get the byte array of the int and return it, little endian style
         return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(toConvert).array();
+    }
+
+    public static void addIntToByteArray(int toConvert, ArrayList<Byte> array) {
+        addBytesToArray(convertIntToByteArray(toConvert), array);
+    }
+
+    /**
+     * Turns a float into an array of bytes in LITTLE_ENDIAN format.
+     * @param toConvert
+     * @return The byte array representing the float
+     */
+    public static byte[] convertFloatToByteArray(float toConvert) {
+        return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(toConvert).array();
+    }
+
+    public static void addFloatToByteArray(float toConvert, ArrayList<Byte> array) {
+        addBytesToArray(convertFloatToByteArray(toConvert), array);
     }
 
     /**
@@ -27,10 +44,6 @@ public class ByteManager {
         for (Byte b: bytes) {
             array.add(b);
         }
-    }
-
-    public static void addIntToByteArray(int toConvert, ArrayList<Byte> array) {
-        addBytesToArray(convertIntToByteArray(toConvert), array);
     }
 
     /**
