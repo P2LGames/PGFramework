@@ -7,10 +7,7 @@ import command.GenericCommand;
 import communication.ServerException;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The class representing a reprogrammable entity
@@ -74,53 +71,103 @@ public abstract class GenericEntity {
         commandMap.put(commandName, command);
     }
 
+    public void updateCommand(Integer commandId, GenericCommand command) { commandMapId.put(commandId, command); }
+
     /**
      * Makes a default implementation for a command
      */
     private void makeDefaults() throws ServerException {
 
         try {
+            // Get this class
             Class<?> thisClass = this.getClass();
+
+            // If there is no entity annotation
             if(!thisClass.isAnnotationPresent(Entity.class)) {
+                // Then we throw an error
                 throw new ServerException("This entity is missing the @Entity annotation");
             }
+            // Otherwise, we setup the default commands
             else {
+                // Get the default command class
                 Class<?> defaultCommandsClass = thisClass.getAnnotation(Entity.class).defaultCommands();
-                Object classObject = defaultCommandsClass.getConstructor().newInstance();
 
-                for (Method commandMethod : defaultCommandsClass.getDeclaredMethods()) {
-                    if (commandMethod.isAnnotationPresent(Command.class)) {
-
-                        // Get the command name and id for the maps
-                        String commandName = commandMethod.getAnnotation(Command.class).commandName();
-                        Integer commandId = commandMethod.getAnnotation(Command.class).id();
-                        System.out.println("CommandID: " + commandId);
-
-                        // Create a generic command
-                        GenericCommand command = new GenericCommand();
-
-                        // Set the class object and method of the command
-                        command.setClassObject(classObject);
-                        command.setMethod(commandMethod);
-
-                        // Add the command to the maps
-                        commandMap.put(commandName, command);
-                        commandMapId.put(commandId, command);
-
-                        // Add the command class to our list
-                        addCommandClass(commandMethod.getDeclaringClass().getName());
-                    }
-                    else if (commandMethod.isAnnotationPresent(SetEntity.class)) {
-                        // Set the entity of our class object
-                        commandMethod.invoke(classObject, this);
-                    }
-                }
+                // Setup the commands with the default class
+                setupCommandsWithClass(defaultCommandsClass);
             }
         } catch (Exception e) {
             throw new ServerException(e.getMessage());
         }
 
     }
+
+    public void setupCommandsWithClass(Class<?> commandsClass) throws Exception {
+        // Create an object with it
+        Object classObject = commandsClass.getConstructor().newInstance();
+
+        // Loop through the methods is contains
+        for (Method commandMethod : commandsClass.getDeclaredMethods()) {
+            // If an have the command annotation, then set that method up as a command
+            if (commandMethod.isAnnotationPresent(Command.class)) {
+
+                // Get the command name and id for the maps
+                String commandName = commandMethod.getAnnotation(Command.class).commandName();
+                Integer commandId = commandMethod.getAnnotation(Command.class).id();
+
+                // Create a generic command
+                GenericCommand command = new GenericCommand();
+
+                // Set the class object and method of the command
+                command.setClassObject(classObject);
+                command.setMethod(commandMethod);
+
+                // Add the command to the maps
+                commandMap.put(commandName, command);
+                commandMapId.put(commandId, command);
+
+                // Add the command class to our list
+                addCommandClass(commandMethod.getDeclaringClass().getName());
+            }
+            else if (commandMethod.isAnnotationPresent(SetEntity.class)) {
+                // Set the entity of our class object
+                commandMethod.invoke(classObject, this);
+            }
+        }
+    }
+
+    public void setupCommandIdWithClass(Class<?> commandsClass, int commandId) throws Exception {
+        // Create a class object with the loaded class
+        Object classObject = commandsClass.getConstructor().newInstance();
+
+        // Create a generic command
+        GenericCommand command = new GenericCommand();
+
+        // Loop through the methods the commands class has
+        for (Method commandMethod : commandsClass.getDeclaredMethods()) {
+            // If it has the command annotation, then check to see if it has the commandId
+            if (commandMethod.isAnnotationPresent(Command.class)) {
+
+                // Get the command name and id for the maps
+                int methodId = commandMethod.getAnnotation(Command.class).id();
+
+                // If they match, set the commands method to this one
+                if (methodId == commandId) {
+                    command.setMethod(commandMethod);
+                }
+            }
+            else if (commandMethod.isAnnotationPresent(SetEntity.class)) {
+                // Set the entity of our class object
+                commandMethod.invoke(classObject, this);
+            }
+        }
+
+        // Set the class object for this generic command
+        command.setClassObject(classObject);
+
+        // Put the command into the command map
+        commandMapId.put(commandId, command);
+    }
+
 
     public void addCommandClass(String className) {
         // Ensure no duplicates

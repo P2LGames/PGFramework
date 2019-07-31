@@ -134,7 +134,7 @@ public class GenericCommandHandler {
     /**
      * Compiles the result into a byte array to send back to the server.
      * If success is true, then the message is the type (int), an int with the number of bytes, a 1, signifying success, along
-     * with two ints signifying the entityId and the placeholderId
+     * with some other stuff.
      * Otherwise, the message is the type, an int with the number of bytes, a 0 (byte), and the bytes representing the
      * error message.
      * @param success Whether or not we were able to successfully setup the entity data we recieved

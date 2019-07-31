@@ -24,9 +24,7 @@ public class RobotDefault {
 
         giveOrders();
 
-//        List<String> orders = robot.getOrders();
         byte[] orders = robot.getOrders();
-//        System.out.println(orders.length);
 
         return orders;
     }
@@ -39,14 +37,15 @@ public class RobotDefault {
 //        System.out.println("Position: " + position + " Type: " + type + " Byte length: " + bytes.length);
 
         // If it was ourselves, and the player
-        if (position == Robot.AttachmentPosition.SELF.getNumVal()
+        if (position == Robot.AttachmentType.SELF.getNumVal()
                 && type == Robot.InputType.PLAYER.getNumVal()) {
 
             // There will we two ints, move and rotate that follow
-            this.move = ByteBuffer.wrap(bytes, 8, 4).getInt();
-            this.rotate = ByteBuffer.wrap(bytes, 12, 4).getInt();
+            int move = ByteBuffer.wrap(bytes, 8, 4).getInt();
+            int rotate = ByteBuffer.wrap(bytes, 12, 4).getInt();
 
-            System.out.println("Move: " + move + " Rotate: " + rotate);
+            // Pass it to the viewable playerInput function
+            this.playerInput(move, rotate);
         }
 
         return new byte[0];
@@ -62,6 +61,11 @@ public class RobotDefault {
     private String message = "";
     private int move = 0;
     private int rotate = 0;
+
+    public void playerInput(int move, int rotate) {
+        this.move = move;
+        this.rotate = rotate;
+    }
 
     public void giveOrders() {
 
@@ -90,7 +94,6 @@ public class RobotDefault {
                 // Right now I can only rotate to the right, can you fix me?
                 turnRight();
             }
-
         }
         else {
             // Use this if you want tto stop the robot from turning
@@ -100,7 +103,6 @@ public class RobotDefault {
         if (message != "") {
             print(message);
         }
-
     }
 
     //// *READONLY

@@ -76,6 +76,7 @@ public class TCPServerBytes implements Runnable {
                     // The byte result
                     byte[] result = new byte[]{};
 
+                    // Setup the entity
                     if (requestType == RequestType.ENTITY_SETUP.getNumVal()) {
                         // Get the result from the entity setup class
                         result = new EntitySetup().setupEntitiesWithBytes(bytes);
@@ -87,6 +88,10 @@ public class TCPServerBytes implements Runnable {
                     // If we want to run a command, do so.
                     else if (requestType == RequestType.COMMAND.getNumVal()) {
                         result = new GenericCommandHandler().handleCommand(bytes);
+                    }
+                    // If we want to update a file in the framework, do so.
+                    else if (requestType == RequestType.FILE_UPDATE.getNumVal()) {
+                        result = new InMemoryClassLoader().updateClass(bytes);
                     }
 
                     // If the result has data to write, write it
