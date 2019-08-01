@@ -1,4 +1,4 @@
-//// *READONLY
+//// *NOACCESS
 package command;
 
 import annotations.Command;
@@ -13,9 +13,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RobotDefault {
-    private Robot robot;
+//// *READONLY
 
+public class RobotDefault {
     //// *NOACCESS
 
     @Command(commandName = "process", id = 0)
@@ -56,9 +56,10 @@ public class RobotDefault {
         this.robot = (Robot)robot;
     }
 
+    private Robot robot;
+
     //// *READWRITE
 
-    private String message = "";
     private int move = 0;
     private int rotate = 0;
 
@@ -70,16 +71,8 @@ public class RobotDefault {
     public void giveOrders() {
 
         // If the user want's to move, meaning input is -1 or 1
-        if (this.move != 0) {
-
-            // We should move!
-            if (this.move > 0) {
-                // Right now I can only move forward, can you fix me?
-                moveForward();
-            }
-            else if (this.move < 0) {
-                moveBackward();
-            }
+        if (this.move > 0) {
+            moveForward();
         }
         else {
             // Use this if you want to stop the robot's movement
@@ -87,25 +80,17 @@ public class RobotDefault {
         }
 
         // If the user wants to rotate, meaning input is -1 or 1
-        if (this.rotate != 0) {
-
-            // We should rotate
-            if (this.rotate > 0) {
-                // Right now I can only rotate to the right, can you fix me?
-                turnRight();
-            }
+        if (this.rotate < 0) {
+            // Right now I can only turn to the left, can you fix me?
+            turnLeft();
         }
         else {
-            // Use this if you want tto stop the robot from turning
+            // Use this if you want to stop the robot from turning
             stopTurning();
-        }
-
-        if (message != "") {
-            print(message);
         }
     }
 
-    //// *READONLY
+    //// *NOACCESS
 
     public void moveForward() {
         int position = Robot.AttachmentPosition.BASE.getNumVal();
@@ -155,4 +140,8 @@ public class RobotDefault {
 
     public Robot getRobot() { return robot; }
 
+    //// *READONLY
+
 }
+
+
