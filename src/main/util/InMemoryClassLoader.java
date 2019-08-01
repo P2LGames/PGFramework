@@ -151,8 +151,6 @@ public class InMemoryClassLoader {
         boolean success = true;
         String errorMessage = "";
 
-        System.out.println("FILE CONTENTS: \n" + fileContents);
-
         try {
             // Create the compiler
             InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance();
@@ -222,12 +220,16 @@ public class InMemoryClassLoader {
         // Otherwise, send an error message
         else {
             // Add the integer 2 + length of error message to our byte array, this is the rest of the bytes
-            int messageLength = 2 + errorMessage.getBytes().length;
+            int messageLength = 10 + errorMessage.getBytes().length;
             ByteManager.addIntToByteArray(messageLength, result);
 
             // Failure
             result.add((byte)0);
             result.add((byte)0);
+
+            // Add the entity id and command id
+            ByteManager.addIntToByteArray(entityId, result);
+            ByteManager.addIntToByteArray(commandId, result);
 
             // Message
             ByteManager.addBytesToArray(errorMessage.getBytes(), result);
