@@ -19,18 +19,17 @@ public class ServerHandler {
 
         try {
             // Initialize the server
-            System.out.println("Initializing Socket");
+            System.out.println("Initializing Socket: ServerHandler");
             this.serverSocket = new ServerSocket(6789);
 
             // Keep trying to connect toc clients!
             while (true) {
 
                 try {
-                    // Create a new client out of the connection
-                    ClientHandler client = new ClientHandler(this.serverSocket.accept());
-
-                    // Run the client
-                    client.run();
+                    System.out.println("Accepting Connection");
+                    // Create and run a new client using an accepted connection
+                    new ClientHandler(this.serverSocket.accept()).start();
+                    System.out.println("Test");
                 }
                 catch (IOException e) {
                     e.printStackTrace();
@@ -54,6 +53,6 @@ public class ServerHandler {
 
     public static void main(String[] args) {
         // Start up a new server
-        ServerHandler server = new ServerHandler();
+        new ServerHandler();
     }
 }

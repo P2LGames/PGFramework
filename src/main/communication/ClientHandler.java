@@ -10,21 +10,17 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public class ClientHandler implements Runnable {
+public class ClientHandler extends Thread {
 
-    private Boolean shouldRun;
+    private Boolean shouldRun = true;
 
     private Socket connectionSocket;
     private DataInputStream inFromClient;
     private DataOutputStream outToClient;
 
-    public ClientHandler(Socket connection) throws IOException {
-        this.shouldRun = true;
-
-        // Setup the in and out of the client connection
+    public ClientHandler(Socket connection) {
+        // Save the connection socket
         this.connectionSocket = connection;
-        this.inFromClient = new DataInputStream(connection.getInputStream());
-        this.outToClient = new DataOutputStream(connection.getOutputStream());
     }
 
     /**
@@ -34,6 +30,9 @@ public class ClientHandler implements Runnable {
     public void run() {
 
         try {
+            // Setup the in and out from the socket
+            this.inFromClient = new DataInputStream(this.connectionSocket.getInputStream());
+            this.outToClient = new DataOutputStream(this.connectionSocket.getOutputStream());
 
             while (shouldRun) {
 
@@ -76,6 +75,7 @@ public class ClientHandler implements Runnable {
                 if (result.length > 0) {
                     outToClient.write(result);
                 }
+                
 //                    } else if(clientBundle.getType() == RequestType.ENTITY_UPDATE) {
 //                        System.out.println(clientBundle.getSerializedData());
 //                        EntityUpdateRequest request = Serializer.deserialize(clientBundle.getSerializedData(), EntityUpdateRequest.class);
