@@ -4,6 +4,7 @@ import main.command.GenericCommandHandler;
 import main.entity.EntityLoader;
 import main.entity.EntitySetup;
 import main.util.InMemoryClassLoader;
+import util.ByteManager;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -12,7 +13,7 @@ import java.net.Socket;
 
 public class ClientHandler extends Thread {
 
-    private Boolean shouldRun = true;
+    private Boolean running = true;
 
     private Socket connectionSocket;
     private DataInputStream inFromClient;
@@ -34,11 +35,21 @@ public class ClientHandler extends Thread {
             this.inFromClient = new DataInputStream(this.connectionSocket.getInputStream());
             this.outToClient = new DataOutputStream(this.connectionSocket.getOutputStream());
 
-            while (shouldRun) {
+            while (running) {
 
                 // Read in the next byte from the client the int returned will be between 0-255
                 int requestType = inFromClient.readShort();
 //                    System.out.println(requestType);
+
+                // Check that the type is not recognizable
+                if (!this.requestTypeRecognized(requestType)) {
+                    System.out.println(requestType);
+                    // Then write that we don't recognize this type to the engine
+                    outToClient.write(ByteManager.convertIntToByteArray(RequestType.UNRECOGNIZED.getNumVal()));
+
+                    // Move on
+                    continue;
+                }
 
                 // Read in the byte count as an int from the client
                 int byteCount = inFromClient.readInt();
@@ -75,7 +86,7 @@ public class ClientHandler extends Thread {
                 if (result.length > 0) {
                     outToClient.write(result);
                 }
-                
+
 //                    } else if(clientBundle.getType() == RequestType.ENTITY_UPDATE) {
 //                        System.out.println(clientBundle.getSerializedData());
 //                        EntityUpdateRequest request = Serializer.deserialize(clientBundle.getSerializedData(), EntityUpdateRequest.class);
@@ -108,6 +119,17 @@ public class ClientHandler extends Thread {
                 ioe.printStackTrace();
             }
         }
+    }
+
+    private boolean requestTypeRecognized(int requestType) {
+        // We recognize the request type if it matches one of our enums, otherwise, we don't
+        boolean recognized = (requestType == RequestType.ENTITY_SETUP.getNumVal()
+                || requestType == RequestType.ENTITY_REGISTER.getNumVal()
+                || requestType == RequestType.COMMAND.getNumVal()
+                || requestType == RequestType.FILE_UPDATE.getNumVal());
+
+
+        return recognized;
     }
 
 }

@@ -22,7 +22,6 @@ import static org.mockito.Mockito.*;
 
 public class TCPServerTest {
 
-
     @Test
     public void testConnection() {
         try {

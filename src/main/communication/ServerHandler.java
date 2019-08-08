@@ -6,30 +6,30 @@ import java.net.ServerSocket;
 /**
  * The TCP socket server that accepts requests from the client
  */
-public class ServerHandler {
+public class ServerHandler implements Runnable {
 
+    public static int PORT = 6789;
+
+
+    boolean running = true;
     ServerSocket serverSocket = null;
 
-    public ServerHandler() {
-        /**
-         * I feel like I might need to track individual clients and see when they disconnect so I can clean them up maybe?
-         * Or those things can be handled inside of ClientHandler, in which case, all the things should be fine once that thread dies down.
-         * That's the cleaner way let's do that.
-         */
+    public ServerHandler() {}
 
+    @Override
+    public void run() {
         try {
             // Initialize the server
             System.out.println("Initializing Socket: ServerHandler");
-            this.serverSocket = new ServerSocket(6789);
+            this.serverSocket = new ServerSocket(PORT);
 
             // Keep trying to connect toc clients!
-            while (true) {
+            while (running) {
 
                 try {
                     System.out.println("Accepting Connection");
                     // Create and run a new client using an accepted connection
                     new ClientHandler(this.serverSocket.accept()).start();
-                    System.out.println("Test");
                 }
                 catch (IOException e) {
                     e.printStackTrace();
@@ -49,6 +49,20 @@ public class ServerHandler {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void stop() {
+        // Stop the server from running
+        this.running = false;
+
+        try {
+            // Close the server connection
+            if (this.serverSocket != null) { this.serverSocket.close(); }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static void main(String[] args) {
