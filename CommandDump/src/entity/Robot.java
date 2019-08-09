@@ -125,7 +125,8 @@ public class Robot extends GenericEntity {
     }
 
     public enum InputType {
-        PLAYER(0);
+        PLAYER_KEY(0),
+        PLAYER_MOUSE(1);
 
         private int numVal;
 

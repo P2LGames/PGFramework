@@ -67,6 +67,6 @@ public class ServerHandler implements Runnable {
 
     public static void main(String[] args) {
         // Start up a new server
-        new ServerHandler();
+        new ServerHandler().run();
     }
 }

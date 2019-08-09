@@ -42,7 +42,7 @@ public class ServerHandlerTest {
     }
 
     @Test
-    public void testConnection() {
+    public void testIndividualConnection() {
         /**
          * What am I trying to test here? That I can connect to the server using the address and port, and get a valid response.
          * How do I do that? Create a socket, and connect that socket to the server, it will create a client handler for me.
@@ -82,14 +82,14 @@ public class ServerHandlerTest {
     }
 
     @Test
-    public void multipleConnections() {
+    public void testMultipleConnections() {
         /**
          * What am I trying to test here? That I can connect to the server using the address and port, and get a valid response.
          * How do I do that? Create a socket, and connect that socket to the server, it will create a client handler for me.
          * Further testing: Pass in byte data and test sample response
          */
         try {
-
+            // Keep track of the clients and their in and output streams
             ArrayList<Socket> clients = new ArrayList<>();
             ArrayList<DataOutputStream> outs = new ArrayList<>();
             ArrayList<DataInputStream> ins = new ArrayList<>();
@@ -107,9 +107,7 @@ public class ServerHandlerTest {
                 // Write a byte to the framework
                 DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
                 byte[] bytes = new byte[] { 0, 10 };
-//                System.out.println(bytes.length);
                 outToServer.write(bytes);
-//            outToServer.writeBytes();
 
                 // Read the data from the server
                 DataInputStream inFromServer = new DataInputStream(clientSocket.getInputStream());
