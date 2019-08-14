@@ -176,7 +176,7 @@ public class InMemoryClassLoader {
             errorMessage = "Error: " + e.getLocalizedMessage();
         }
 
-        return this.compileFileUpdateResult(success, entityId, commandId, errorMessage);
+        return this.compileFileUpdateResult(success, entityId, commandId, className, errorMessage);
     }
 
     /**
@@ -191,11 +191,14 @@ public class InMemoryClassLoader {
      * @param errorMessage Empty is success is true
      * @return The array of bytes to send back to the client
      */
-    private byte[] compileFileUpdateResult(boolean success, int entityId, int commandId, String errorMessage) {
+    private byte[] compileFileUpdateResult(boolean success, int entityId, int commandId, String className, String errorMessage) {
         // Setup the response, add the response type to it
         ArrayList<Byte> result = new ArrayList<>();
         result.add((byte) RequestType.FILE_UPDATE.getNumVal());
         result.add((byte)0);
+
+        // Convert the className to a byte array
+        byte[] classNameBytes = className.getBytes();
 
         // If the setup was a success, then all we need is:
         // 1. length of message
@@ -203,8 +206,8 @@ public class InMemoryClassLoader {
         // 3. 2 ints (8 bytes) for entity id and command id
         if (success) {
             // Add the message length to our byte array
-            // 2 for the success, 8 for the entityId and commandId
-            int messageLength = 2 + 8;
+            // 2 for the success, 8 for the entityId and commandId, and 4 (int) + the length of the className
+            int messageLength = 2 + 8 + 4 + classNameBytes.length;
             ByteManager.addIntToByteArray(messageLength, result);
 
             // Add that is was a success
@@ -216,11 +219,17 @@ public class InMemoryClassLoader {
 
             // Add the commandId to the array
             ByteManager.addIntToByteArray(commandId, result);
+
+            // Add the length of the class name bytes
+            ByteManager.addIntToByteArray(classNameBytes.length, result);
+
+            // Add the class name bytes
+            ByteManager.addBytesToArray(classNameBytes, result);
         }
         // Otherwise, send an error message
         else {
             // Add the integer 2 + length of error message to our byte array, this is the rest of the bytes
-            int messageLength = 10 + errorMessage.getBytes().length;
+            int messageLength = 10 + 4 + classNameBytes.length + errorMessage.getBytes().length;
             ByteManager.addIntToByteArray(messageLength, result);
 
             // Failure
@@ -230,6 +239,12 @@ public class InMemoryClassLoader {
             // Add the entity id and command id
             ByteManager.addIntToByteArray(entityId, result);
             ByteManager.addIntToByteArray(commandId, result);
+
+            // Add the length of the class name bytes
+            ByteManager.addIntToByteArray(classNameBytes.length, result);
+
+            // Add the class name bytes
+            ByteManager.addBytesToArray(classNameBytes, result);
 
             // Message
             ByteManager.addBytesToArray(errorMessage.getBytes(), result);
