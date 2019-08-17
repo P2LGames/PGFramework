@@ -6,7 +6,6 @@ import communication.ServerException;
 import entity.GenericEntity;
 import entity.GenericEntityMap;
 import main.communication.RequestType;
-import main.communication.request.CommandRequest;
 import util.ByteManager;
 
 import java.nio.ByteBuffer;
@@ -18,40 +17,15 @@ import java.util.Arrays;
  */
 public class GenericCommandHandler extends Thread {
 
-    private GenericCommandFactory commandFactory;
-
-    public GenericCommandHandler() {
-        this.commandFactory = new GenericCommandFactory();
-    }
-
-    public void setCommandFactory(GenericCommandFactory commandFactory) {
-        this.commandFactory = commandFactory;
-    }
+    public GenericCommandHandler() {}
 
     /**
      * Takes a command request and using the factory to retrieve the correct command and run it
      *
-     * @param request the request holding the data for the command to be run
+     * @param requestBytes the request holding the data for the command to be run
      *
      * @return the result of running the command
      */
-    public CommandResult handleCommand(CommandRequest request) {
-        GenericCommand command;
-        try {
-            command = commandFactory.getCommand(request);
-        } catch(ServerException e) {
-            return new CommandResult(e.getMessage(), false, request.getEntityId());
-        }
-        command.setParameters(request.getParameters());
-        // Get the result of the command so the client knows what the value is from
-        CommandResult result = command.run();
-        // Set the entityId and command name in the result
-        result.setEntityId(request.getEntityId());
-        result.setCommand(request.getCommand());
-        // Return the result
-        return result;
-    }
-
     public byte[] handleCommand(byte[] requestBytes) {
         // Parse the entity type and placeholder ID from the request bytes
         int entityId = ByteBuffer.wrap(requestBytes, 0, 4).getInt();

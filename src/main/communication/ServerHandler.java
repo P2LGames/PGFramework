@@ -10,7 +10,6 @@ public class ServerHandler implements Runnable {
 
     public static int PORT = 6789;
 
-
     boolean running = true;
     ServerSocket serverSocket = null;
 

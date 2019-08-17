@@ -3,8 +3,6 @@ package main.entity;
 import entity.GenericEntity;
 import entity.GenericEntityMap;
 import main.communication.RequestType;
-import main.communication.request.EntityRequest;
-import main.communication.result.EntityResult;
 import util.ByteManager;
 
 import java.nio.ByteBuffer;
@@ -18,27 +16,11 @@ public class EntityLoader {
     /**
      * Creates an entity of the specified type, assigns it an id, registers it, and returns the id
      *
-     * @param request
-     *  holds the type of entity to be created
+     * @param requestBytes
+     *  The bytes to be unpacked to register the entity
      * @return
-     *  the data structure holding the success of the operation and the entity id if it was successful
+     *  The bytes that represent whether or not the entity was successfully registered
      */
-    public synchronized EntityResult registerEntity(EntityRequest request) {
-        GenericEntity entity;
-        try {
-            Class<?> loadedClass = Class.forName(request.getEntityType());
-            entity = (GenericEntity) loadedClass.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new EntityResult(false, e.getMessage());
-        }
-        GenericEntityMap entityMap = GenericEntityMap.getInstance();
-        String entityId = getEntityId(request.getEntityType(), entityMap.size());
-        entityMap.put(entityId, entity);
-        return new EntityResult(entityId, request.getPlaceholderId());
-    }
-
-
     public synchronized byte[] registerEntity(byte[] requestBytes) {
         // Parse the entity type and placeholder ID from the request bytes
         Integer entityType = ByteBuffer.wrap(requestBytes, 0, 4).getInt();
@@ -134,15 +116,5 @@ public class EntityLoader {
         byte[] resultArray = ByteManager.convertArrayListToArray(result);
 
         return resultArray;
-    }
-
-    /**
-     * Returns the next entity id
-     *
-     * @return
-     *  the id
-     */
-    private String getEntityId(String name, int idNum) {
-        return name + idNum;
     }
 }
