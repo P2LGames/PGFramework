@@ -78,7 +78,7 @@ public class EntityLoader {
     }
 
     /**
-     * Compiles the result into a byte array to send back to the server.
+     * Compiles the result into a byte array to send back to the game engine.
      * If success is true, then the message is the type (int), an int with the number of bytes, a 1, signifying success, along
      * with two ints signifying the entityId and the placeholderId
      * Otherwise, the message is the type, an int with the number of bytes, a 0 (byte), and the bytes representing the
@@ -116,12 +116,15 @@ public class EntityLoader {
         // Otherwise, send an error message
         else {
             // Add the integer 2 + errorMessage.getBytes().length to our byte array, this is the rest of the bytes
-            int messageLength = 2 + errorMessage.getBytes().length;
+            int messageLength = 6 + errorMessage.getBytes().length;
             ByteManager.addIntToByteArray(messageLength, result);
 
             // Failure
             result.add((byte)0);
             result.add((byte)0);
+
+            // Add the placeholder id
+            ByteManager.addIntToByteArray(placeholderId, result);
 
             // Message
             ByteManager.addBytesToArray(errorMessage.getBytes(), result);

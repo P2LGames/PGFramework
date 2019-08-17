@@ -8,23 +8,89 @@ import entity.Robot;
 import entity.RobotAttachments.Base;
 import util.ByteManager;
 
-import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 //// *READONLY
 
 public class RobotDefault {
-    //// *NOACCESS
+
+    /**
+     * Definition: Function
+     *
+     * A FUNCTION is a method or routine that you call to run or execute a part of your code.
+     * Below is the function W_Pressed.
+     * It is called whenever you press W while you have the robot selected.
+     */
+
+    /**
+     * This function is called whenever you press W.
+     * Get the robot to move forward when you press W!
+     */
+    //// *PERMISSION w,1:r,0 *END_PERMISSION
+    public void W_Pressed() {
+        /**
+         * Whenever you put '//' in front of something, you comment it out. This means that the computer
+         * will ignore it when it runs your code.
+         *
+         * The '// moveForward();' code below is commented out and will not run when you press W.
+         * Try removing the comments and recompiling.
+         */
+
+        // moveForward();
+    }
+
+    //// *PERMISSION n,0 *END_PERMISSION
+
+    /**
+     * Called when you have this robot selected, and you press a key.
+     * @param code An integer representing the key that you pressed
+     * @param pressed Whether or not you pressed or released the key. 1 is pressed, 0 is released.
+     */
+    public void playerKeyPressed(int code, int pressed) {
+
+        if (code == 87 && pressed == 1) {
+            W_Pressed();
+        }
+
+    }
+
+    /**
+     * Fill this in to give the robot his orders.
+     * Can you help him move around? We gotta get to the finish!
+     */
+    public void giveOrders() {
+
+    }
+
+    /**
+     * These are the functions you can call on your robot!
+     * Use them well.
+     */
+
+    // moveForward()
+    // moveBackward()
+    // stopMoving()
+    // turnLeft()
+    // turnRight()
+    // stopTurning()
+    // print(String)
+
+
+
+    private Robot robot;
+
+    public boolean isActionPressed(int pressed) {
+        return pressed == 1;
+    }
 
     @Command(commandName = "process", id = 0)
     public byte[] process() {
-        robot.clearOrders();
-
         giveOrders();
 
         byte[] orders = robot.getOrders();
+
+        // Clear the robot's orders for the next loop
+        robot.clearOrders();
 
         return orders;
     }
@@ -36,16 +102,24 @@ public class RobotDefault {
         int type = ByteBuffer.wrap(bytes, 4, 4).getInt();
 //        System.out.println("Position: " + position + " Type: " + type + " Byte length: " + bytes.length);
 
-        // If it was ourselves, and the player
-        if (position == Robot.AttachmentType.SELF.getNumVal()
-                && type == Robot.InputType.PLAYER.getNumVal()) {
+        // If the signal came from the robot
+        if (position == Robot.AttachmentType.SELF.getNumVal()) {
 
-            // There will we two ints, move and rotate that follow
-            int move = ByteBuffer.wrap(bytes, 8, 4).getInt();
-            int rotate = ByteBuffer.wrap(bytes, 12, 4).getInt();
+            // If the input type was a player key stroke
+            if (type == Robot.InputType.PLAYER_KEY.getNumVal()) {
+                // Handle the data from the keystroke
+                // Get the character code and the action
+                int code = ByteBuffer.wrap(bytes, 8, 4).getInt();
+                int action = ByteBuffer.wrap(bytes, 12, 4).getInt();
 
-            // Pass it to the viewable playerInput function
-            this.playerInput(move, rotate);
+                // Pass it to the viewable playerKeyPressed function
+                this.playerKeyPressed(code, action);
+            }
+            // If the input type was a player mouse input
+            else if (type == Robot.InputType.PLAYER_MOUSE.getNumVal()) {
+
+            }
+
         }
 
         return new byte[0];
@@ -55,42 +129,6 @@ public class RobotDefault {
     public void setRobot(GenericEntity robot) {
         this.robot = (Robot)robot;
     }
-
-    private Robot robot;
-
-    //// *READWRITE
-
-    private int move = 0;
-    private int rotate = 0;
-
-    public void playerInput(int move, int rotate) {
-        this.move = move;
-        this.rotate = rotate;
-    }
-
-    public void giveOrders() {
-
-        // If the user want's to move, meaning input is -1 or 1
-        if (this.move > 0) {
-            moveForward();
-        }
-        else {
-            // Use this if you want to stop the robot's movement
-            stopMoving();
-        }
-
-        // If the user wants to rotate, meaning input is -1 or 1
-        if (this.rotate < 0) {
-            // Right now I can only turn to the left, can you fix me?
-            turnLeft();
-        }
-        else {
-            // Use this if you want to stop the robot from turning
-            stopTurning();
-        }
-    }
-
-    //// *NOACCESS
 
     public void moveForward() {
         int position = Robot.AttachmentPosition.BASE.getNumVal();

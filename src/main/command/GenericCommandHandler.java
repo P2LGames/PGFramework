@@ -16,7 +16,7 @@ import java.util.Arrays;
 /**
  * The class that handles the running of a generic command
  */
-public class GenericCommandHandler {
+public class GenericCommandHandler extends Thread {
 
     private GenericCommandFactory commandFactory;
 
@@ -175,12 +175,16 @@ public class GenericCommandHandler {
         // Otherwise, send an error message
         else {
             // Add the integer 2 + length of error message to our byte array, this is the rest of the bytes
-            int messageLength = 2 + errorMessage.getBytes().length;
+            int messageLength = 10 + errorMessage.getBytes().length;
             ByteManager.addIntToByteArray(messageLength, result);
 
             // Failure
             result.add((byte)0);
             result.add((byte)0);
+
+            // Add the entity id and command id
+            ByteManager.addIntToByteArray(entityId, result);
+            ByteManager.addIntToByteArray(commandId, result);
 
             // Message
             ByteManager.addBytesToArray(errorMessage.getBytes(), result);

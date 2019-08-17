@@ -6,7 +6,8 @@ public enum RequestType {
     COMMAND(2),
     ENTITY_UPDATE(3),
     FILE_GET(4),
-    FILE_UPDATE(5);
+    FILE_UPDATE(5),
+    UNRECOGNIZED(-1);
 
     private int numVal;
 
