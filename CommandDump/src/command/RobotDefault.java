@@ -14,7 +14,32 @@ import java.nio.ByteBuffer;
 
 public class RobotDefault {
 
-    //// *READWRITE
+    /**
+     * Definition: Function
+     *
+     * A FUNCTION is a method or routine that you call to run or execute a part of your code.
+     * Below is the function W_Pressed.
+     * It is called whenever you press W while you have the robot selected.
+     */
+
+    /**
+     * This function is called whenever you press W.
+     * Get the robot to move forward when you press W!
+     */
+    //// *PERMISSION w,1:r,0 *END_PERMISSION
+    public void W_Pressed() {
+        /**
+         * Whenever you put '//' in front of something, you comment it out. This means that the computer
+         * will ignore it when it runs your code.
+         *
+         * The '// moveForward();' code below is commented out and will not run when you press W.
+         * Try removing the comments and recompiling.
+         */
+
+        // moveForward();
+    }
+
+    //// *PERMISSION n,0 *END_PERMISSION
 
     /**
      * Called when you have this robot selected, and you press a key.
@@ -22,6 +47,10 @@ public class RobotDefault {
      * @param pressed Whether or not you pressed or released the key. 1 is pressed, 0 is released.
      */
     public void playerKeyPressed(int code, int pressed) {
+
+        if (code == 87 && pressed == 1) {
+            W_Pressed();
+        }
 
     }
 
@@ -32,8 +61,6 @@ public class RobotDefault {
     public void giveOrders() {
 
     }
-
-    //// *READONLY
 
     /**
      * These are the functions you can call on your robot!
@@ -48,7 +75,7 @@ public class RobotDefault {
     // stopTurning()
     // print(String)
 
-    //// *NOACCESS
+
 
     private Robot robot;
 

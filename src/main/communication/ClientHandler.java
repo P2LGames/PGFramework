@@ -10,6 +10,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ClientHandler extends Thread {
 
@@ -101,6 +102,9 @@ public class ClientHandler extends Thread {
 
             }
 
+        }
+        catch (SocketException e) {
+            e.printStackTrace();
         }
         catch (IOException e) {
             e.printStackTrace();

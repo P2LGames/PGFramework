@@ -16,7 +16,7 @@ import java.util.Arrays;
 /**
  * The class that handles the running of a generic command
  */
-public class GenericCommandHandler {
+public class GenericCommandHandler extends Thread {
 
     private GenericCommandFactory commandFactory;
 
