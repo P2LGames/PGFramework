@@ -67,11 +67,13 @@ public class ClientHandler extends Thread {
 
                 // Setup the entity
                 if (requestType == RequestType.ENTITY_SETUP.getNumVal()) {
+
                     // Get the result from the entity setup class
                     result = new EntitySetup().setupEntitiesWithBytes(bytes);
                 }
                 // If we want to register an entity, do so.
                 else if (requestType == RequestType.ENTITY_REGISTER.getNumVal()) {
+                    System.out.println("Test");
                     result = new EntityLoader().registerEntity(bytes);
                 }
                 // If we want to run a command, do so.

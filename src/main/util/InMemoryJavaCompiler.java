@@ -11,7 +11,7 @@ public class InMemoryJavaCompiler {
 	private JavaCompiler javac;
 	private DynamicClassLoader classLoader;
 	private Iterable<String> options;
-	boolean ignoreWarnings = true;
+	boolean ignoreWarnings = false;
 
 	private Map<String, SourceCode> sourceCodes = new HashMap<String, SourceCode>();
 
@@ -22,6 +22,7 @@ public class InMemoryJavaCompiler {
 	private InMemoryJavaCompiler() {
 		this.javac = ToolProvider.getSystemJavaCompiler();
 		this.classLoader = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
+//		this.classLoader = new DynamicClassLoader("target/classes");
 	}
 
 	/**
@@ -79,23 +80,47 @@ public class InMemoryJavaCompiler {
 		if (sourceCodes.size() == 0) {
 			throw new CompilationException("No source code to compile");
 		}
-		Collection<SourceCode> compilationUnits = sourceCodes.values();
-		CompiledCode[] code;
 
-		code = new CompiledCode[compilationUnits.size()];
+		// Get all of the source codes
+		Collection<SourceCode> compilationUnits = sourceCodes.values();
+
+		// Track the compiled codes
+		CompiledCode[] code = new CompiledCode[compilationUnits.size()];
+
+		// Create an iterator for the source codes
 		Iterator<SourceCode> iter = compilationUnits.iterator();
+
+		// Loop through all of the source codes
 		for (int i = 0; i < code.length; i++) {
+			// Create a new compiled code for each class
 			code[i] = new CompiledCode(iter.next().getClassName());
 		}
+
+		// Create a diagnostics collector
 		DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
+
+		// Create an extended file manager
 		ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(javac.getStandardFileManager(null, null, null), classLoader);
+
+		// Create a task to compile all of the source code
 		JavaCompiler.CompilationTask task = javac.getTask(null, fileManager, collector, options, null, compilationUnits);
+
+		// Start the task
 		boolean result = task.call();
+
+		// If the result was false, or we have some diagnostics information
 		if (!result || collector.getDiagnostics().size() > 0) {
+			// Then we have a problem, and we need to get a solid report for the user
 			StringBuffer exceptionMsg = new StringBuffer();
+
+			// Unable to compile source
 			exceptionMsg.append("Unable to compile the source");
+
+			// Track whether or not we have warnings or errors
 			boolean hasWarnings = false;
 			boolean hasErrors = false;
+
+			// Loop through the diagnostics problems, and track which one we got
 			for (Diagnostic<? extends JavaFileObject> d : collector.getDiagnostics()) {
 				switch (d.getKind()) {
 				case NOTE:
@@ -109,19 +134,27 @@ public class InMemoryJavaCompiler {
 					hasErrors = true;
 					break;
 				}
+
+				// We also append the kind and warning message we recieve from the diagnostics
 				exceptionMsg.append("\n").append("[kind=").append(d.getKind());
 				exceptionMsg.append(", ").append("line=").append(d.getLineNumber());
 				exceptionMsg.append(", ").append("message=").append(d.getMessage(Locale.US)).append("]");
 			}
+
+			// If we had a warning and are not ignoring them, or if we had errors
 			if (hasWarnings && !ignoreWarnings || hasErrors) {
+				// Throw a new compilation exception with the message we just compiled above
 				throw new CompilationException(exceptionMsg.toString());
 			}
 		}
 
+		// Create a new map of class names to source codes
 		Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
 		for (String className : sourceCodes.keySet()) {
 			classes.put(className, classLoader.loadClass(className));
 		}
+
+		// Return the classes
 		return classes;
 	}
 

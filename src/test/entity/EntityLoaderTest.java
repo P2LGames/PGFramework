@@ -21,4 +21,15 @@ public class EntityLoaderTest {
 //        assertEquals(result2, expectedResult2);
 //
 //    }
+
+    @Test
+    public void testSetupEntity() {
+
+    }
+
+
+    @Test
+    public void testRegisterEntity() {
+
+    }
 }

@@ -2,8 +2,6 @@ package main.communication;
 
 import command.Result;
 import main.command.GenericCommandHandler;
-import main.communication.request.CommandRequest;
-import main.communication.request.EntityUpdateRequest;
 import main.entity.EntityUpdater;
 import util.Serializer;
 

@@ -105,33 +105,56 @@ public abstract class GenericEntity {
         // Create an object with it
         Object classObject = commandsClass.getConstructor().newInstance();
 
-        // Loop through the methods is contains
-        for (Method commandMethod : commandsClass.getDeclaredMethods()) {
-            // If an have the command annotation, then set that method up as a command
-            if (commandMethod.isAnnotationPresent(Command.class)) {
+        // Also look through the parent classes for annotations
+        Class<?> clazz = commandsClass;
 
-                // Get the command name and id for the maps
-                String commandName = commandMethod.getAnnotation(Command.class).commandName();
-                Integer commandId = commandMethod.getAnnotation(Command.class).id();
+        // Track the methods we update, don't want to update them twice
+        Set<Method> mappedMethods = new HashSet<>();
+        boolean setEntity = false;
 
-                // Create a generic command
-                GenericCommand command = new GenericCommand();
+        // While we aren't looking at the object.class
+        while (clazz != Object.class) {
+            // Loop through the methods the class contains
+            for (Method commandMethod : clazz.getDeclaredMethods()) {
+                // If the method has already been mapped, skip it
+                if (mappedMethods.contains(commandMethod)) {
+                    continue;
+                }
 
-                // Set the class object and method of the command
-                command.setClassObject(classObject);
-                command.setMethod(commandMethod);
+                // If an have the command annotation, then set that method up as a command
+                if (commandMethod.isAnnotationPresent(Command.class)) {
+                    // Add the method to the mapped methods
+                    mappedMethods.add(commandMethod);
 
-                // Add the command to the maps
-                commandMap.put(commandName, command);
-                commandMapId.put(commandId, command);
+                    // Get the command name and id for the maps
+                    String commandName = commandMethod.getAnnotation(Command.class).commandName();
+                    Integer commandId = commandMethod.getAnnotation(Command.class).id();
 
-                // Add the command class to our list
-                addCommandClass(commandMethod.getDeclaringClass().getName());
+                    // Create a generic command
+                    GenericCommand command = new GenericCommand();
+
+                    // Set the class object and method of the command
+                    command.setClassObject(classObject);
+                    command.setMethod(commandMethod);
+
+                    // Add the command to the maps
+                    commandMap.put(commandName, command);
+                    commandMapId.put(commandId, command);
+
+                    // Add the command class to our list
+                    addCommandClass(commandMethod.getDeclaringClass().getName());
+                }
+                else if (!setEntity && commandMethod.isAnnotationPresent(SetEntity.class)) {
+                    // Set the entity of our class object
+                    commandMethod.invoke(classObject, this);
+
+                    // Entity was set
+                    setEntity = true;
+                }
             }
-            else if (commandMethod.isAnnotationPresent(SetEntity.class)) {
-                // Set the entity of our class object
-                commandMethod.invoke(classObject, this);
-            }
+
+            // Move to the parent of the current class
+            clazz = clazz.getSuperclass();
         }
     }
 
@@ -142,23 +165,49 @@ public abstract class GenericEntity {
         // Create a generic command
         GenericCommand command = new GenericCommand();
 
-        // Loop through the methods the commands class has
-        for (Method commandMethod : commandsClass.getDeclaredMethods()) {
-            // If it has the command annotation, then check to see if it has the commandId
-            if (commandMethod.isAnnotationPresent(Command.class)) {
+        // Also look through the parent classes for annotations
+        Class<?> clazz = commandsClass;
 
-                // Get the command name and id for the maps
-                int methodId = commandMethod.getAnnotation(Command.class).id();
+        // Track if we have updated the method or not
+        boolean methodMapped = false;
+        boolean setEntity = false;
 
-                // If they match, set the commands method to this one
-                if (methodId == commandId) {
-                    command.setMethod(commandMethod);
+        // While we aren't looking at the object.class
+        while (clazz != Object.class) {
+            // If we have mapped the method and set the entity, we can stop
+            if (methodMapped && setEntity) {
+                break;
+            }
+
+            // Loop through the methods the class contains
+            for (Method commandMethod : clazz.getDeclaredMethods()) {
+
+                // If we have not already mapped the method and if it has the command annotation, see if it matches the command id
+                if (!methodMapped && commandMethod.isAnnotationPresent(Command.class)) {
+
+                    // Get the command name and id for the maps
+                    int methodId = commandMethod.getAnnotation(Command.class).id();
+
+                    // If they match, set the commands method to this one
+                    if (methodId == commandId) {
+                        command.setMethod(commandMethod);
+
+                        // We have mapped the method
+                        methodMapped = true;
+                    }
+                }
+                // Otherwise, check and see if we can set the entity on the object
+                else if (!setEntity && commandMethod.isAnnotationPresent(SetEntity.class)) {
+                    // Set the entity of our class object
+                    commandMethod.invoke(classObject, this);
+
+                    // Entity mapped
+                    setEntity = true;
                 }
             }
-            else if (commandMethod.isAnnotationPresent(SetEntity.class)) {
-                // Set the entity of our class object
-                commandMethod.invoke(classObject, this);
-            }
+
+            // Move to the parent of the current class
+            clazz = clazz.getSuperclass();
         }
 
         // Set the class object for this generic command
