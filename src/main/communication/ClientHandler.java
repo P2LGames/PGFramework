@@ -1,6 +1,7 @@
 package main.communication;
 
-import main.command.GenericCommandHandler;
+import main.command.CommandHandler;
+import main.command.CommandThreadMonitor;
 import main.entity.EntityLoader;
 import main.entity.EntitySetup;
 import main.util.InMemoryClassLoader;
@@ -8,21 +9,39 @@ import util.ByteManager;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ClientHandler extends Thread {
 
     private Boolean running = true;
 
+    // Sockets and I/O
     private Socket connectionSocket;
     private DataInputStream inFromClient;
     private DataOutputStream outToClient;
 
+    // Our command thread monitor
+    private CommandThreadMonitor monitor;
+
+    // Mutex locking on the bytes to send to the server
+    private boolean manipulatingToSend = false;
+
+    // Track data to be sent
+    private ArrayList<byte[]> toSend = new ArrayList<>();
+
     public ClientHandler(Socket connection) {
         // Save the connection socket
         this.connectionSocket = connection;
+
+        // Create our command thread monitor
+        monitor = new CommandThreadMonitor(this);
     }
 
     /**
@@ -44,7 +63,6 @@ public class ClientHandler extends Thread {
 
                 // Check that the type is not recognizable
                 if (!this.requestTypeRecognized(requestType)) {
-                    System.out.println(requestType);
                     // Then write that we don't recognize this type to the engine
                     outToClient.write(ByteManager.convertIntToByteArray(RequestType.UNRECOGNIZED.getNumVal()));
 
@@ -67,18 +85,20 @@ public class ClientHandler extends Thread {
 
                 // Setup the entity
                 if (requestType == RequestType.ENTITY_SETUP.getNumVal()) {
-
                     // Get the result from the entity setup class
                     result = new EntitySetup().setupEntitiesWithBytes(bytes);
                 }
                 // If we want to register an entity, do so.
                 else if (requestType == RequestType.ENTITY_REGISTER.getNumVal()) {
-                    System.out.println("Test");
                     result = new EntityLoader().registerEntity(bytes);
                 }
                 // If we want to run a command, do so.
                 else if (requestType == RequestType.COMMAND.getNumVal()) {
-                    result = new GenericCommandHandler().handleCommand(bytes);
+                    // Create the handler, passing it ourselves, its bytes, etc.
+                    CommandHandler handler = new CommandHandler(this, bytes);
+
+                    // Add the thread to the thread monitor, this will start it
+                    monitor.addThread(handler);
                 }
                 // If we want to update a file in the framework, do so.
                 else if (requestType == RequestType.FILE_UPDATE.getNumVal()) {
@@ -89,6 +109,26 @@ public class ClientHandler extends Thread {
                 if (result.length > 0) {
                     outToClient.write(result);
                 }
+
+                // Also write all of the data that is in toSend
+                // Wait for manipulating to send to be false
+                while (manipulatingToSend) {
+                    // Do nothing, wait until we can add our data
+                }
+
+                // Mutex lock
+                manipulatingToSend = true;
+
+                // Send all of the data
+                for (byte[] send: toSend) {
+                    outToClient.write(send);
+                }
+
+                // Clear the toSend
+                toSend.clear();
+
+                // Mutex unlock
+                manipulatingToSend = false;
 
 //                    } else if(clientBundle.getType() == RequestType.ENTITY_UPDATE) {
 //                        System.out.println(clientBundle.getSerializedData());
@@ -103,7 +143,9 @@ public class ClientHandler extends Thread {
 //                    }
 
             }
-
+        }
+        catch (EOFException e) {
+            System.out.println("Socket: Connection was dropped.");
         }
         catch (SocketException e) {
             e.printStackTrace();
@@ -116,6 +158,9 @@ public class ClientHandler extends Thread {
             e.printStackTrace();
         }
         finally {
+            // Stop and finish our thread monitor
+            monitor.endProcess();
+
             // Try to close sockets, clean up connections
             try {
                 if (inFromClient != null) { inFromClient.close(); }
@@ -125,6 +170,20 @@ public class ClientHandler extends Thread {
                 ioe.printStackTrace();
             }
         }
+    }
+
+    public void sendByteArray(byte[] result) {
+        while (manipulatingToSend) {
+            // Do nothing, wait until we can add our data
+        }
+        // Mutex lock
+        manipulatingToSend = true;
+
+        // Add our to send
+        toSend.add(result);
+
+        // Mutex unlock
+        manipulatingToSend = false;
     }
 
     private boolean requestTypeRecognized(int requestType) {

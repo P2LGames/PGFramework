@@ -1,20 +1,14 @@
 package test.communication;
 
-import command.CommandResult;
-import main.command.GenericCommandHandler;
 import main.communication.*;
-import main.communication.request.CommandRequest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import util.ByteManager;
-import util.Serializer;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -39,6 +33,8 @@ public class ServerHandlerTest {
     public void tearDown() {
         // Stop the server
         server.stop();
+
+        server = null;
     }
 
     @Test
@@ -106,8 +102,7 @@ public class ServerHandlerTest {
 
                 // Write a byte to the framework
                 DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-                byte[] bytes = new byte[] { 0, 10 };
-                outToServer.write(bytes);
+                outToServer.write(ByteManager.convertIntToByteArray(-1));
 
                 // Read the data from the server
                 DataInputStream inFromServer = new DataInputStream(clientSocket.getInputStream());
@@ -136,8 +131,11 @@ public class ServerHandlerTest {
         }
         catch(Exception e) {
             System.out.println("Unexpected exception: " + e.getMessage());
+            e.printStackTrace();
             Assert.fail();
         }
     }
+
+
 
 }

@@ -1,14 +1,9 @@
 package main.communication;
 
-import command.Result;
-import main.command.GenericCommandHandler;
-import main.entity.EntityUpdater;
-import util.Serializer;
+import main.command.CommandHandler;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
 
 /**
@@ -18,15 +13,10 @@ public class UDPServer {
     private DatagramSocket socket;
     private boolean running;
     private byte[] buf = new byte[256];
-    private GenericCommandHandler commandHandler;
+    private CommandHandler commandHandler;
 
     public UDPServer() throws SocketException {
         socket = new DatagramSocket(4445);
-        commandHandler = new GenericCommandHandler();
-    }
-
-    public void setCommandHandler(GenericCommandHandler commandHandler) {
-        this.commandHandler = commandHandler;
     }
 
     public void run() throws IOException {

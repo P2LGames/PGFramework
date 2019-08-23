@@ -1,19 +1,7 @@
 package test.utils;
 
-import command.CommandResult;
-import entity.GenericEntity;
-import entity.TestEntity;
-import main.command.GenericCommandHandler;
 import entity.GenericEntityMap;
-import main.util.InMemoryClassLoader;
 import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.io.*;
-import java.util.Random;
-
-import static org.junit.Assert.*;
 
 public class MyClassLoaderTest {
 
@@ -134,7 +122,7 @@ public class MyClassLoaderTest {
 //            commandRequest.setCommand("params");
 //            commandRequest.setEntityId(request.getEntityId());
 //
-//            GenericCommandHandler handler = new GenericCommandHandler();
+//            CommandHandler handler = new CommandHandler();
 //            CommandResult commandResult = handler.handleCommand(commandRequest);
 //            CommandResult expectedResult = new CommandResult(randInt + "yooooooo", commandRequest.getEntityId());
 //
@@ -222,7 +210,7 @@ public class MyClassLoaderTest {
 //            // Setup the class loader
 //            InMemoryClassLoader loader = new InMemoryClassLoader();
 //            // Setup the command handler
-//            GenericCommandHandler handler = new GenericCommandHandler();
+//            CommandHandler handler = new CommandHandler();
 //
 //
 //            UpdateRequest request = new UpdateRequest();

@@ -1,17 +1,5 @@
 package test.command;
 
-import command.CommandResult;
-import command.GenericCommand;
-import command.StringCommandDefault;
-import communication.ServerException;
-import main.command.GenericCommandHandler;
-import org.junit.Assert;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
-
-import static org.mockito.Mockito.*;
-
 
 public class CommandHandlerTest {
 
@@ -37,7 +25,7 @@ public class CommandHandlerTest {
 //            when(factory.getCommand(commandRequest)).thenReturn(command);
 //
 //            // Create a generic command handler and have it execute the command
-//            GenericCommandHandler handler = new GenericCommandHandler();
+//            CommandHandler handler = new CommandHandler();
 //            handler.setCommandFactory(factory);
 //            CommandResult result = handler.handleCommand(commandRequest);
 //

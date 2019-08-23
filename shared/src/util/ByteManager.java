@@ -11,13 +11,22 @@ public class ByteManager {
      * @param toConvert
      * @return The byte array representing the integer
      */
-    public static byte[] convertIntToByteArray(int toConvert) {
+    public static byte[] convertIntToByteArray(int toConvert, Boolean... bigEndian) {
         // Get the byte array of the int and return it, little endian style
-        return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(toConvert).array();
+        if (bigEndian.length > 0 && bigEndian[0]) {
+            return ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putInt(toConvert).array();
+        }
+        else {
+            return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(toConvert).array();
+        }
     }
 
     public static void addIntToByteArray(int toConvert, ArrayList<Byte> array) {
-        addBytesToArray(convertIntToByteArray(toConvert), array);
+        addBytesToArray(convertIntToByteArray(toConvert, false), array);
+    }
+
+    public static void addIntToByteArray(int toConvert, ArrayList<Byte> array, boolean bigEndian) {
+        addBytesToArray(convertIntToByteArray(toConvert, bigEndian), array);
     }
 
     /**
@@ -62,6 +71,17 @@ public class ByteManager {
 
         // Return the primitive array
         return resultBytes;
+    }
+
+    /**
+     * Pads the given array list with the given number of 0s
+     * @param array The array list to pad
+     * @param padCount The number of desired 0s
+     */
+    public static void padWithBytes(ArrayList<Byte> array, int padCount) {
+        for (int i = 0; i < padCount; i++) {
+            array.add((byte)0);
+        }
     }
 
 }

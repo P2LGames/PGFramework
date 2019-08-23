@@ -23,7 +23,7 @@ public class ServerHandler implements Runnable {
             this.serverSocket = new ServerSocket(PORT);
 
             // Keep trying to connect toc clients!
-            while (running) {
+            while (running && !this.serverSocket.isClosed()) {
 
                 try {
                     System.out.println("Accepting Connection");
@@ -36,6 +36,7 @@ public class ServerHandler implements Runnable {
             }
         }
         catch (IOException e) {
+            System.out.println("Server Handler Error");
             e.printStackTrace();
         }
         // Cleanup

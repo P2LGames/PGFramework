@@ -5,6 +5,7 @@ import command.GenericCommand;
 import communication.ServerException;
 import entity.GenericEntity;
 import entity.GenericEntityMap;
+import main.communication.ClientHandler;
 import main.communication.RequestType;
 import util.ByteManager;
 
@@ -15,18 +16,37 @@ import java.util.Arrays;
 /**
  * The class that handles the running of a generic command
  */
-public class GenericCommandHandler {
+public class CommandHandler extends Thread {
 
-    public GenericCommandHandler() {}
+    private ClientHandler handler;
+
+    private byte[] requestBytes;
+
+    private boolean finished = false;
+
+    public CommandHandler(ClientHandler handler, byte[] requestBytes) {
+        this.handler = handler;
+        this.requestBytes = requestBytes;
+    }
+
+    @Override
+    public void run() {
+        // Get the result from the command
+        byte[] result = handleCommand();
+
+        // Send it back to the client handler
+        handler.sendByteArray(result);
+
+        // Mark ourselves as finished
+        finished = true;
+    }
 
     /**
      * Takes a command request and using the factory to retrieve the correct command and run it
      *
-     * @param requestBytes the request holding the data for the command to be run
-     *
      * @return the result of running the command
      */
-    public byte[] handleCommand(byte[] requestBytes) {
+    public byte[] handleCommand() {
         // Parse the entity type and placeholder ID from the request bytes
         int entityId = ByteBuffer.wrap(requestBytes, 0, 4).getInt();
         int commandId = ByteBuffer.wrap(requestBytes, 4, 4).getInt();
@@ -168,5 +188,13 @@ public class GenericCommandHandler {
         byte[] resultArray = ByteManager.convertArrayListToArray(result);
 
         return resultArray;
+    }
+
+    public byte[] compileTimeoutError() {
+        return new byte[0];
+    }
+
+    public boolean isFinished() {
+        return finished;
     }
 }

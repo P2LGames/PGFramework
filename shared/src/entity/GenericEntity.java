@@ -14,22 +14,16 @@ import java.util.*;
  */
 public abstract class GenericEntity {
     private String entityID;
-    private Map<String, GenericCommand> commandMap;
     private Map<Integer, GenericCommand> commandMapId;
-    private List<String> commandClasses;
 
     GenericEntity() throws ServerException {
-        this.commandMap = new HashMap<>();
         this.commandMapId = new HashMap<>();
-        this.commandClasses = new ArrayList<>();
         makeDefaults();
     }
 
     GenericEntity(String entityID) throws ServerException {
         this.entityID = entityID;
-        this.commandMap = new HashMap<>();
         this.commandMapId = new HashMap<>();
-        this.commandClasses = new ArrayList<>();
         makeDefaults();
     }
 
@@ -38,21 +32,14 @@ public abstract class GenericEntity {
     }
 
     /**
-     * Gets the command with the name provided
+     * Gets shallow copy of the command with the id provided
      *
-     * @param commandName the name of the command to be retrieved
+     * @param commandId the id of the command to be retrieved
      *
      * @return the generic command object described by the name
      *
      * @throws ServerException thrown when a deep copy of the command is unable to be made
      */
-    public GenericCommand getCommand(String commandName) throws ServerException {
-        try {
-            return commandMap.get(commandName).clone();
-        } catch (CloneNotSupportedException e) {
-            throw new ServerException("Unable to clone command\n" + e.getMessage());
-        }
-    }
     public GenericCommand getCommand(int commandId) throws ServerException {
         try {
             return commandMapId.get(commandId).clone();
@@ -64,13 +51,9 @@ public abstract class GenericEntity {
     /**
      * Updates the current implementation of a command
      *
-     * @param commandName the name of the command to be updated
+     * @param commandId the id of the command to be updated
      * @param command the generic command instance to update it to
      */
-    public void updateCommand(String commandName, GenericCommand command) {
-        commandMap.put(commandName, command);
-    }
-
     public void updateCommand(Integer commandId, GenericCommand command) { commandMapId.put(commandId, command); }
 
     /**
@@ -126,8 +109,7 @@ public abstract class GenericEntity {
                     // Add the method to the mapped methods
                     mappedMethods.add(commandMethod);
 
-                    // Get the command name and id for the maps
-                    String commandName = commandMethod.getAnnotation(Command.class).commandName();
+                    // Get the command id for the maps
                     Integer commandId = commandMethod.getAnnotation(Command.class).id();
 
                     // Create a generic command
@@ -138,11 +120,7 @@ public abstract class GenericEntity {
                     command.setMethod(commandMethod);
 
                     // Add the command to the maps
-                    commandMap.put(commandName, command);
                     commandMapId.put(commandId, command);
-
-                    // Add the command class to our list
-                    addCommandClass(commandMethod.getDeclaringClass().getName());
                 }
                 else if (!setEntity && commandMethod.isAnnotationPresent(SetEntity.class)) {
                     // Set the entity of our class object
@@ -216,19 +194,4 @@ public abstract class GenericEntity {
         // Put the command into the command map
         commandMapId.put(commandId, command);
     }
-
-
-    public void addCommandClass(String className) {
-        // Ensure no duplicates
-        for (int i = 0; i < commandClasses.size(); i++) {
-            if (className == commandClasses.get(i)) {
-                commandClasses.remove(i);
-                break;
-            }
-        }
-        // Add the class name
-        commandClasses.add(className);
-    }
-
-    public List<String> getCommandClasses() { return commandClasses; }
 }
