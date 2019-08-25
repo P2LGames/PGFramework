@@ -1,5 +1,6 @@
 package main.communication;
 
+import entity.GenericEntityMap;
 import main.command.CommandHandler;
 import main.command.CommandThreadMonitor;
 import main.entity.EntityLoader;
@@ -31,10 +32,10 @@ public class ClientHandler extends Thread {
     private CommandThreadMonitor monitor;
 
     // Mutex locking on the bytes to send to the server
-    private boolean manipulatingToSend = false;
+    private volatile boolean writingToOut = false;
 
-    // Track data to be sent
-    private ArrayList<byte[]> toSend = new ArrayList<>();
+    // My entity IDs in the server
+    private ArrayList<String> myEntityIds = new ArrayList<>();
 
     public ClientHandler(Socket connection) {
         // Save the connection socket
@@ -42,6 +43,9 @@ public class ClientHandler extends Thread {
 
         // Create our command thread monitor
         monitor = new CommandThreadMonitor(this);
+
+        // Start the monitor
+        monitor.start();
     }
 
     /**
@@ -59,7 +63,7 @@ public class ClientHandler extends Thread {
 
                 // Read in the next byte from the client the int returned will be between 0-255
                 int requestType = inFromClient.readShort();
-//                    System.out.println(requestType);
+//                System.out.println(requestType);
 
                 // Check that the type is not recognizable
                 if (!this.requestTypeRecognized(requestType)) {
@@ -72,7 +76,7 @@ public class ClientHandler extends Thread {
 
                 // Read in the byte count as an int from the client
                 int byteCount = inFromClient.readInt();
-//                    System.out.println(byteCount);
+//                System.out.println(byteCount);
 
                 // Create a byte array with the number of bytes to read
                 byte[] bytes = new byte[byteCount];
@@ -90,7 +94,7 @@ public class ClientHandler extends Thread {
                 }
                 // If we want to register an entity, do so.
                 else if (requestType == RequestType.ENTITY_REGISTER.getNumVal()) {
-                    result = new EntityLoader().registerEntity(bytes);
+                    result = new EntityLoader().registerEntity(this, bytes);
                 }
                 // If we want to run a command, do so.
                 else if (requestType == RequestType.COMMAND.getNumVal()) {
@@ -105,30 +109,17 @@ public class ClientHandler extends Thread {
                     result = new InMemoryClassLoader().updateClass(bytes);
                 }
 
+                // Also write all of the data that is in toSend
+                // Lock writing out
+                writingLock();
+
                 // If the result has data to write, write it
                 if (result.length > 0) {
                     outToClient.write(result);
                 }
 
-                // Also write all of the data that is in toSend
-                // Wait for manipulating to send to be false
-                while (manipulatingToSend) {
-                    // Do nothing, wait until we can add our data
-                }
-
-                // Mutex lock
-                manipulatingToSend = true;
-
-                // Send all of the data
-                for (byte[] send: toSend) {
-                    outToClient.write(send);
-                }
-
-                // Clear the toSend
-                toSend.clear();
-
-                // Mutex unlock
-                manipulatingToSend = false;
+                // Unlock writing
+                writingUnlock();
 
 //                    } else if(clientBundle.getType() == RequestType.ENTITY_UPDATE) {
 //                        System.out.println(clientBundle.getSerializedData());
@@ -158,8 +149,12 @@ public class ClientHandler extends Thread {
             e.printStackTrace();
         }
         finally {
+
             // Stop and finish our thread monitor
             monitor.endProcess();
+
+            // Remove our entities from the entity map
+            GenericEntityMap.getInstance().removeEntities(myEntityIds);
 
             // Try to close sockets, clean up connections
             try {
@@ -173,17 +168,23 @@ public class ClientHandler extends Thread {
     }
 
     public void sendByteArray(byte[] result) {
-        while (manipulatingToSend) {
-            // Do nothing, wait until we can add our data
+        // Lock writing out
+        writingLock();
+
+        try {
+            // If there was something in the result
+            if (result.length > 0) {
+                // Write it out
+                outToClient.write(result);
+            }
         }
-        // Mutex lock
-        manipulatingToSend = true;
+        catch (IOException e) {
+            System.out.println("Failed to write from command");
+            e.printStackTrace();
+        }
 
-        // Add our to send
-        toSend.add(result);
-
-        // Mutex unlock
-        manipulatingToSend = false;
+        // Unlock writing
+        writingUnlock();
     }
 
     private boolean requestTypeRecognized(int requestType) {
@@ -195,6 +196,27 @@ public class ClientHandler extends Thread {
 
 
         return recognized;
+    }
+
+    private void writingLock() {
+        while (writingToOut) {
+            // Do nothing, wait until we can add our data
+        }
+
+        // Mutex lock
+        writingToOut = true;
+    }
+
+    private void writingUnlock() {
+        writingToOut = false;
+    }
+
+    public void addEntity(int entityId) {
+        myEntityIds.add(Integer.toString(entityId));
+    }
+
+    public void endProcess() {
+        running = false;
     }
 
 }

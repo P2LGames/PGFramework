@@ -24,6 +24,9 @@ public class CommandHandler extends Thread {
 
     private boolean finished = false;
 
+    private int entityId;
+    private int commandId;
+
     public CommandHandler(ClientHandler handler, byte[] requestBytes) {
         this.handler = handler;
         this.requestBytes = requestBytes;
@@ -48,8 +51,8 @@ public class CommandHandler extends Thread {
      */
     public byte[] handleCommand() {
         // Parse the entity type and placeholder ID from the request bytes
-        int entityId = ByteBuffer.wrap(requestBytes, 0, 4).getInt();
-        int commandId = ByteBuffer.wrap(requestBytes, 4, 4).getInt();
+        entityId = ByteBuffer.wrap(requestBytes, 0, 4).getInt();
+        commandId = ByteBuffer.wrap(requestBytes, 4, 4).getInt();
 
         // The next byte tells us if we have a parameter or not
         int hasParameter = ByteBuffer.wrap(requestBytes, 8, 1).get();
@@ -191,7 +194,33 @@ public class CommandHandler extends Thread {
     }
 
     public byte[] compileTimeoutError() {
-        return new byte[0];
+        // Setup the response, add the response type to it
+        ArrayList<Byte> result = new ArrayList<>();
+        result.add((byte) RequestType.COMMAND_ERROR.getNumVal());
+        result.add((byte)0);
+
+        String errorMessage = "Timeout: Command took too long to finish, possible infinite loop.";
+
+        // Add the integer 10 + length of error message to our byte array, this is the rest of the bytes
+        int messageLength = 10 + errorMessage.getBytes().length;
+        ByteManager.addIntToByteArray(messageLength, result);
+
+        // Command error type
+        result.add((byte) CommandError.TIMEOUT.getNumVal());
+        result.add((byte)0);
+
+        // Add the entity id and command id
+        ByteManager.addIntToByteArray(entityId, result);
+        ByteManager.addIntToByteArray(commandId, result);
+
+        // Message
+        ByteManager.addBytesToArray(errorMessage.getBytes(), result);
+
+        // Convert the arraylist into an array of bytes
+        byte[] resultArray = ByteManager.convertArrayListToArray(result);
+
+        // Return the resulting array of bytes
+        return resultArray;
     }
 
     public boolean isFinished() {

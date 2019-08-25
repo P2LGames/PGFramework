@@ -4,6 +4,7 @@ import main.communication.ClientHandler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CommandThreadMonitor extends Thread {
 
@@ -14,10 +15,13 @@ public class CommandThreadMonitor extends Thread {
     private boolean running = true;
 
     // The threads we want to be monitoring
-    private Map<Integer, MonitoringThread> monitoring = new HashMap<>();
+    private Map<Integer, MonitoringThread> monitoring = new ConcurrentHashMap<>();
 
     // Track the current id
     private int currentId = 0;
+
+    // Lock the monitoring
+    private boolean monitoringLocked = false;
 
     public CommandThreadMonitor(ClientHandler client) {
         this.client = client;
@@ -27,6 +31,7 @@ public class CommandThreadMonitor extends Thread {
     public void run() {
         // While we are still running
         while (running) {
+
             // Loop through all of the threads we want to monitor
             for (Integer i : monitoring.keySet()) {
                 MonitoringThread t = monitoring.get(i);
@@ -55,7 +60,7 @@ public class CommandThreadMonitor extends Thread {
 
             // Slow down the loop and detect interrupts
             try {
-                Thread.sleep(100);
+                Thread.sleep(50);
             }
             catch (InterruptedException e) {
                 break;
@@ -82,8 +87,18 @@ public class CommandThreadMonitor extends Thread {
         // Setup the monitoring thread
         MonitoringThread t = new MonitoringThread(thread, timeout);
 
+        // While monitoring locked, stop
+        while (monitoringLocked) {
+
+        }
+
+        // Lock the monitoring
+        monitoringLocked = true;
+
         // Add the monitoring thread to our list
         monitoring.put(currentId, new MonitoringThread(thread));
+
+        monitoringLocked = false;
 
         // Increment the current id
         currentId++;
@@ -131,16 +146,16 @@ public class CommandThreadMonitor extends Thread {
             lastTimeCheck = currentTime;
         }
 
+        public byte[] getTimeoutError() {
+            return thread.compileTimeoutError();
+        }
+
         public boolean hasTimedOut() {
             return timeAlive > timeout;
         }
 
         public boolean isFinished() {
             return thread.isFinished();
-        }
-
-        public byte[] getTimeoutError() {
-            return thread.compileTimeoutError();
         }
 
         public void start() {

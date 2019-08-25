@@ -2,6 +2,7 @@ package main.entity;
 
 import entity.GenericEntity;
 import entity.GenericEntityMap;
+import main.communication.ClientHandler;
 import main.communication.RequestType;
 import util.ByteManager;
 
@@ -21,7 +22,7 @@ public class EntityLoader {
      * @return
      *  The bytes that represent whether or not the entity was successfully registered
      */
-    public synchronized byte[] registerEntity(byte[] requestBytes) {
+    public synchronized byte[] registerEntity(ClientHandler handler, byte[] requestBytes) {
         // Parse the entity type and placeholder ID from the request bytes
         Integer entityType = ByteBuffer.wrap(requestBytes, 0, 4).getInt();
         Integer placeholderId = ByteBuffer.wrap(requestBytes, 4, 4).getInt();
@@ -52,8 +53,8 @@ public class EntityLoader {
             entityMap.put(Integer.toString(entityId), entity);
         }
 
-        System.out.println("EntityId: " + entityId + " PlaceholderId: " + placeholderId);
-        System.out.println(errorMessage);
+//        System.out.println("EntityId: " + entityId + " PlaceholderId: " + placeholderId);
+        handler.addEntity(entityId);
 
         // Compile and return the registerEntity result
         return compileRegisterResult(success, entityId, placeholderId, errorMessage);

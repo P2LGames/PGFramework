@@ -13,8 +13,20 @@ public class TestDefault {
     }
 
     @Command(commandName = "talk", id = 1)
-    public String talk() {
-        return "I can talk, yay!!";
+    public byte[] talk() {
+        return "I can talk, yay!!".getBytes();
+    }
+
+    @Command(commandName = "timeout", id = 2)
+    public void timeout() {
+        try {
+            for (int i = 0; i < 10000; i++) {
+                Thread.sleep(100);
+            }
+        }
+        catch (InterruptedException e) {
+
+        }
     }
 
     public TestEntity getTestEntity() {
