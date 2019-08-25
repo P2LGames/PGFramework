@@ -2,7 +2,7 @@ package main.command;
 
 import main.communication.ClientHandler;
 
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,14 +14,8 @@ public class CommandThreadMonitor extends Thread {
     // We should be running
     private boolean running = true;
 
-    // The threads we want to be monitoring
-    private Map<Integer, MonitoringThread> monitoring = new ConcurrentHashMap<>();
-
-    // Track the current id
-    private int currentId = 0;
-
-    // Lock the monitoring
-    private boolean monitoringLocked = false;
+    // The threads we want to be monitoring, concurrent so multiple threads modifying it has no adverse effect
+    private Map<Integer, LinkedList<MonitoringThread>> monitoring = new ConcurrentHashMap<>();
 
     public CommandThreadMonitor(ClientHandler client) {
         this.client = client;
@@ -34,15 +28,27 @@ public class CommandThreadMonitor extends Thread {
 
             // Loop through all of the threads we want to monitor
             for (Integer i : monitoring.keySet()) {
-                MonitoringThread t = monitoring.get(i);
+                LinkedList<MonitoringThread> monitoringQueue = monitoring.get(i);
+
+                MonitoringThread t = monitoringQueue.peek();
+
+                // If there is no thread we are monitoring, stop
+                if (t == null) {
+                    continue;
+                }
 
                 // Update each thread's runtime
                 t.updateTimeAlive(System.currentTimeMillis());
 
                 // Check to see if the thread is finished
                 if (t.isFinished()) {
-                    // Remove the thread from our map
-                    monitoring.remove(i);
+                    // Remove the thread from the queue
+                    monitoringQueue.remove();
+
+                    // Start the next thread, if there is one
+                    if (monitoringQueue.peek() != null) {
+                        monitoringQueue.peek().start();
+                    }
                 }
                 // Check to see if it has timed out
                 else if (t.hasTimedOut()) {
@@ -53,14 +59,14 @@ public class CommandThreadMonitor extends Thread {
                     // Use the generic command handler to compile a return message
                     client.sendByteArray(t.getTimeoutError());
 
-                    // Remove the thread from out map
-                    monitoring.remove(i);
+                    // Remove all the threads from the queue, if there was a timeout we want to stop the robot
+                    monitoringQueue.clear();
                 }
             }
 
             // Slow down the loop and detect interrupts
             try {
-                Thread.sleep(50);
+                Thread.sleep(1);
             }
             catch (InterruptedException e) {
                 break;
@@ -72,40 +78,35 @@ public class CommandThreadMonitor extends Thread {
         // Setup the monitoring thread
         MonitoringThread t = new MonitoringThread(thread);
 
-        // Add the monitoring thread to our list
-        monitoring.put(currentId, new MonitoringThread(thread));
-
-        // Increment the current id
-        currentId++;
-        currentId %= 1000;
-
-        // Start the thread
-        t.start();
+        addMonitoringThread(t);
     }
 
     public void addThread(CommandHandler thread, long timeout) {
         // Setup the monitoring thread
         MonitoringThread t = new MonitoringThread(thread, timeout);
 
-        // While monitoring locked, stop
-        while (monitoringLocked) {
+        addMonitoringThread(t);
+    }
 
+    private void addMonitoringThread(MonitoringThread t) {
+        int entityId = t.getEntityId();
+
+        // If there is no linked list for the entity id yet
+        if (!monitoring.keySet().contains(entityId)) {
+            // Add one to the monitoring
+            monitoring.put(entityId, new LinkedList<>());
         }
 
-        // Lock the monitoring
-        monitoringLocked = true;
-
         // Add the monitoring thread to our list
-        monitoring.put(currentId, new MonitoringThread(thread));
+        LinkedList<MonitoringThread> monitoringQueue = monitoring.get(entityId);
 
-        monitoringLocked = false;
+        // Add the thread to the queue
+        monitoringQueue.add(t);
 
-        // Increment the current id
-        currentId++;
-        currentId %= 1000;
-
-        // Start the thread
-        t.start();
+        // If the monitoring queue has only the thread we just added, start the thread
+        if (monitoringQueue.size() == 1) {
+            t.start();
+        }
     }
 
     public void endProcess() {
@@ -125,22 +126,18 @@ public class CommandThreadMonitor extends Thread {
 
         private MonitoringThread(CommandHandler thread) {
             this.thread = thread;
-
-            // lastTimeCheck tracks the delta
-            lastTimeCheck = System.currentTimeMillis();
         }
 
         private MonitoringThread(CommandHandler thread, long timeout) {
             this.thread = thread;
             this.timeout = timeout;
-
-            // lastTimeCheck tracks the delta
-            lastTimeCheck = System.currentTimeMillis();
         }
 
         public void updateTimeAlive(long currentTime) {
             // Update the time alive using the time passed
             timeAlive += currentTime - lastTimeCheck;
+
+            System.out.println("Time Alive: " + timeAlive);
 
             // Change the last time check to equal the current time
             lastTimeCheck = currentTime;
@@ -150,8 +147,20 @@ public class CommandThreadMonitor extends Thread {
             return thread.compileTimeoutError();
         }
 
+        public int getEntityId() { return thread.entityId; }
+
         public boolean hasTimedOut() {
-            return timeAlive > timeout;
+            // If we have been alive longer than our timeout
+            if (timeAlive > timeout) {
+                // Set out timed out to true on the thread
+                thread.setTimedOut(true);
+
+                // Return true
+                return true;
+            }
+
+            // Otherwise, return false
+            return false;
         }
 
         public boolean isFinished() {
@@ -159,6 +168,10 @@ public class CommandThreadMonitor extends Thread {
         }
 
         public void start() {
+            // Time alive starts now
+            lastTimeCheck = System.currentTimeMillis();
+
+            // Start the thread
             thread.start();
         }
 

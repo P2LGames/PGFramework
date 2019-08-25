@@ -27,6 +27,11 @@ public class ServerHandlerTest {
         // Sets up and starts a server
         server = new ServerHandler();
         new Thread(server).start();
+
+        try {
+            Thread.sleep(50);
+        }
+        catch (InterruptedException e) {}
     }
 
     @After
@@ -90,7 +95,7 @@ public class ServerHandlerTest {
             ArrayList<DataOutputStream> outs = new ArrayList<>();
             ArrayList<DataInputStream> ins = new ArrayList<>();
 
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 100; i++) {
                 // Create a client socket
                 Socket clientSocket = new Socket();
 

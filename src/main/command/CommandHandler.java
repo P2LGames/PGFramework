@@ -23,9 +23,10 @@ public class CommandHandler extends Thread {
     private byte[] requestBytes;
 
     private boolean finished = false;
+    private boolean timedOut = false;
 
-    private int entityId;
-    private int commandId;
+    public int entityId;
+    public int commandId;
 
     public CommandHandler(ClientHandler handler, byte[] requestBytes) {
         this.handler = handler;
@@ -37,8 +38,11 @@ public class CommandHandler extends Thread {
         // Get the result from the command
         byte[] result = handleCommand();
 
-        // Send it back to the client handler
-        handler.sendByteArray(result);
+        // If we did not time out
+        if (!timedOut) {
+            // Send the data back to the client handler
+            handler.sendByteArray(result);
+        }
 
         // Mark ourselves as finished
         finished = true;
@@ -53,6 +57,8 @@ public class CommandHandler extends Thread {
         // Parse the entity type and placeholder ID from the request bytes
         entityId = ByteBuffer.wrap(requestBytes, 0, 4).getInt();
         commandId = ByteBuffer.wrap(requestBytes, 4, 4).getInt();
+
+        System.out.println("Command ID: " + commandId);
 
         // The next byte tells us if we have a parameter or not
         int hasParameter = ByteBuffer.wrap(requestBytes, 8, 1).get();
@@ -78,7 +84,6 @@ public class CommandHandler extends Thread {
             errorMessage = "Error running command for entity: " + entityId + "\nError: " + e.getMessage();
         }
 
-        CommandResult runResult = null;
         byte[] commandReturnValue = new byte[]{};
 
         // If the command was initialized
@@ -100,11 +105,10 @@ public class CommandHandler extends Thread {
                     && obj.getClass().getComponentType() == byte.class) {
                 commandReturnValue = (byte[]) obj;
             }
-
             // If the object wasn't a byte array, throw an error, we only accept byte arrays
             else {
                 success = false;
-                errorMessage = "Error: Return type was not bytes.";
+                errorMessage = "Return type was not bytes.";
             }
         }
 
@@ -199,7 +203,7 @@ public class CommandHandler extends Thread {
         result.add((byte) RequestType.COMMAND_ERROR.getNumVal());
         result.add((byte)0);
 
-        String errorMessage = "Timeout: Command took too long to finish, possible infinite loop.";
+        String errorMessage = "Command took too long to finish, possible infinite loop.";
 
         // Add the integer 10 + length of error message to our byte array, this is the rest of the bytes
         int messageLength = 10 + errorMessage.getBytes().length;
@@ -226,4 +230,6 @@ public class CommandHandler extends Thread {
     public boolean isFinished() {
         return finished;
     }
+
+    public void setTimedOut(boolean timedOut) { this.timedOut = timedOut; }
 }

@@ -24,9 +24,23 @@ public class TestDefault {
                 Thread.sleep(100);
             }
         }
-        catch (InterruptedException e) {
+        catch (InterruptedException e) {}
+    }
 
+    @Command(commandName = "first", id = 3)
+    public byte[] first() {
+        System.out.println("SLEEPING");
+        try {
+            Thread.sleep(300);
         }
+        catch (InterruptedException e) {}
+
+        return "I ran first".getBytes();
+    }
+
+    @Command(commandName = "second", id = 4)
+    public byte[] second() {
+        return "I ran second".getBytes();
     }
 
     public TestEntity getTestEntity() {
