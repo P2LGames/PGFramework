@@ -61,6 +61,8 @@ public class CommandThreadMonitor extends Thread {
 
                     // Remove all the threads from the queue, if there was a timeout we want to stop the robot
                     monitoringQueue.clear();
+
+                    System.out.println("Cleared size: " + monitoring.get(i).size());
                 }
             }
 
@@ -136,8 +138,6 @@ public class CommandThreadMonitor extends Thread {
         public void updateTimeAlive(long currentTime) {
             // Update the time alive using the time passed
             timeAlive += currentTime - lastTimeCheck;
-
-            System.out.println("Time Alive: " + timeAlive);
 
             // Change the last time check to equal the current time
             lastTimeCheck = currentTime;

@@ -31,6 +31,10 @@ public class CommandHandler extends Thread {
     public CommandHandler(ClientHandler handler, byte[] requestBytes) {
         this.handler = handler;
         this.requestBytes = requestBytes;
+
+        // Parse the entity type and placeholder ID from the request bytes
+        entityId = ByteBuffer.wrap(requestBytes, 0, 4).getInt();
+        commandId = ByteBuffer.wrap(requestBytes, 4, 4).getInt();
     }
 
     @Override
@@ -54,12 +58,6 @@ public class CommandHandler extends Thread {
      * @return the result of running the command
      */
     public byte[] handleCommand() {
-        // Parse the entity type and placeholder ID from the request bytes
-        entityId = ByteBuffer.wrap(requestBytes, 0, 4).getInt();
-        commandId = ByteBuffer.wrap(requestBytes, 4, 4).getInt();
-
-        System.out.println("Command ID: " + commandId);
-
         // The next byte tells us if we have a parameter or not
         int hasParameter = ByteBuffer.wrap(requestBytes, 8, 1).get();
         Object[] commandParameter = new Object[0];
@@ -81,7 +79,7 @@ public class CommandHandler extends Thread {
         catch(ServerException e) {
             // If there was an exception, we failed getting the command
             success = false;
-            errorMessage = "Error running command for entity: " + entityId + "\nError: " + e.getMessage();
+            errorMessage = "Error running command for entity: " + entityId + "\nError Message: " + e.getMessage();
         }
 
         byte[] commandReturnValue = new byte[]{};

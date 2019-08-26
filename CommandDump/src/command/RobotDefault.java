@@ -128,6 +128,20 @@ public class RobotDefault {
         this.robot.addOrder(position, orderType, new byte[0]);
     }
 
+    public void turnRight90() {
+        int position = Robot.AttachmentPosition.BASE.getNumVal();
+        int orderType = Base.OrderTypes.ROTATE_BY.getNumVal();
+
+        this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray((float)(Math.PI / -2.0)));
+    }
+
+    public void turnLeft90() {
+        int position = Robot.AttachmentPosition.BASE.getNumVal();
+        int orderType = Base.OrderTypes.ROTATE_BY.getNumVal();
+
+        this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray((float)(Math.PI / 2.0)));
+    }
+
     public void print(String message) {
         robot.printMessage(message);
     }

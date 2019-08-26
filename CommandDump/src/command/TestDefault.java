@@ -29,7 +29,6 @@ public class TestDefault {
 
     @Command(commandName = "first", id = 3)
     public byte[] first() {
-        System.out.println("SLEEPING");
         try {
             Thread.sleep(300);
         }
@@ -41,6 +40,21 @@ public class TestDefault {
     @Command(commandName = "second", id = 4)
     public byte[] second() {
         return "I ran second".getBytes();
+    }
+
+    @Command(commandName = "asyncLast", id = 5)
+    public byte[] asyncLast() {
+        try {
+            Thread.sleep(300);
+        }
+        catch (InterruptedException e) {}
+
+        return "I ran last".getBytes();
+    }
+
+    @Command(commandName = "asyncFirst", id = 6)
+    public byte[] asyncFirst() {
+        return "I ran first".getBytes();
     }
 
     public TestEntity getTestEntity() {
