@@ -1,6 +1,6 @@
 package test.communication;
 
-import main.communication.*;
+import main.communication.ServerHandler;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,41 +14,12 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-public class ServerHandlerTest {
-
-    ServerHandler server;
-
-    @Before
-    public void setup() {
-        // Sets up and starts a server
-        server = new ServerHandler();
-        new Thread(server).start();
-
-        try {
-            Thread.sleep(50);
-        }
-        catch (InterruptedException e) {}
-    }
-
-    @After
-    public void tearDown() {
-        // Stop the server
-        server.stop();
-
-        server = null;
-    }
+public class AzureTest {
 
     @Test
     public void testIndividualConnection() {
-        /**
-         * What am I trying to test here? That I can connect to the server using the address and port, and get a valid response.
-         * How do I do that? Create a socket, and connect that socket to the server, it will create a client handler for me.
-         * Further testing: Pass in byte data and test sample response
-         */
+
         try {
             // Create a client socket
             Socket clientSocket = new Socket();
@@ -57,7 +28,7 @@ public class ServerHandlerTest {
             clientSocket.setSoTimeout(2000);
 
             // Connect to the server
-            clientSocket.connect(new InetSocketAddress("localhost", ServerHandler.PORT));
+            clientSocket.connect(new InetSocketAddress("pgframework.westus.azurecontainer.io", ServerHandler.PORT));
 
             // Write a byte to the framework
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
@@ -95,7 +66,7 @@ public class ServerHandlerTest {
             ArrayList<DataOutputStream> outs = new ArrayList<>();
             ArrayList<DataInputStream> ins = new ArrayList<>();
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 100; i++) { // 1 + 3 minimum threads per user, so 301 threads
                 // Create a client socket
                 Socket clientSocket = new Socket();
 
@@ -103,7 +74,7 @@ public class ServerHandlerTest {
                 clientSocket.setSoTimeout(2000);
 
                 // Connect to the server
-                clientSocket.connect(new InetSocketAddress("localhost", ServerHandler.PORT));
+                clientSocket.connect(new InetSocketAddress("pgframework.westus.azurecontainer.io", ServerHandler.PORT));
 
                 // Write a byte to the framework
                 DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
@@ -140,5 +111,9 @@ public class ServerHandlerTest {
             Assert.fail();
         }
     }
+
+
+
+
 
 }

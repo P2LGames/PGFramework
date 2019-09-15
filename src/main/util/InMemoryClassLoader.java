@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -41,7 +42,7 @@ public class InMemoryClassLoader {
         starting += 4;
 
         // CLASS NAME as string from bytes
-        String className = new String(Arrays.copyOfRange(requestBytes, starting, starting + classNameLength));
+        String className = new String(Arrays.copyOfRange(requestBytes, starting, starting + classNameLength), StandardCharsets.US_ASCII);
         starting += classNameLength;
 
         // FILE CONTENTS length in bytes
@@ -49,7 +50,7 @@ public class InMemoryClassLoader {
         starting += 4;
 
         // FILE CONTENTS as string from bytes
-        String fileContents = new String(Arrays.copyOfRange(requestBytes, starting, starting + fileContentsLength));
+        String fileContents = new String(Arrays.copyOfRange(requestBytes, starting, starting + fileContentsLength), StandardCharsets.US_ASCII);
 
         // Track success and error message
         boolean success = true;

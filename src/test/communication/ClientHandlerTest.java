@@ -724,4 +724,127 @@ public class ClientHandlerTest {
         }
     }
 
+    @Test
+    public void testRecompile() {
+        try {
+
+            // Keep track of the clients and their in and output streams
+            ArrayList<Socket> clients = new ArrayList<>();
+            ArrayList<DataOutputStream> outs = new ArrayList<>();
+            ArrayList<DataInputStream> ins = new ArrayList<>();
+
+            for (int i = 0; i < 100; i++) {
+
+
+                String override = "// HIDE ROWS:14\n" +
+                        "package command;\n" +
+                        "\n" +
+                        "import annotations.Command;\n" +
+                        "import annotations.SetEntity;\n" +
+                        "import entity.GenericEntity;\n" +
+                        "import entity.Robot;\n" +
+                        "import entity.RobotAttachments.Base;\n" +
+                        "import util.ByteManager;\n" +
+                        "import command.RobotDefault;\n" +
+                        "\n" +
+                        "import java.nio.ByteBuffer;\n" +
+                        "\n" +
+                        "\n" +
+                        "\n" +
+                        "public class RobotOverride extends RobotDefault {\n" +
+                        "\n" +
+                        "    // DO NOT EDIT ABOVE THIS LINE\n" +
+                        "\n" +
+                        "\tint w = 0;\n" +
+                        "\tint a = 0;\n" +
+                        "\tint d = 0;\n" +
+                        "\n" +
+                        "    /**\n" +
+                        "     * Called when you have this robot selected, and you press a key.\n" +
+                        "     * @param code An integer representing the ascii character of the key that you pressed.\n" +
+                        "     *             zyBooks 2.14 has a table of characters and their ascii code for your reference.\n" +
+                        "     * @param pressed Whether or not you pressed or released the key. 1 is pressed, 0 is released.\n" +
+                        "     */\n" +
+                        "    @Override\n" +
+                        "    public void playerKeyPressed(int code, int pressed) {\n" +
+                        "    \tif (code == 87) w = pressed;\n" +
+                        "\t\tif (code == 65) a = pressed;\n" +
+                        "\t\tif (code == " + i + ") d = pressed;\n" + // Change one thing in the class
+                        "    }\n" +
+                        "\n" +
+                        "    /**\n" +
+                        "     * Fill this in to give the robot his orders 30 times per second.\n" +
+                        "     * New orders will override the ones the robot is currently executing.\n" +
+                        "     */\n" +
+                        "    @Override\n" +
+                        "    public void giveOrders() {\n" +
+                        "\t\t// print(\"\" + w \"\\n\");\n" +
+                        "\t\tif (w == 1) moveForward();\n" +
+                        "\t\t\n" +
+                        "\t\tif (a == 1) turnLeft();\n" +
+                        "\t\telse if (d == 1) turnRight();\n" +
+                        "\t\telse stopTurning();\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    // DO NOT EDIT BELOW THIS LINE\n" +
+                        "\n" +
+                        "    /**\n" +
+                        "     * You have access to quite a few functions to help the robot move.\n" +
+                        "     * moveForward()\n" +
+                        "     * moveBackward()\n" +
+                        "     * stopMoving()\n" +
+                        "     * turnLeft()\n" +
+                        "     * turnRight()\n" +
+                        "     * turnLeft90()\n" +
+                        "     * turnRight90()\n" +
+                        "     * stopTurning()\n" +
+                        "     */\n" +
+                        "\n" +
+                        "}";
+
+                // Create a client socket
+                Socket clientSocket = new Socket();
+
+                // Set its timeout
+                clientSocket.setSoTimeout(2000);
+
+                // Connect to the server
+                clientSocket.connect(new InetSocketAddress("localhost", ServerHandler.PORT));
+
+                // Write a byte to the framework
+                DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+                outToServer.write(ByteManager.convertIntToByteArray(-1));
+
+                // Read the data from the server
+                DataInputStream inFromServer = new DataInputStream(clientSocket.getInputStream());
+                int fromServer = inFromServer.readInt();
+
+                // Asset that we get the unrecognized value
+                assertEquals(-1, fromServer);
+
+                // Save the socket and in and outs so we can close them late
+                clients.add(clientSocket);
+                outs.add(outToServer);
+                ins.add(inFromServer);
+            }
+
+            // Close all connections
+            for (Socket s: clients) {
+                s.close();
+            }
+            for (DataOutputStream o: outs) {
+                o.close();
+            }
+            for (DataInputStream i: ins) {
+                i.close();
+            }
+
+        }
+        catch(Exception e) {
+            System.out.println("Unexpected exception: " + e.getMessage());
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
 }

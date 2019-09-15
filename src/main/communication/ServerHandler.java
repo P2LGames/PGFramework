@@ -8,7 +8,7 @@ import java.net.ServerSocket;
  */
 public class ServerHandler implements Runnable {
 
-    public static int PORT = 6789;
+    public static int PORT = 5545;
 
     boolean running = true;
     ServerSocket serverSocket = null;
@@ -19,7 +19,7 @@ public class ServerHandler implements Runnable {
     public void run() {
         try {
             // Initialize the server
-            System.out.println("Initializing Socket: ServerHandler");
+            System.out.println("ServerHandler: " + PORT);
             this.serverSocket = new ServerSocket(PORT);
 
             // Keep trying to connect toc clients!

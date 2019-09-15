@@ -63,7 +63,9 @@ public class ClientHandler extends Thread {
 
                 // Read in the next byte from the client the int returned will be between 0-255
                 int requestType = inFromClient.readShort();
-//                System.out.println(requestType);
+                if (requestType != RequestType.COMMAND.getNumVal()) {
+                    System.out.println("Request Type: " + requestType);
+                }
 
                 // Check that the type is not recognizable
                 if (!this.requestTypeRecognized(requestType)) {
@@ -76,13 +78,20 @@ public class ClientHandler extends Thread {
 
                 // Read in the byte count as an int from the client
                 int byteCount = inFromClient.readInt();
-//                System.out.println(byteCount);
+                if (requestType != RequestType.COMMAND.getNumVal()) {
+                    System.out.println("Byte Count: " + byteCount);
+                }
+
 
                 // Create a byte array with the number of bytes to read
                 byte[] bytes = new byte[byteCount];
 
                 // Read the bytes
-                inFromClient.read(bytes);
+                for (int i = 0; i < byteCount; i++) {
+                    bytes[i] = inFromClient.readByte();
+                }
+//                inFromClient.read
+//                inFromClient.read(bytes);
 
                 // The byte result
                 byte[] result = new byte[]{};
@@ -136,7 +145,7 @@ public class ClientHandler extends Thread {
             }
         }
         catch (EOFException e) {
-            System.out.println("Socket: Connection was dropped.");
+            System.out.println("Client Socket: Connection was dropped.");
         }
         catch (SocketException e) {
             e.printStackTrace();

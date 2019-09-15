@@ -3,6 +3,7 @@ package main.entity;
 import main.communication.RequestType;
 import util.ByteManager;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class EntitySetup {
@@ -17,7 +18,8 @@ public class EntitySetup {
         String errorMessage = "";
 
         // Turn the data into a string
-        String entitySetupData = new String(bytes);
+        String entitySetupData = new String(bytes, StandardCharsets.US_ASCII);
+        System.out.println("Entity setup data: " + entitySetupData);
 
         // Split the string and use it to get information to the entity type map
         String[] types = entitySetupData.split(",");
