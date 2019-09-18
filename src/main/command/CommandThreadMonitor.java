@@ -61,8 +61,6 @@ public class CommandThreadMonitor extends Thread {
 
                     // Remove all the threads from the queue, if there was a timeout we want to stop the robot
                     monitoringQueue.clear();
-
-                    System.out.println("Cleared size: " + monitoring.get(i).size());
                 }
             }
 

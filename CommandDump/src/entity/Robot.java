@@ -126,7 +126,15 @@ public class Robot extends GenericEntity {
 
     public enum InputType {
         PLAYER_KEY(0),
-        PLAYER_MOUSE(1);
+        PLAYER_MOUSE(1),
+
+        // Sensors can send interrupt events as well
+        SENSOR_SCAN(10),
+        SENSOR_GET_MAP(11),
+        SENSOR_POSITION(12),
+
+        // Actuators can let us know when they finish actions
+        ACTION_FINISHED(20);
 
         private int numVal;
 

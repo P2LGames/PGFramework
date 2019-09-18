@@ -123,18 +123,17 @@ public class ServerHandlerTest {
             }
 
             // Close all connections
-            for (Socket s: clients) {
+            for (Socket s : clients) {
                 s.close();
             }
-            for (DataOutputStream o: outs) {
+            for (DataOutputStream o : outs) {
                 o.close();
             }
-            for (DataInputStream i: ins) {
+            for (DataInputStream i : ins) {
                 i.close();
             }
 
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("Unexpected exception: " + e.getMessage());
             e.printStackTrace();
             Assert.fail();

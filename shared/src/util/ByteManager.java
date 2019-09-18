@@ -43,6 +43,15 @@ public class ByteManager {
     }
 
     /**
+     * Turns a double into an array of bytes in LITTLE_ENDIAN format.
+     * @param toConvert
+     * @return The byte array representing the float
+     */
+    public static byte[] convertDoubleToByteArray(double toConvert) {
+        return ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putDouble(toConvert).array();
+    }
+
+    /**
      * Adds the given bytes to the passed ArrayList.
      * @param bytes The bytes to add to the array list
      * @param array The array list of bytes
