@@ -17,10 +17,6 @@ public class RobotDefault {
 
     //// *PERMISSION w,0 *END_PERMISSION
 
-    int a = 0;
-    int w = 0;
-    int d = 0;
-
     /**
      * Called when you have this robot selected, and you press a key.
      * @param code An integer representing the key that you pressed
@@ -28,28 +24,6 @@ public class RobotDefault {
      */
     public void playerKeyPressed(int code, int pressed) {
 
-        // Press p to see position
-        if (code == 80 && pressed == 1) {
-            getPosition();
-        }
-        // Press m too see the map
-        else if (code == 77 && pressed == 1) {
-            getMapData();
-        }
-        // Press h to toggle scanning
-        else if (code == 72 && pressed == 1) {
-            toggleScanning();
-        }
-
-        // Movement
-        if (code == 87) w = pressed;
-        else if (code == 65) a = pressed;
-        else if (code == 67) d = pressed;
-
-    }
-
-    public void playerClicked(float x, float y, int pressed) {
-        print("Clicked, x: " + x + " y: " + y + " pressed: " + pressed + "\n");
     }
 
     /**
@@ -57,24 +31,17 @@ public class RobotDefault {
      * Can you help him move around? We gotta get to the finish!
      */
     public void giveOrders() {
-        if (w == 1) {
-            moveForward();
-        }
 
-        if (a == 1) {
-            turnLeft();
-        }
-        else if (d == 1) {
-            turnRight();
-        }
-        else {
-            stopTurning();
-        }
+    }
+
+
+    public void playerClicked(float x, float y, int pressed) {
+
     }
 
 
     /** Tread's interrupt event,
-     all actuators will have sometehing like this **/
+     all actuators will have something like this **/
 
     public void treadsFinishedOrder() {
         print("Treads finished action\n");
@@ -84,26 +51,15 @@ public class RobotDefault {
     /** These are the sensor's interrupt events **/
 
     public void scanned(float[] detectedX, float[] detectedY) {
-        for (int i = 0; i < detectedX.length; i++) {
-            print("Found at x: " + detectedX[i] + " y: " + detectedY[i] + "\n");
-        }
+
     }
 
     public void positionRecieved(float x, float y) {
-        print("My position is x: " + (int)x + " y: " + (int)y + "\n");
+
     }
 
     public void mapReceived(int[][] map) {
-        String mapStr = "";
 
-        for (int x = 0; x < map.length; x++) {
-            for (int y = 0; y < map[0].length; y++) {
-                mapStr += map[x][y] + " ";
-            }
-            mapStr += "\n";
-        }
-
-        print(mapStr + "\n");
     }
 
     //// *PERMISSION n,0 *END_PERMISSION
