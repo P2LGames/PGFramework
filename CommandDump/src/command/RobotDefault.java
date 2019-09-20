@@ -162,14 +162,14 @@ public class RobotDefault {
         this.robot = (Robot)robot;
     }
 
-    public void moveForward() {
+    public void moveForward1() {
         int position = Robot.AttachmentPosition.BASE.getNumVal();
         int orderType = Base.OrderTypes.MOVE.getNumVal();
 
         this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray(1f));
     }
 
-    public void moveBackward() {
+    public void moveBackward1() {
         int position = Robot.AttachmentPosition.BASE.getNumVal();
         int orderType = Base.OrderTypes.MOVE.getNumVal();
 
@@ -218,6 +218,20 @@ public class RobotDefault {
         this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray((float)(Math.PI / 2.0)));
     }
 
+    public void turnRight45() {
+        int position = Robot.AttachmentPosition.BASE.getNumVal();
+        int orderType = Base.OrderTypes.ROTATE_BY.getNumVal();
+
+        this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray((float)(Math.PI / -4.0)));
+    }
+
+    public void turnLeft45() {
+        int position = Robot.AttachmentPosition.BASE.getNumVal();
+        int orderType = Base.OrderTypes.ROTATE_BY.getNumVal();
+
+        this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray((float)(Math.PI / 4.0)));
+    }
+
     public void getMapData() {
         int position = Robot.AttachmentPosition.HEAD.getNumVal();
         int orderType = Head.OrderTypes.GET_MAP.getNumVal();
@@ -241,6 +255,30 @@ public class RobotDefault {
 
     public void print(String message) {
         robot.printMessage(message);
+    }
+    public void print(int message) {
+        robot.printMessage(Integer.toString(message));
+    }
+    public void print(float message) {
+        robot.printMessage(Float.toString(message));
+    }
+    public void print(double message) {
+        robot.printMessage(Double.toString(message));
+    }
+    public void print(char message) {
+        robot.printMessage(Character.toString(message));
+    }
+    public void print(boolean message) {
+        robot.printMessage(Boolean.toString(message));
+    }
+    public void print(byte message) {
+        robot.printMessage(Byte.toString(message));
+    }
+    public void print(short message) {
+        robot.printMessage(Short.toString(message));
+    }
+    public void print(long message) {
+        robot.printMessage(Long.toString(message));
     }
 
     public Robot getRobot() { return robot; }
