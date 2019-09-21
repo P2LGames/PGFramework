@@ -19,7 +19,6 @@ public class EntitySetup {
 
         // Turn the data into a string
         String entitySetupData = new String(bytes, StandardCharsets.US_ASCII);
-        System.out.println("Entity setup data: " + entitySetupData);
 
         // Split the string and use it to get information to the entity type map
         String[] types = entitySetupData.split(",");
@@ -42,7 +41,6 @@ public class EntitySetup {
             success = false;
             // Setup the error message properly
             errorMessage = "Error parsing setup data: " + e.getMessage();
-            System.out.println(errorMessage);
         }
 
         return compileSetupResult(success, errorMessage);

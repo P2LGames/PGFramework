@@ -3,16 +3,11 @@ package entity;
 import annotations.Entity;
 import annotations.Getter;
 import annotations.Setter;
-import command.PathingEntityDefault;
 import command.RobotDefault;
 import communication.ServerException;
-import entity.RobotAttachments.*;
 import util.ByteManager;
-import util.Serializer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 @Entity(defaultCommands = RobotDefault.class)
 public class Robot extends GenericEntity {

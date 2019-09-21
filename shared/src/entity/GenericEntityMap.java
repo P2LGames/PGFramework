@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GenericEntityMap extends ConcurrentHashMap<String, GenericEntity> {
     private static GenericEntityMap instance;
 
-    private GenericEntityMap() {
+    public GenericEntityMap() {
 
     }
 

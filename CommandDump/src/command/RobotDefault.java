@@ -19,11 +19,11 @@ public class RobotDefault {
 
     /**
      * Called when you have this robot selected, and you press a key.
-     * @param code An integer representing the key that you pressed
+     * @param code An integer representing the key that you pressed.
      * @param pressed Whether or not you pressed or released the key. 1 is pressed, 0 is released.
      */
     public void playerKeyPressed(int code, int pressed) {
-
+        print("Key Pressed!\n");
     }
 
     /**

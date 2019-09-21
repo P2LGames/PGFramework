@@ -5,6 +5,7 @@ import main.command.CommandHandler;
 import main.command.CommandThreadMonitor;
 import main.entity.EntityLoader;
 import main.entity.EntitySetup;
+import main.entity.EntityTypeMap;
 import main.util.InMemoryClassLoader;
 import util.ByteManager;
 
@@ -20,6 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ClientHandler extends Thread {
+
+    private GenericEntityMap entityMap = new GenericEntityMap();
+    private EntityTypeMap entityTypeMap = new EntityTypeMap();
 
     private Boolean running = true;
 
@@ -63,9 +67,9 @@ public class ClientHandler extends Thread {
 
                 // Read in the next byte from the client the int returned will be between 0-255
                 int requestType = inFromClient.readShort();
-                if (requestType != RequestType.COMMAND.getNumVal()) {
-                    System.out.println("Request Type: " + requestType);
-                }
+//                if (requestType != RequestType.COMMAND.getNumVal()) {
+//                    System.out.println("Request Type: " + requestType);
+//                }
 
                 // Check that the type is not recognizable
                 if (!this.requestTypeRecognized(requestType)) {
@@ -78,15 +82,12 @@ public class ClientHandler extends Thread {
 
                 // Read in the byte count as an int from the client
                 int byteCount = inFromClient.readInt();
-                if (requestType != RequestType.COMMAND.getNumVal()) {
-                    System.out.println("Byte Count: " + byteCount);
-                }
+//                if (requestType != RequestType.COMMAND.getNumVal()) {
+//                    System.out.println("Byte Count: " + byteCount);
+//                }
 
-
-                // Create a byte array with the number of bytes to read
+                // Create a byte array with the number of bytes to read and read the bytes
                 byte[] bytes = new byte[byteCount];
-
-                // Read the bytes
                 for (int i = 0; i < byteCount; i++) {
                     bytes[i] = inFromClient.readByte();
                 }
