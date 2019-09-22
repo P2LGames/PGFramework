@@ -44,7 +44,7 @@ public class RobotDefault {
      all actuators will have something like this **/
 
     public void treadsFinishedOrder() {
-        print("Treads finished action\n");
+
     }
 
 

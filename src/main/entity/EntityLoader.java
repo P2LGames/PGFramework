@@ -22,7 +22,8 @@ public class EntityLoader {
      * @return
      *  The bytes that represent whether or not the entity was successfully registered
      */
-    public synchronized byte[] registerEntity(ClientHandler handler, byte[] requestBytes) {
+    public synchronized byte[] registerEntity(ClientHandler handler, EntityTypeMap entityTypeMap,
+                                              GenericEntityMap entityMap, byte[] requestBytes) {
         // Parse the entity type and placeholder ID from the request bytes
         Integer entityType = ByteBuffer.wrap(requestBytes, 0, 4).getInt();
         Integer placeholderId = ByteBuffer.wrap(requestBytes, 4, 4).getInt();
@@ -37,18 +38,17 @@ public class EntityLoader {
 
         try {
             // Load the class and construct the entity using that class
-            Class<?> loadedClass = Class.forName(EntityTypeMap.getInstance().get(entityType));
+            Class<?> loadedClass = Class.forName(entityTypeMap.get(entityType));
             entity = (GenericEntity) loadedClass.getDeclaredConstructor().newInstance();
         }
         catch (Exception e) {
             // If there was an exception, we failed the registration
             success = false;
-            errorMessage = "Error parsing register data for entity type: " + EntityTypeMap.getInstance().get(entityType) + "\nError: " + e.getMessage();
+            errorMessage = "Error parsing register data for entity type: " + entityTypeMap.get(entityType) + "\nError: " + e.getMessage();
         }
 
         // If we succeeded, register the entity
         if (entity != null) {
-            GenericEntityMap entityMap = GenericEntityMap.getInstance();
             entityId = entityMap.size();
             entityMap.put(Integer.toString(entityId), entity);
         }

@@ -13,7 +13,7 @@ public class EntitySetup {
      * @param bytes An array of bytes representing a string in id:className,id:className format.
      * @return The byte array to send back to the client, letting it know if we failed or succeeded.
      */
-    public byte[] setupEntitiesWithBytes(byte[] bytes) {
+    public byte[] setupEntitiesWithBytes(EntityTypeMap entityTypeMap, byte[] bytes) {
         boolean success = true;
         String errorMessage = "";
 
@@ -33,7 +33,7 @@ public class EntitySetup {
                 String entityClass = typeToClass[1];
 
                 // Add it to our entity type map for future use
-                EntityTypeMap.getInstance().put(entityType, entityClass);
+                entityTypeMap.put(entityType, entityClass);
             }
         }
         catch (IndexOutOfBoundsException e) {

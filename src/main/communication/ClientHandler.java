@@ -15,10 +15,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ClientHandler extends Thread {
 
@@ -100,23 +97,23 @@ public class ClientHandler extends Thread {
                 // Setup the entity
                 if (requestType == RequestType.ENTITY_SETUP.getNumVal()) {
                     // Get the result from the entity setup class
-                    result = new EntitySetup().setupEntitiesWithBytes(bytes);
+                    result = new EntitySetup().setupEntitiesWithBytes(entityTypeMap, bytes);
                 }
                 // If we want to register an entity, do so.
                 else if (requestType == RequestType.ENTITY_REGISTER.getNumVal()) {
-                    result = new EntityLoader().registerEntity(this, bytes);
+                    result = new EntityLoader().registerEntity(this, entityTypeMap, entityMap, bytes);
                 }
                 // If we want to run a command, do so.
                 else if (requestType == RequestType.COMMAND.getNumVal()) {
                     // Create the handler, passing it ourselves, its bytes, etc.
-                    CommandHandler handler = new CommandHandler(this, bytes);
+                    CommandHandler handler = new CommandHandler(this, entityMap, bytes);
 
                     // Add the thread to the thread monitor, this will start it
                     monitor.addThread(handler);
                 }
                 // If we want to update a file in the framework, do so.
                 else if (requestType == RequestType.FILE_UPDATE.getNumVal()) {
-                    result = new InMemoryClassLoader().updateClass(bytes);
+                    result = new InMemoryClassLoader().updateClass(entityMap, bytes);
                 }
 
                 // Also write all of the data that is in toSend
@@ -162,9 +159,6 @@ public class ClientHandler extends Thread {
 
             // Stop and finish our thread monitor
             monitor.endProcess();
-
-            // Remove our entities from the entity map
-            GenericEntityMap.getInstance().removeEntities(myEntityIds);
 
             // Try to close sockets, clean up connections
             try {
