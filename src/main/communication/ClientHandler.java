@@ -223,4 +223,8 @@ public class ClientHandler extends Thread {
         running = false;
     }
 
+    public boolean isRunning() {
+        return running;
+    }
+
 }

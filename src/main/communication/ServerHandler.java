@@ -2,6 +2,7 @@ package main.communication;
 
 import java.io.*;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 
 /**
  * The TCP socket server that accepts requests from the client
@@ -12,6 +13,8 @@ public class ServerHandler implements Runnable {
 
     boolean running = true;
     ServerSocket serverSocket = null;
+
+    ArrayList<ClientHandler> handlers = new ArrayList<>();
 
     public ServerHandler() {}
 
@@ -25,10 +28,23 @@ public class ServerHandler implements Runnable {
             // Keep trying to connect toc clients!
             while (running && !this.serverSocket.isClosed()) {
 
+                // Loop through the handlers and remove the disconnected ones
+                for (int i = handlers.size() - 1; i > 0; i--) {
+                    if (!handlers.get(i).isRunning()) {
+                        handlers.remove(i);
+                    }
+                }
+
+                System.out.println("Current Client Count: " + handlers.size());
+
                 try {
                     System.out.println("Accepting Connection");
+
                     // Create and run a new client using an accepted connection
-                    new ClientHandler(this.serverSocket.accept()).start();
+                    ClientHandler client = new ClientHandler(this.serverSocket.accept());
+                    client.start();
+
+                    handlers.add(client);
                 }
                 catch (IOException e) {
                     e.printStackTrace();
