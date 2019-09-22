@@ -19,6 +19,7 @@ import java.util.Arrays;
 public class CommandHandler extends Thread {
 
     private ClientHandler handler;
+    private GenericEntityMap entityMap;
 
     private byte[] requestBytes;
 
@@ -28,8 +29,9 @@ public class CommandHandler extends Thread {
     public int entityId;
     public int commandId;
 
-    public CommandHandler(ClientHandler handler, byte[] requestBytes) {
+    public CommandHandler(ClientHandler handler, GenericEntityMap entityMap, byte[] requestBytes) {
         this.handler = handler;
+        this.entityMap = entityMap;
         this.requestBytes = requestBytes;
 
         // Parse the entity type and placeholder ID from the request bytes
@@ -115,11 +117,8 @@ public class CommandHandler extends Thread {
     }
 
     public GenericCommand getCommand(int entityId, int commandId) throws ServerException {
-        // Get the map of entities
-        GenericEntityMap entities = GenericEntityMap.getInstance();
-
         // Get the entity that has this entity id
-        GenericEntity entity = entities.get(Integer.toString(entityId));
+        GenericEntity entity = entityMap.get(Integer.toString(entityId));
 
         // If the entity is null, we could not find the entity with that id
         if(entity == null) {

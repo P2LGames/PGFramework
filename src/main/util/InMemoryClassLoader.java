@@ -1,17 +1,10 @@
 package main.util;
 
-import annotations.SetEntity;
-import command.GenericCommand;
 import entity.GenericEntity;
 import main.communication.RequestType;
 import entity.GenericEntityMap;
 import util.ByteManager;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -24,7 +17,7 @@ public class InMemoryClassLoader {
      * @param requestBytes Array of bytes with all necessary information to get the entity and update it's command info.
      * @return Byte array as a reponse, whether or not we were successful
      */
-    public byte[] updateClass(byte[] requestBytes) {
+    public byte[] updateClass(GenericEntityMap entityMap, byte[] requestBytes) {
         // Track where we are in the request bytes
         int starting = 0;
 
@@ -64,7 +57,7 @@ public class InMemoryClassLoader {
             Class<?> loadedClass = compiler.compile(className, fileContents);
 
             // Get the entity via the entity id
-            GenericEntity entity = GenericEntityMap.getInstance().get(Integer.toString(entityId));
+            GenericEntity entity = entityMap.get(Integer.toString(entityId));
 
             // Depending on the command id, update the entity with the loaded class
             // If the command id is -1, then update all commands with the class
