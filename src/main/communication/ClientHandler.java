@@ -143,12 +143,9 @@ public class ClientHandler extends Thread {
             }
         }
         catch (EOFException e) {
-            System.out.println("Client Socket: Connection was dropped.");
+            //System.out.println("Client Socket: Connection was dropped.");
         }
         catch (SocketException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
             e.printStackTrace();
         }
         catch (Exception e) {
@@ -157,8 +154,10 @@ public class ClientHandler extends Thread {
         }
         finally {
 
-            // Stop and finish our thread monitor
+            // Stop and finish our thread monitor and ourselves
             monitor.endProcess();
+
+            endProcess();
 
             // Try to close sockets, clean up connections
             try {
@@ -197,7 +196,6 @@ public class ClientHandler extends Thread {
                 || requestType == RequestType.ENTITY_REGISTER.getNumVal()
                 || requestType == RequestType.COMMAND.getNumVal()
                 || requestType == RequestType.FILE_UPDATE.getNumVal());
-
 
         return recognized;
     }

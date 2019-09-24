@@ -72,6 +72,20 @@ public class CommandThreadMonitor extends Thread {
                 break;
             }
         }
+
+        // Stop all command threads
+        for (Integer i : monitoring.keySet()) {
+            LinkedList<MonitoringThread> monitoringQueue = monitoring.get(i);
+
+            MonitoringThread t = monitoringQueue.peek();
+
+            // If there is no thread we are monitoring, stop
+            if (t == null) {
+                continue;
+            }
+
+            t.stop();
+        }
     }
 
     public void addThread(CommandHandler thread) {

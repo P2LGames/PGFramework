@@ -17,6 +17,7 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -101,6 +102,10 @@ public class ClientHandlerTest {
         }
         catch (InterruptedException e) {}
 
+        // Test recompile commands
+        System.out.println("Testing recompilation");
+        testRecompile();
+
         // Test the command timeout
         System.out.println("Testing Command Timeout");
         testCommandTimeout();
@@ -118,6 +123,14 @@ public class ClientHandlerTest {
         // Test asyncrous commands
         System.out.println("Testing two entities asyncrous");
         testTwoEntitiesAsync();
+
+
+
+        // Wait just a bit
+        try {
+            Thread.sleep(1000);
+        }
+        catch (InterruptedException e) {}
 
         // Check to make sure the entity exists before the client disconnects
 //        assertTrue(GenericEntityMap.getInstance().entityExists("0"));
@@ -724,127 +737,216 @@ public class ClientHandlerTest {
         }
     }
 
-    @Test
     public void testRecompile() {
+        int i = new Random().nextInt();
+        String testOverrideClass = "command.TestOverride";
+        String testOverride = "package command;\n" +
+                "\n" +
+                "import annotations.SetEntity;\n" +
+                "import annotations.Command;\n" +
+                "import entity.TestEntity;\n\n" +
+                "public class TestOverride {\n" +
+                "    private TestEntity testEntity;\n" +
+                "\n" +
+                "    @Command(commandName = \"run\", id = 0)\n" +
+                "    public void run() {\n" +
+                "        int num = 0;\n" +
+                "    }\n" +
+                "\n" +
+                "    @Command(commandName = \"talk\", id = 1)\n" +
+                "    public byte[] talk() {\n" +
+                "        return \"I can talk, yay!! " + i + "\".getBytes();\n" +
+                "    }\n" +
+                "\n" +
+                "    @Command(commandName = \"timeout\", id = 2)\n" +
+                "    public void timeout() {\n" +
+                "        try {\n" +
+                "            for (int i = 0; i < 10000; i++) {\n" +
+                "                Thread.sleep(100);\n" +
+                "            }\n" +
+                "        }\n" +
+                "        catch (InterruptedException e) {}\n" +
+                "    }\n" +
+                "\n" +
+                "    @Command(commandName = \"first\", id = 3)\n" +
+                "    public byte[] first() {\n" +
+                "        try {\n" +
+                "            Thread.sleep(300);\n" +
+                "        }\n" +
+                "        catch (InterruptedException e) {}\n" +
+                "\n" +
+                "        return \"I ran first\".getBytes();\n" +
+                "    }\n" +
+                "\n" +
+                "    @Command(commandName = \"second\", id = 4)\n" +
+                "    public byte[] second() {\n" +
+                "        return \"I ran second\".getBytes();\n" +
+                "    }\n" +
+                "\n" +
+                "    @Command(commandName = \"asyncLast\", id = 5)\n" +
+                "    public byte[] asyncLast() {\n" +
+                "        try {\n" +
+                "            Thread.sleep(300);\n" +
+                "        }\n" +
+                "        catch (InterruptedException e) {}\n" +
+                "\n" +
+                "        return \"I ran last\".getBytes();\n" +
+                "    }\n" +
+                "\n" +
+                "    @Command(commandName = \"asyncFirst\", id = 6)\n" +
+                "    public byte[] asyncFirst() {\n" +
+                "        return \"I ran first\".getBytes();\n" +
+                "    }\n" +
+                "\n" +
+                "    public TestEntity getTestEntity() {\n" +
+                "        return testEntity;\n" +
+                "    }\n" +
+                "\n" +
+                "    @SetEntity\n" +
+                "    public void setTestEntity(TestEntity testEntity) {\n" +
+                "        this.testEntity = testEntity;\n" +
+                "    }\n" +
+                "}";
+
+        // Setup the request bytes
+        ArrayList<Byte> recompileBytes = new ArrayList<>();
+
+        // Add the entity id and the command id we want to recompile
+        ByteManager.addIntToByteArray(0, recompileBytes, true);
+        ByteManager.addIntToByteArray(1, recompileBytes, true);
+
+        // Add the class and file contents
+        ByteManager.addIntToByteArray(testOverrideClass.getBytes().length, recompileBytes, true);
+        ByteManager.addBytesToArray(testOverrideClass.getBytes(), recompileBytes);
+        ByteManager.addIntToByteArray(testOverride.getBytes().length, recompileBytes, true);
+        ByteManager.addBytesToArray(testOverride.getBytes(), recompileBytes);
+
+        // Create some request bytes
+        ArrayList<Byte> requestBytes = new ArrayList<>();
+
+        // Pad the left and add the request integer
+        ByteManager.padWithBytes(requestBytes, 1);
+        requestBytes.add((byte) RequestType.FILE_UPDATE.getNumVal());
+
+        // Add the length of the command bytes
+        ByteManager.addIntToByteArray(recompileBytes.size(), requestBytes, true);
+
+        // Add the register bytes to the request bytes
+        ByteManager.addBytesToArray(ByteManager.convertArrayListToArray(recompileBytes), requestBytes);
+
         try {
+            // Send the request
+            outToServer.write(ByteManager.convertArrayListToArray(requestBytes));
 
-            // Keep track of the clients and their in and output streams
-            ArrayList<Socket> clients = new ArrayList<>();
-            ArrayList<DataOutputStream> outs = new ArrayList<>();
-            ArrayList<DataInputStream> ins = new ArrayList<>();
+            // Read in the stuffs
+            // Get the type of responses
+            int type = inFromServer.readByte();
 
-            for (int i = 0; i < 100; i++) {
+            // Read a byte (It's a padding)
+            inFromServer.readByte();
 
+            // Get the length of the message
+            byte[] lengthBytes = new byte[4];
+            inFromServer.read(lengthBytes);
+            int length = ByteBuffer.wrap(lengthBytes, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
 
-                String override = "// HIDE ROWS:14\n" +
-                        "package command;\n" +
-                        "\n" +
-                        "import annotations.Command;\n" +
-                        "import annotations.SetEntity;\n" +
-                        "import entity.GenericEntity;\n" +
-                        "import entity.Robot;\n" +
-                        "import entity.RobotAttachments.Base;\n" +
-                        "import util.ByteManager;\n" +
-                        "import command.RobotDefault;\n" +
-                        "\n" +
-                        "import java.nio.ByteBuffer;\n" +
-                        "\n" +
-                        "\n" +
-                        "\n" +
-                        "public class RobotOverride extends RobotDefault {\n" +
-                        "\n" +
-                        "    // DO NOT EDIT ABOVE THIS LINE\n" +
-                        "\n" +
-                        "\tint w = 0;\n" +
-                        "\tint a = 0;\n" +
-                        "\tint d = 0;\n" +
-                        "\n" +
-                        "    /**\n" +
-                        "     * Called when you have this robot selected, and you press a key.\n" +
-                        "     * @param code An integer representing the ascii character of the key that you pressed.\n" +
-                        "     *             zyBooks 2.14 has a table of characters and their ascii code for your reference.\n" +
-                        "     * @param pressed Whether or not you pressed or released the key. 1 is pressed, 0 is released.\n" +
-                        "     */\n" +
-                        "    @Override\n" +
-                        "    public void playerKeyPressed(int code, int pressed) {\n" +
-                        "    \tif (code == 87) w = pressed;\n" +
-                        "\t\tif (code == 65) a = pressed;\n" +
-                        "\t\tif (code == " + i + ") d = pressed;\n" + // Change one thing in the class
-                        "    }\n" +
-                        "\n" +
-                        "    /**\n" +
-                        "     * Fill this in to give the robot his orders 30 times per second.\n" +
-                        "     * New orders will override the ones the robot is currently executing.\n" +
-                        "     */\n" +
-                        "    @Override\n" +
-                        "    public void giveOrders() {\n" +
-                        "\t\t// print(\"\" + w \"\\n\");\n" +
-                        "\t\tif (w == 1) moveForward();\n" +
-                        "\t\t\n" +
-                        "\t\tif (a == 1) turnLeft();\n" +
-                        "\t\telse if (d == 1) turnRight();\n" +
-                        "\t\telse stopTurning();\n" +
-                        "    }\n" +
-                        "\n" +
-                        "    // DO NOT EDIT BELOW THIS LINE\n" +
-                        "\n" +
-                        "    /**\n" +
-                        "     * You have access to quite a few functions to help the robot move.\n" +
-                        "     * moveForward()\n" +
-                        "     * moveBackward()\n" +
-                        "     * stopMoving()\n" +
-                        "     * turnLeft()\n" +
-                        "     * turnRight()\n" +
-                        "     * turnLeft90()\n" +
-                        "     * turnRight90()\n" +
-                        "     * stopTurning()\n" +
-                        "     */\n" +
-                        "\n" +
-                        "}";
+            // Read the success byte
+            int success = inFromServer.readByte();
 
-                // Create a client socket
-                Socket clientSocket = new Socket();
+            // Read a buffer byte
+            inFromServer.readByte();
 
-                // Set its timeout
-                clientSocket.setSoTimeout(2000);
+            // Read in the placeholder and entity id
+            inFromServer.read(lengthBytes);
+            int entityId = ByteBuffer.wrap(lengthBytes, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            inFromServer.read(lengthBytes);
+            int commandId = ByteBuffer.wrap(lengthBytes, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
 
-                // Connect to the server
-                clientSocket.connect(new InetSocketAddress("localhost", ServerHandler.PORT));
+            // We want the class name
+            inFromServer.read(lengthBytes);
+            int classNameLength = ByteBuffer.wrap(lengthBytes, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            lengthBytes = new byte[classNameLength];
+            inFromServer.read(lengthBytes);
+            String classPackage = new String(lengthBytes);
 
-                // Write a byte to the framework
-                DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-                outToServer.write(ByteManager.convertIntToByteArray(-1));
-
-                // Read the data from the server
-                DataInputStream inFromServer = new DataInputStream(clientSocket.getInputStream());
-                int fromServer = inFromServer.readInt();
-
-                // Asset that we get the unrecognized value
-                assertEquals(-1, fromServer);
-
-                // Save the socket and in and outs so we can close them late
-                clients.add(clientSocket);
-                outs.add(outToServer);
-                ins.add(inFromServer);
-            }
-
-            // Close all connections
-            for (Socket s: clients) {
-                s.close();
-            }
-            for (DataOutputStream o: outs) {
-                o.close();
-            }
-            for (DataInputStream i: ins) {
-                i.close();
-            }
+            assertEquals(1, success);
+            assertEquals("command.TestOverride", classPackage);
 
         }
-        catch(Exception e) {
-            System.out.println("Unexpected exception: " + e.getMessage());
+        catch (IOException e) {
             e.printStackTrace();
-            Assert.fail();
         }
+
+
+
+        // Setup the request bytes
+        ArrayList<Byte> commandBytes = new ArrayList<>();
+
+        // Add the entity id and the command id we want to run
+        ByteManager.addIntToByteArray(0, commandBytes, true);
+        ByteManager.addIntToByteArray(1, commandBytes, true);
+
+        // There is no parameter
+        commandBytes.add((byte) 0);
+
+        // Create some request bytes
+        requestBytes = new ArrayList<>();
+
+        // Pad the left and add the request integer
+        ByteManager.padWithBytes(requestBytes, 1);
+        requestBytes.add((byte) RequestType.COMMAND.getNumVal());
+
+        // Add the length of the command bytes
+        ByteManager.addIntToByteArray(commandBytes.size(), requestBytes, true);
+
+        // Add the register bytes to the request bytes
+        ByteManager.addBytesToArray(ByteManager.convertArrayListToArray(commandBytes), requestBytes);
+
+        try {
+            // Send the request
+            outToServer.write(ByteManager.convertArrayListToArray(requestBytes));
+
+            // Get the type of responses
+            int type = inFromServer.readByte();
+
+            // Read a byte (It's a padding)
+            inFromServer.readByte();
+
+            // Get the length of the message
+            byte[] lengthBytes = new byte[4];
+            inFromServer.read(lengthBytes);
+            int length = ByteBuffer.wrap(lengthBytes, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+
+            // Read the success byte
+            int success = inFromServer.readByte();
+
+            // Read a buffer byte
+            inFromServer.readByte();
+
+            // Read in the placeholder and entity id
+            inFromServer.read(lengthBytes);
+            int entityId = ByteBuffer.wrap(lengthBytes, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            inFromServer.read(lengthBytes);
+            int commandId = ByteBuffer.wrap(lengthBytes, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+
+            // Read in the rest of the bytes, they should be a string
+            lengthBytes = new byte[length - 10];
+            inFromServer.read(lengthBytes);
+            String commandOutput = new String(lengthBytes);
+
+            // Check our asserts
+            assertEquals(RequestType.COMMAND.getNumVal(), type);
+//            assertEquals(27, length);
+            assertEquals(1, success);
+            assertEquals(0, entityId);
+            assertEquals(1, commandId);
+            assertEquals("I can talk, yay!! " + i, commandOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+            assert false;
+        }
+
     }
+
 
 }

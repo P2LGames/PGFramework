@@ -2,6 +2,7 @@ package main.communication;
 
 import java.io.*;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 
 /**
@@ -15,6 +16,7 @@ public class ServerHandler implements Runnable {
     ServerSocket serverSocket = null;
 
     ArrayList<ClientHandler> handlers = new ArrayList<>();
+    int handlerCount = 0;
 
     public ServerHandler() {}
 
@@ -22,29 +24,40 @@ public class ServerHandler implements Runnable {
     public void run() {
         try {
             // Initialize the server
-            System.out.println("ServerHandler: " + PORT);
+            System.out.println("ServerHandler V1.1.1: " + PORT);
             this.serverSocket = new ServerSocket(PORT);
 
             // Keep trying to connect toc clients!
             while (running && !this.serverSocket.isClosed()) {
 
-                // Loop through the handlers and remove the disconnected ones
-                for (int i = handlers.size() - 1; i > 0; i--) {
-                    if (!handlers.get(i).isRunning()) {
-                        handlers.remove(i);
-                    }
-                }
-
-                System.out.println("Current Client Count: " + handlers.size());
-
                 try {
-                    System.out.println("Accepting Connection");
-
                     // Create and run a new client using an accepted connection
-                    ClientHandler client = new ClientHandler(this.serverSocket.accept());
+                    Socket clientSocket = this.serverSocket.accept();
+//                    String IP = clientSocket.getRemoteSocketAddress().toString();
+//
+//                    System.out.println(IP);
+//                    if (IP.contains("10.240.255.56") || IP.contains("10.240.255.55")) {
+//                        continue;
+//                    }
+
+                    ClientHandler client = new ClientHandler(clientSocket);
                     client.start();
 
                     handlers.add(client);
+
+                    // Loop through the handlers and remove the disconnected ones
+                    for (int i = handlers.size() - 1; i > 0; i--) {
+                        if (!handlers.get(i).isRunning()) {
+                            handlers.remove(i);
+                        }
+                    }
+
+                    if (handlerCount != handlers.size()) {
+                        handlerCount = handlers.size();
+
+                        System.out.println("Current Client Count: " + handlers.size());
+                    }
+
                 }
                 catch (IOException e) {
                     e.printStackTrace();
