@@ -88,20 +88,25 @@ public class CommandThreadMonitor extends Thread {
         }
     }
 
-    public void addThread(CommandHandler thread) {
+    public void addThread(MonitorableThread thread) {
         // Setup the monitoring thread
         MonitoringThread t = new MonitoringThread(thread);
 
         addMonitoringThread(t);
     }
 
-    public void addThread(CommandHandler thread, long timeout) {
+    public void addThread(MonitorableThread thread, long timeout) {
         // Setup the monitoring thread
         MonitoringThread t = new MonitoringThread(thread, timeout);
 
         addMonitoringThread(t);
     }
 
+    /**
+     * Adds the given monitoring thread to the queue of threads for that robot.
+     * If there are no threads in the robot's queue, it will immediately start the thread.
+     * @param t The thread to add.
+     */
     private void addMonitoringThread(MonitoringThread t) {
         int entityId = t.getEntityId();
 
@@ -136,13 +141,13 @@ public class CommandThreadMonitor extends Thread {
         private long timeAlive = 0;
         private long lastTimeCheck;
 
-        private CommandHandler thread;
+        private MonitorableThread thread;
 
-        private MonitoringThread(CommandHandler thread) {
+        private MonitoringThread(MonitorableThread thread) {
             this.thread = thread;
         }
 
-        private MonitoringThread(CommandHandler thread, long timeout) {
+        private MonitoringThread(MonitorableThread thread, long timeout) {
             this.thread = thread;
             this.timeout = timeout;
         }
@@ -159,7 +164,7 @@ public class CommandThreadMonitor extends Thread {
             return thread.compileTimeoutError();
         }
 
-        public int getEntityId() { return thread.entityId; }
+        public int getEntityId() { return thread.getEntityId(); }
 
         public boolean hasTimedOut() {
             // If we have been alive longer than our timeout

@@ -16,7 +16,7 @@ import java.util.Arrays;
 /**
  * The class that handles the running of a generic command
  */
-public class CommandHandler extends Thread {
+public class CommandHandler extends Thread implements MonitorableThread {
 
     private ClientHandler handler;
     private GenericEntityMap entityMap;
@@ -229,4 +229,6 @@ public class CommandHandler extends Thread {
     }
 
     public void setTimedOut(boolean timedOut) { this.timedOut = timedOut; }
+
+    public int getEntityId() { return entityId; }
 }

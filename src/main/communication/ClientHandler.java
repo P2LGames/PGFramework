@@ -113,7 +113,11 @@ public class ClientHandler extends Thread {
                 }
                 // If we want to update a file in the framework, do so.
                 else if (requestType == RequestType.FILE_UPDATE.getNumVal()) {
-                    result = new InMemoryClassLoader().updateClass(entityMap, bytes);
+                    // Create the handler, passing it ourselves, its bytes, etc.
+                    InMemoryClassLoader handler = new InMemoryClassLoader(this, entityMap, bytes);
+
+                    // Add the thread to the thread monitor, this will start it
+                    monitor.addThread(handler);
                 }
 
                 // Also write all of the data that is in toSend

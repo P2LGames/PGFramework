@@ -8,7 +8,7 @@ import java.nio.ByteOrder;
 
 public class ByteManagerTest {
 
-    @Test
+
     public void testDoubleBytes() {
         double test1 = 355.543;
         double test2 = 1555.012345;

@@ -1,6 +1,9 @@
 package main.util;
 
 import entity.GenericEntity;
+import main.command.CommandError;
+import main.command.MonitorableThread;
+import main.communication.ClientHandler;
 import main.communication.RequestType;
 import entity.GenericEntityMap;
 import util.ByteManager;
@@ -10,24 +13,38 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class InMemoryClassLoader {
+public class InMemoryClassLoader extends Thread implements MonitorableThread {
 
-    /**
-     * Attempts to update a GenericEntity's command data with the passed request bytes.
-     * @param requestBytes Array of bytes with all necessary information to get the entity and update it's command info.
-     * @return Byte array as a reponse, whether or not we were successful
-     */
-    public byte[] updateClass(GenericEntityMap entityMap, byte[] requestBytes) {
+    private ClientHandler handler;
+    private GenericEntityMap entityMap;
+    private byte[] requestBytes;
+
+    private boolean finished = false;
+    private boolean timedOut = false;
+
+    public int entityId;
+    public int commandId;
+    String className;
+    String fileContents;
+
+    public InMemoryClassLoader(ClientHandler handler, GenericEntityMap entityMap, byte[] requestBytes) {
+        this.handler = handler;
+        this.entityMap = entityMap;
+        this.requestBytes = requestBytes;
+    }
+
+    @Override
+    public void run() {
         // Track where we are in the request bytes
         int starting = 0;
 
         // Unpack our bytes, lots of data
         // ENTITY ID
-        int entityId = ByteBuffer.wrap(requestBytes, starting, 4).getInt();
+        entityId = ByteBuffer.wrap(requestBytes, starting, 4).getInt();
         starting += 4;
 
         // COMMAND ID in bytes
-        int commandId = ByteBuffer.wrap(requestBytes, starting, 4).getInt();
+        commandId = ByteBuffer.wrap(requestBytes, starting, 4).getInt();
         starting += 4;
 
         // CLASS NAME length in bytes
@@ -35,7 +52,7 @@ public class InMemoryClassLoader {
         starting += 4;
 
         // CLASS NAME as string from bytes
-        String className = new String(Arrays.copyOfRange(requestBytes, starting, starting + classNameLength), StandardCharsets.US_ASCII);
+        className = new String(Arrays.copyOfRange(requestBytes, starting, starting + classNameLength), StandardCharsets.US_ASCII);
         starting += classNameLength;
 
         // FILE CONTENTS length in bytes
@@ -43,7 +60,26 @@ public class InMemoryClassLoader {
         starting += 4;
 
         // FILE CONTENTS as string from bytes
-        String fileContents = new String(Arrays.copyOfRange(requestBytes, starting, starting + fileContentsLength), StandardCharsets.US_ASCII);
+        fileContents = new String(Arrays.copyOfRange(requestBytes, starting, starting + fileContentsLength), StandardCharsets.US_ASCII);
+
+        // Get the result from the command
+        byte[] result = updateClass();
+
+        // If we did not time out
+        if (!timedOut) {
+            // Send the data back to the client handler
+            handler.sendByteArray(result);
+        }
+
+        // Mark ourselves as finished
+        finished = true;
+    }
+
+    /**
+     * Attempts to update a GenericEntity's command data with the passed request bytes.
+     * @return Byte array as a reponse, whether or not we were successful
+     */
+    public byte[] updateClass() {
 
         // Track success and error message
         boolean success = true;
@@ -74,7 +110,7 @@ public class InMemoryClassLoader {
             errorMessage = "Error: " + e.getLocalizedMessage();
         }
 
-        return this.compileFileUpdateResult(success, entityId, commandId, className, errorMessage);
+        return this.compileFileUpdateResult(success, errorMessage);
     }
 
     /**
@@ -84,12 +120,10 @@ public class InMemoryClassLoader {
      * Otherwise, the message is the type, an int with the number of bytes, a 0 (byte), and the bytes representing the
      * error message.
      * @param success Whether or not we were able to successfully setup the entity data we recieved
-     * @param entityId The entity id
-     * @param commandId The id of the command
-     * @param errorMessage Empty is success is true
+     * @param errorMessage Empty if success is true
      * @return The array of bytes to send back to the client
      */
-    private byte[] compileFileUpdateResult(boolean success, int entityId, int commandId, String className, String errorMessage) {
+    private byte[] compileFileUpdateResult(boolean success, String errorMessage) {
         // Setup the response, add the response type to it
         ArrayList<Byte> result = new ArrayList<>();
         result.add((byte) RequestType.FILE_UPDATE.getNumVal());
@@ -153,5 +187,43 @@ public class InMemoryClassLoader {
 
         return resultArray;
     }
+
+    public byte[] compileTimeoutError() {
+        // Setup the response, add the response type to it
+        ArrayList<Byte> result = new ArrayList<>();
+        result.add((byte) RequestType.COMMAND_ERROR.getNumVal());
+        result.add((byte)0);
+
+        String errorMessage = "Command took too long to finish, possible infinite loop.";
+
+        // Add the integer 10 + length of error message to our byte array, this is the rest of the bytes
+        int messageLength = 10 + errorMessage.getBytes().length;
+        ByteManager.addIntToByteArray(messageLength, result);
+
+        // Command error type
+        result.add((byte) CommandError.TIMEOUT.getNumVal());
+        result.add((byte)0);
+
+        // Add the entity id and command id
+        ByteManager.addIntToByteArray(entityId, result);
+        ByteManager.addIntToByteArray(commandId, result);
+
+        // Message
+        ByteManager.addBytesToArray(errorMessage.getBytes(), result);
+
+        // Convert the arraylist into an array of bytes
+        byte[] resultArray = ByteManager.convertArrayListToArray(result);
+
+        // Return the resulting array of bytes
+        return resultArray;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setTimedOut(boolean timedOut) { this.timedOut = timedOut; }
+
+    public int getEntityId() { return entityId; }
 
 }

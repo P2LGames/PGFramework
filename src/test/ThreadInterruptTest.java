@@ -25,18 +25,18 @@ public class ThreadInterruptTest {
 
     InfiniteLoopThread infLoop;
 
-    @Before
+
     public void setup() {
         infLoop = new InfiniteLoopThread();
         infLoop.start();
     }
 
-    @After
+
     public void tearDown() {
         infLoop = null;
     }
 
-    @Test
+
     public void testInterrupt() {
         // Ensure the thread is alive
         assertTrue(infLoop.isAlive());
