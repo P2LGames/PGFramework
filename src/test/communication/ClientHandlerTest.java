@@ -696,7 +696,6 @@ public class ClientHandlerTest {
             assertEquals(6, commandId);
             assertEquals("I ran first", commandOutput);
 
-
             // Get the type of responses
             type = inFromServer.readByte();
 
@@ -740,6 +739,7 @@ public class ClientHandlerTest {
     public void testRecompile() {
         int i = new Random().nextInt();
         String testOverrideClass = "command.TestOverride";
+        String testOverrideFilePath = "src/command/TestOverride";
         String testOverride = "package command;\n" +
                 "\n" +
                 "import annotations.SetEntity;\n" +
@@ -816,6 +816,8 @@ public class ClientHandlerTest {
         ByteManager.addIntToByteArray(1, recompileBytes, true);
 
         // Add the class and file contents
+        ByteManager.addIntToByteArray(testOverrideFilePath.getBytes().length, recompileBytes, true);
+        ByteManager.addBytesToArray(testOverrideFilePath.getBytes(), recompileBytes);
         ByteManager.addIntToByteArray(testOverrideClass.getBytes().length, recompileBytes, true);
         ByteManager.addBytesToArray(testOverrideClass.getBytes(), recompileBytes);
         ByteManager.addIntToByteArray(testOverride.getBytes().length, recompileBytes, true);
@@ -846,9 +848,9 @@ public class ClientHandlerTest {
             inFromServer.readByte();
 
             // Get the length of the message
-            byte[] lengthBytes = new byte[4];
-            inFromServer.read(lengthBytes);
-            int length = ByteBuffer.wrap(lengthBytes, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            byte[] byteCount = new byte[4];
+            inFromServer.read(byteCount);
+            int length = ByteBuffer.wrap(byteCount, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
 
             // Read the success byte
             int success = inFromServer.readByte();
@@ -857,24 +859,34 @@ public class ClientHandlerTest {
             inFromServer.readByte();
 
             // Read in the placeholder and entity id
-            inFromServer.read(lengthBytes);
-            int entityId = ByteBuffer.wrap(lengthBytes, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
-            inFromServer.read(lengthBytes);
-            int commandId = ByteBuffer.wrap(lengthBytes, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            inFromServer.read(byteCount);
+            int entityId = ByteBuffer.wrap(byteCount, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            inFromServer.read(byteCount);
+            int commandId = ByteBuffer.wrap(byteCount, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+
+            // We want the file path
+            inFromServer.read(byteCount);
+            int filePathLength = ByteBuffer.wrap(byteCount, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            byteCount = new byte[filePathLength];
+            inFromServer.read(byteCount);
+            String filePath = new String(byteCount);
 
             // We want the class name
-            inFromServer.read(lengthBytes);
-            int classNameLength = ByteBuffer.wrap(lengthBytes, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
-            lengthBytes = new byte[classNameLength];
-            inFromServer.read(lengthBytes);
-            String classPackage = new String(lengthBytes);
+            byteCount = new byte[4];
+            inFromServer.read(byteCount);
+            int classNameLength = ByteBuffer.wrap(byteCount, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            byteCount = new byte[classNameLength];
+            inFromServer.read(byteCount);
+            String classPackage = new String(byteCount);
 
             assertEquals(1, success);
+            assertEquals("src/command/TestOverride", filePath);
             assertEquals("command.TestOverride", classPackage);
 
         }
         catch (IOException e) {
             e.printStackTrace();
+            assert false;
         }
 
 

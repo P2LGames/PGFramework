@@ -24,6 +24,7 @@ public class InMemoryClassLoader extends Thread implements MonitorableThread {
 
     public int entityId;
     public int commandId;
+    String filePath;
     String className;
     String fileContents;
 
@@ -47,19 +48,21 @@ public class InMemoryClassLoader extends Thread implements MonitorableThread {
         commandId = ByteBuffer.wrap(requestBytes, starting, 4).getInt();
         starting += 4;
 
-        // CLASS NAME length in bytes
+        // FILE PATH from bytes
+        int filePathLength = ByteBuffer.wrap(requestBytes, starting, 4).getInt();
+        starting += 4;
+        filePath = new String(Arrays.copyOfRange(requestBytes, starting, starting + filePathLength), StandardCharsets.US_ASCII);
+        starting += filePathLength;
+
+        // CLASS NAME from bytes
         int classNameLength = ByteBuffer.wrap(requestBytes, starting, 4).getInt();
         starting += 4;
-
-        // CLASS NAME as string from bytes
         className = new String(Arrays.copyOfRange(requestBytes, starting, starting + classNameLength), StandardCharsets.US_ASCII);
         starting += classNameLength;
 
-        // FILE CONTENTS length in bytes
+        // FILE CONTENTS from bytes
         int fileContentsLength = ByteBuffer.wrap(requestBytes, starting, 4).getInt();
         starting += 4;
-
-        // FILE CONTENTS as string from bytes
         fileContents = new String(Arrays.copyOfRange(requestBytes, starting, starting + fileContentsLength), StandardCharsets.US_ASCII);
 
         // Get the result from the command
@@ -107,7 +110,7 @@ public class InMemoryClassLoader extends Thread implements MonitorableThread {
         }
         catch (Exception e) {
             success = false;
-            errorMessage = "Error: " + e.getLocalizedMessage();
+            errorMessage = e.getLocalizedMessage();
         }
 
         return this.compileFileUpdateResult(success, errorMessage);
@@ -130,6 +133,7 @@ public class InMemoryClassLoader extends Thread implements MonitorableThread {
         result.add((byte)0);
 
         // Convert the className to a byte array
+        byte[] filePathBytes = filePath.getBytes();
         byte[] classNameBytes = className.getBytes();
 
         // If the setup was a success, then all we need is:
@@ -138,8 +142,8 @@ public class InMemoryClassLoader extends Thread implements MonitorableThread {
         // 3. 2 ints (8 bytes) for entity id and command id
         if (success) {
             // Add the message length to our byte array
-            // 2 for the success, 8 for the entityId and commandId, and 4 (int) + the length of the className
-            int messageLength = 2 + 8 + 4 + classNameBytes.length;
+            // 2 for the success, 8 for the entityId and commandId, and 4 * 2 (int) + the length of the className & filePath
+            int messageLength = 18 + filePathBytes.length + classNameBytes.length;
             ByteManager.addIntToByteArray(messageLength, result);
 
             // Add that is was a success
@@ -152,16 +156,18 @@ public class InMemoryClassLoader extends Thread implements MonitorableThread {
             // Add the commandId to the array
             ByteManager.addIntToByteArray(commandId, result);
 
-            // Add the length of the class name bytes
-            ByteManager.addIntToByteArray(classNameBytes.length, result);
+            // Add the file path to the bytes
+            ByteManager.addIntToByteArray(filePathBytes.length, result);
+            ByteManager.addBytesToArray(filePathBytes, result);
 
-            // Add the class name bytes
+            // Add the class name to the bytes
+            ByteManager.addIntToByteArray(classNameBytes.length, result);
             ByteManager.addBytesToArray(classNameBytes, result);
         }
         // Otherwise, send an error message
         else {
-            // Add the integer 2 + length of error message to our byte array, this is the rest of the bytes
-            int messageLength = 10 + 4 + classNameBytes.length + errorMessage.getBytes().length;
+            // Add the integer 2 + 8 for the entityId and commandId, and 4 * 2 (int) + the length of the className & filePath, then the errorMessage
+            int messageLength = 18 + filePathBytes.length + classNameBytes.length + errorMessage.getBytes().length;
             ByteManager.addIntToByteArray(messageLength, result);
 
             // Failure
@@ -172,10 +178,12 @@ public class InMemoryClassLoader extends Thread implements MonitorableThread {
             ByteManager.addIntToByteArray(entityId, result);
             ByteManager.addIntToByteArray(commandId, result);
 
-            // Add the length of the class name bytes
-            ByteManager.addIntToByteArray(classNameBytes.length, result);
+            // Add the file path to the bytes
+            ByteManager.addIntToByteArray(filePathBytes.length, result);
+            ByteManager.addBytesToArray(filePathBytes, result);
 
-            // Add the class name bytes
+            // Add the class name to the bytes
+            ByteManager.addIntToByteArray(classNameBytes.length, result);
             ByteManager.addBytesToArray(classNameBytes, result);
 
             // Message
