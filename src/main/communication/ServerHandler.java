@@ -11,11 +11,13 @@ import java.util.ArrayList;
 public class ServerHandler implements Runnable {
 
     public static int PORT = 5545;
+    public static String VERSION = "1.2";
 
     boolean running = true;
     ServerSocket serverSocket = null;
 
-    ArrayList<ClientHandler> handlers = new ArrayList<>();
+//    ArrayList<ClientHandler> handlers = new ArrayList<>();
+    ClientHandler client;
     int handlerCount = 0;
 
     public ServerHandler() {}
@@ -24,43 +26,42 @@ public class ServerHandler implements Runnable {
     public void run() {
         try {
             // Initialize the server
-            System.out.println("ServerHandler V1.1.1: " + PORT);
+            System.out.println("ServerHandler V" + VERSION + ": " + PORT);
             this.serverSocket = new ServerSocket(PORT);
 
-            // Keep trying to connect toc clients!
-            while (running && !this.serverSocket.isClosed()) {
+            try {
+                // Create and run a new client using an accepted connection
+                Socket clientSocket = this.serverSocket.accept();
 
-                try {
-                    // Create and run a new client using an accepted connection
-                    Socket clientSocket = this.serverSocket.accept();
-//                    String IP = clientSocket.getRemoteSocketAddress().toString();
-//
-//                    System.out.println(IP);
-//                    if (IP.contains("10.240.255.56") || IP.contains("10.240.255.55")) {
-//                        continue;
+                client = new ClientHandler(this, clientSocket);
+                client.start();
+
+//                handlers.add(client);
+
+//                // Loop through the handlers and remove the disconnected ones
+//                for (int i = handlers.size() - 1; i > 0; i--) {
+//                    if (!handlers.get(i).isRunning()) {
+//                        handlers.remove(i);
 //                    }
+//                }
+//
+//                if (handlerCount != handlers.size()) {
+//                    handlerCount = handlers.size();
+//
+//                    System.out.println("Current Client Count: " + handlers.size());
+//                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
 
-                    ClientHandler client = new ClientHandler(clientSocket);
-                    client.start();
-
-                    handlers.add(client);
-
-                    // Loop through the handlers and remove the disconnected ones
-                    for (int i = handlers.size() - 1; i > 0; i--) {
-                        if (!handlers.get(i).isRunning()) {
-                            handlers.remove(i);
-                        }
-                    }
-
-                    if (handlerCount != handlers.size()) {
-                        handlerCount = handlers.size();
-
-                        System.out.println("Current Client Count: " + handlers.size());
-                    }
-
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
+            // Wait until the client tells us not to
+            synchronized (this) {
+                try {
+                    this.wait();
+                    System.out.println("Client exited, shutting down...");
+                } catch (InterruptedException e) {
+                    System.out.println("Client exited, shutting down...");
                 }
             }
         }

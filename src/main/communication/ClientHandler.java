@@ -19,6 +19,8 @@ import java.util.ArrayList;
 
 public class ClientHandler extends Thread {
 
+    private final ServerHandler handler;
+
     private GenericEntityMap entityMap = new GenericEntityMap();
     private EntityTypeMap entityTypeMap = new EntityTypeMap();
 
@@ -38,9 +40,17 @@ public class ClientHandler extends Thread {
     // My entity IDs in the server
     private ArrayList<String> myEntityIds = new ArrayList<>();
 
-    public ClientHandler(Socket connection) {
+    public ClientHandler(ServerHandler handler, Socket connection) {
         // Save the connection socket
+        this.handler = handler;
         this.connectionSocket = connection;
+        try {
+            this.connectionSocket.setTcpNoDelay(true);
+        }
+        catch (SocketException e) {
+            System.out.println("Couldn't disable Nagle's algorithm");
+        }
+
 
         // Create our command thread monitor
         monitor = new CommandThreadMonitor(this);
@@ -85,11 +95,10 @@ public class ClientHandler extends Thread {
 
                 // Create a byte array with the number of bytes to read and read the bytes
                 byte[] bytes = new byte[byteCount];
-                for (int i = 0; i < byteCount; i++) {
-                    bytes[i] = inFromClient.readByte();
-                }
-//                inFromClient.read
-//                inFromClient.read(bytes);
+                inFromClient.readFully(bytes);
+//                for (int i = 0; i < byteCount; i++) {
+//                    bytes[i] = inFromClient.readByte();
+//                }
 
                 // The byte result
                 byte[] result = new byte[]{};
@@ -131,18 +140,6 @@ public class ClientHandler extends Thread {
 
                 // Unlock writing
                 writingUnlock();
-
-//                    } else if(clientBundle.getType() == RequestType.ENTITY_UPDATE) {
-//                        System.out.println(clientBundle.getSerializedData());
-//                        EntityUpdateRequest request = Serializer.deserialize(clientBundle.getSerializedData(), EntityUpdateRequest.class);
-//                        EntityUpdater updater = new EntityUpdater();
-//                        result = updater.updateEntity(request);
-//                    } else if (clientBundle.getType() == RequestType.FILE_GET) {
-//                        // If it is a get file request then deserialize it accordingly and get the file contents for the provided command name
-//                        FileRequest fileRequest = Serializer.deserialize(clientBundle.getSerializedData(), FileRequest.class);
-//                        FileGetter fileGetter = new FileGetter();
-//                        result = fileGetter.getFile(fileRequest);
-//                    }
 
             }
         }
@@ -222,6 +219,12 @@ public class ClientHandler extends Thread {
     }
 
     public void endProcess() {
+        synchronized (handler) {
+            // Notify the server that we finished
+            handler.notify();
+        }
+
+
         running = false;
     }
 
