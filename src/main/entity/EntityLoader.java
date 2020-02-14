@@ -53,8 +53,10 @@ public class EntityLoader {
             entityMap.put(Integer.toString(entityId), entity);
         }
 
-        System.out.println("EntityId: " + entityId + " PlaceholderId: " + placeholderId);
-        handler.addEntity(entityId);
+        if (entityId != -1) {
+            System.out.println("EntityId: " + entityId + " PlaceholderId: " + placeholderId);
+            handler.addEntity(entityId);
+        }
 
         // Compile and return the registerEntity result
         return compileRegisterResult(success, entityId, placeholderId, errorMessage);

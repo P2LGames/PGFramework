@@ -34,6 +34,7 @@ public class EntitySetup {
 
                 // Add it to our entity type map for future use
                 entityTypeMap.put(entityType, entityClass);
+                System.out.println(entityTypeMap.get(0));
             }
         }
         catch (IndexOutOfBoundsException e) {

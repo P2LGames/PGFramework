@@ -23,6 +23,7 @@ public class RobotDefault {
      * @param pressed Whether or not you pressed or released the key. 1 is pressed, 0 is released.
      */
     public void playerKeyPressed(int code, int pressed) {
+        System.out.println("Test");
         print("Key Pressed!\n");
     }
 
@@ -83,7 +84,7 @@ public class RobotDefault {
         // Turn the bytes into a stream
         int position = ByteBuffer.wrap(bytes, 0, 4).getInt();
         int type = ByteBuffer.wrap(bytes, 4, 4).getInt();
-//        System.out.println("Position: " + position + " Type: " + type + " Byte length: " + bytes.length);
+        System.out.println("Position: " + position + " Type: " + type + " Byte length: " + bytes.length);
 
         // If the signal came from the robot
         if (position == Robot.AttachmentType.SELF.getNumVal()) {

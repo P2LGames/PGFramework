@@ -127,6 +127,7 @@ public class InMemoryClassLoader extends Thread implements MonitorableThread {
      * @return The array of bytes to send back to the client
      */
     private byte[] compileFileUpdateResult(boolean success, String errorMessage) {
+        System.out.println(success + " " + errorMessage);
         // Setup the response, add the response type to it
         ArrayList<Byte> result = new ArrayList<>();
         result.add((byte) RequestType.FILE_UPDATE.getNumVal());
