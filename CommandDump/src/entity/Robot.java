@@ -47,8 +47,8 @@ public class Robot extends GenericEntity {
     public void addOrder(int attachmentPosition, int orderType, byte[] orderParameter) {
         // 3 ints in the front for the position, type, and length, then the order parameter length
         ByteManager.addIntToByteArray(attachmentPosition, this.orderBytes);
+        ByteManager.addIntToByteArray(orderParameter.length + 4, this.orderBytes);
         ByteManager.addIntToByteArray(orderType, this.orderBytes);
-        ByteManager.addIntToByteArray(orderParameter.length, this.orderBytes);
 
         // Order parameter bytes
         ByteManager.addBytesToArray(orderParameter, this.orderBytes);

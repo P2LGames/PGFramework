@@ -23,7 +23,7 @@ public class RobotDefault {
      * @param pressed Whether or not you pressed or released the key. 1 is pressed, 0 is released.
      */
     public void playerKeyPressed(int code, int pressed) {
-        System.out.println("Test");
+        System.out.println(code);
         print("Key Pressed!\n");
     }
 
