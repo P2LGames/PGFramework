@@ -10,6 +10,7 @@ import entity.RobotAttachments.Head;
 import util.ByteManager;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 //// *PERMISSION r,0 *END_PERMISSION
 
@@ -163,18 +164,24 @@ public class RobotDefault {
         this.robot = (Robot)robot;
     }
 
-    public void moveForward1() {
+    public void moveForward() {
         int position = Robot.AttachmentPosition.BASE.getNumVal();
         int orderType = Base.OrderTypes.MOVE.getNumVal();
 
-        this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray(1f));
+        ArrayList<Byte> orderParams = new ArrayList<>();
+        ByteManager.addIntToByteArray(1, orderParams);
+        ByteManager.addFloatToByteArray(0f, orderParams);
+        this.robot.addOrder(position, orderType, ByteManager.convertArrayListToArray(orderParams));
     }
 
-    public void moveBackward1() {
+    public void moveBackward() {
         int position = Robot.AttachmentPosition.BASE.getNumVal();
         int orderType = Base.OrderTypes.MOVE.getNumVal();
 
-        this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray(-1f));
+        ArrayList<Byte> orderParams = new ArrayList<>();
+        ByteManager.addIntToByteArray(-1, orderParams);
+        ByteManager.addFloatToByteArray(0f, orderParams);
+        this.robot.addOrder(position, orderType, ByteManager.convertArrayListToArray(orderParams));
     }
 
     public void stopMoving() {

@@ -9,10 +9,7 @@ import main.entity.EntityTypeMap;
 import main.util.InMemoryClassLoader;
 import util.ByteManager;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -223,6 +220,38 @@ public class ClientHandler extends Thread {
 //            handler.notify();
 //        }
 
+        // Kill the server instance
+        System.out.println("User disconnected, killing server...");
+        ProcessBuilder builder = new ProcessBuilder();
+        builder.command("bash", "-c", "sudo shutdown -h now");
+
+//        builder.directory(new File(System.getProperty("user.home")));
+        try {
+            Process process = builder.start();
+
+            StringBuilder output = new StringBuilder();
+
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line + "\n");
+            }
+
+            int exitVal = process.waitFor();
+            if (exitVal == 0) {
+                System.out.println("Success!");
+                System.out.println(output);
+                System.exit(0);
+            }
+            else {
+                System.out.println("Failed to kill server");
+            }
+        }
+        catch (IOException | InterruptedException e) {
+            System.out.println("Failed to kill server");
+        }
 
         running = false;
     }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class ServerHandler implements Runnable {
 
     public static int PORT = 5545;
-    public static String VERSION = "1.2";
+    public static String VERSION = "1.3";
 
     boolean running = true;
     ServerSocket serverSocket = null;
@@ -75,6 +75,10 @@ public class ServerHandler implements Runnable {
             // Close all sockets when we finish
             try {
                 if (this.serverSocket != null) { this.serverSocket.close(); }
+
+                // Kill the server instance
+                ProcessBuilder builder = new ProcessBuilder();
+                builder.command("sh -c sudo shutdown -h now");
             }
             catch (IOException e) {
                 e.printStackTrace();

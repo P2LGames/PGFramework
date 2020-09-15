@@ -151,10 +151,8 @@ public class InMemoryClassLoader extends Thread implements MonitorableThread {
             result.add((byte)1);
             result.add((byte)0);
 
-            // Add the entityId to the array
+            // Add the entity and command ID to the array
             ByteManager.addIntToByteArray(entityId, result);
-
-            // Add the commandId to the array
             ByteManager.addIntToByteArray(commandId, result);
 
             // Add the file path to the bytes
