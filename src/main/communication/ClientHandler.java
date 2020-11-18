@@ -215,43 +215,8 @@ public class ClientHandler extends Thread {
     }
 
     public void endProcess() {
-//        synchronized (handler) {
-//            // Notify the server that we finished
-//            handler.notify();
-//        }
 
-        // Kill the server instance
-        System.out.println("User disconnected, killing server...");
-        ProcessBuilder builder = new ProcessBuilder();
-        builder.command("bash", "-c", "sudo shutdown -h now");
-
-//        builder.directory(new File(System.getProperty("user.home")));
-        try {
-            Process process = builder.start();
-
-            StringBuilder output = new StringBuilder();
-
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream()));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                output.append(line + "\n");
-            }
-
-            int exitVal = process.waitFor();
-            if (exitVal == 0) {
-                System.out.println("Success!");
-                System.out.println(output);
-                System.exit(0);
-            }
-            else {
-                System.out.println("Failed to kill server");
-            }
-        }
-        catch (IOException | InterruptedException e) {
-            System.out.println("Failed to kill server");
-        }
+        TerminateHandler.TerminateServer();
 
         running = false;
     }

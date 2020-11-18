@@ -45,7 +45,7 @@ public class RobotDefault {
     /** Tread's interrupt event,
      all actuators will have something like this **/
 
-    public void treadsFinishedOrder() {
+    public void treadsFinishedOrder(int orderId) {
 
     }
 
@@ -85,7 +85,7 @@ public class RobotDefault {
         // Turn the bytes into a stream
         int position = ByteBuffer.wrap(bytes, 0, 4).getInt();
         int type = ByteBuffer.wrap(bytes, 4, 4).getInt();
-        System.out.println("Position: " + position + " Type: " + type + " Byte length: " + bytes.length);
+//        System.out.println("Position: " + position + " Type: " + type + " Byte length: " + bytes.length);
 
         // If the signal came from the robot
         if (position == Robot.AttachmentType.SELF.getNumVal()) {
@@ -116,8 +116,9 @@ public class RobotDefault {
         else if (position == Robot.AttachmentPosition.BASE.getNumVal()) {
             // If the type was an action finished
             if (type == Robot.InputType.ACTION_FINISHED.getNumVal()) {
+                int orderId = ByteBuffer.wrap(bytes, 8, 4).getInt();
                 // Then send the alert
-                treadsFinishedOrder();
+                treadsFinishedOrder(orderId);
             }
         }
         // Sensor
@@ -164,23 +165,26 @@ public class RobotDefault {
         this.robot = (Robot)robot;
     }
 
-    public void moveForward() {
+    public void moveInDirectionForSeconds(int direction, float time) { moveInDirectionForSeconds(direction, time, -1); }
+
+    public void moveInDirectionForSeconds(int direction, float time, int orderId) {
         int position = Robot.AttachmentPosition.BASE.getNumVal();
         int orderType = Base.OrderTypes.MOVE.getNumVal();
 
         ArrayList<Byte> orderParams = new ArrayList<>();
-        ByteManager.addIntToByteArray(1, orderParams);
-        ByteManager.addFloatToByteArray(0f, orderParams);
-        this.robot.addOrder(position, orderType, ByteManager.convertArrayListToArray(orderParams));
-    }
+        if (direction >= 0) {
+            ByteManager.addIntToByteArray(1, orderParams);
+        }
+        else {
+            ByteManager.addIntToByteArray(-1, orderParams);
+        }
+        ByteManager.addFloatToByteArray(time, orderParams);
 
-    public void moveBackward() {
-        int position = Robot.AttachmentPosition.BASE.getNumVal();
-        int orderType = Base.OrderTypes.MOVE.getNumVal();
+        // If we have a time, then we want to add in the order id
+        if (time > 0) {
+            ByteManager.addIntToByteArray(orderId, orderParams); // Add the order id
+        }
 
-        ArrayList<Byte> orderParams = new ArrayList<>();
-        ByteManager.addIntToByteArray(-1, orderParams);
-        ByteManager.addFloatToByteArray(0f, orderParams);
         this.robot.addOrder(position, orderType, ByteManager.convertArrayListToArray(orderParams));
     }
 
@@ -205,39 +209,23 @@ public class RobotDefault {
         this.robot.addOrder(position, orderType, new byte[0]);
     }
 
+    public void turnByAmount(float amount) { turnByAmount(amount, -1); }
+
+    public void turnByAmount(float amount, int orderId) {
+        int position = Robot.AttachmentPosition.BASE.getNumVal();
+        int orderType = Base.OrderTypes.ROTATE_BY.getNumVal();
+
+        ArrayList<Byte> orderParams = new ArrayList<>();
+        ByteManager.addFloatToByteArray(amount, orderParams);
+        ByteManager.addIntToByteArray(orderId, orderParams); // Add the order id
+        this.robot.addOrder(position, orderType, ByteManager.convertArrayListToArray(orderParams));
+    }
+
     public void stopTurning() {
         int position = Robot.AttachmentPosition.BASE.getNumVal();
         int orderType = Base.OrderTypes.STOP_ROTATION.getNumVal();
 
         this.robot.addOrder(position, orderType, new byte[0]);
-    }
-
-    public void turnRight90() {
-        int position = Robot.AttachmentPosition.BASE.getNumVal();
-        int orderType = Base.OrderTypes.ROTATE_BY.getNumVal();
-
-        this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray((float)(Math.PI / -2.0)));
-    }
-
-    public void turnLeft90() {
-        int position = Robot.AttachmentPosition.BASE.getNumVal();
-        int orderType = Base.OrderTypes.ROTATE_BY.getNumVal();
-
-        this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray((float)(Math.PI / 2.0)));
-    }
-
-    public void turnRight45() {
-        int position = Robot.AttachmentPosition.BASE.getNumVal();
-        int orderType = Base.OrderTypes.ROTATE_BY.getNumVal();
-
-        this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray((float)(Math.PI / -4.0)));
-    }
-
-    public void turnLeft45() {
-        int position = Robot.AttachmentPosition.BASE.getNumVal();
-        int orderType = Base.OrderTypes.ROTATE_BY.getNumVal();
-
-        this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray((float)(Math.PI / 4.0)));
     }
 
     public void getMapData() {

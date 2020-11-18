@@ -11,16 +11,20 @@ import java.util.ArrayList;
 public class ServerHandler implements Runnable {
 
     public static int PORT = 5545;
-    public static String VERSION = "1.3";
+    public static String VERSION = "1.3.1";
 
     boolean running = true;
     ServerSocket serverSocket = null;
 
-    ArrayList<ClientHandler> handlers = new ArrayList<>();
-//    ClientHandler client;
+    volatile boolean handlersLock = false;
+    volatile ArrayList<ClientHandler> handlers = new ArrayList<>();
     int handlerCount = 0;
 
-    public ServerHandler() {}
+    public ServerHandler() {
+        // Start the terminate handler
+        TerminateHandler terminateHandler = new TerminateHandler(this);
+        terminateHandler.start();
+    }
 
     @Override
     public void run() {
@@ -35,30 +39,13 @@ public class ServerHandler implements Runnable {
                 try {
                     // Create and run a new client using an accepted connection
                     Socket clientSocket = this.serverSocket.accept();
-//                    String IP = clientSocket.getRemoteSocketAddress().toString();
-//
-//                    System.out.println(IP);
-//                    if (IP.contains("10.240.255.56") || IP.contains("10.240.255.55")) {
-//                        continue;
-//                    }
 
                     ClientHandler client = new ClientHandler(this, clientSocket);
                     client.start();
 
+                    handlersLock = true;
                     handlers.add(client);
-
-                    // Loop through the handlers and remove the disconnected ones
-                    for (int i = handlers.size() - 1; i > 0; i--) {
-                        if (!handlers.get(i).isRunning()) {
-                            handlers.remove(i);
-                        }
-                    }
-
-                    if (handlerCount != handlers.size()) {
-                        handlerCount = handlers.size();
-
-                        System.out.println("Current Client Count: " + handlers.size());
-                    }
+                    handlersLock = false;
 
                 }
                 catch (IOException e) {
@@ -76,9 +63,7 @@ public class ServerHandler implements Runnable {
             try {
                 if (this.serverSocket != null) { this.serverSocket.close(); }
 
-                // Kill the server instance
-                ProcessBuilder builder = new ProcessBuilder();
-                builder.command("sh -c sudo shutdown -h now");
+                TerminateHandler.TerminateServer();
             }
             catch (IOException e) {
                 e.printStackTrace();
