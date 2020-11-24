@@ -5,7 +5,9 @@ import annotations.Command;
 import annotations.SetEntity;
 import entity.GenericEntity;
 import entity.Robot;
+import entity.RobotAttachments.Attachment;
 import entity.RobotAttachments.Base;
+import entity.RobotAttachments.Gun;
 import entity.RobotAttachments.Head;
 import util.ByteManager;
 
@@ -245,6 +247,22 @@ public class RobotDefault {
     public void toggleScanning() {
         int position = Robot.AttachmentPosition.HEAD.getNumVal();
         int orderType = Head.OrderTypes.TOGGLE_POLLING.getNumVal();
+
+        this.robot.addOrder(position, orderType, new byte[0]);
+    }
+
+    public void shootGunRight()
+    {
+        int position = Robot.AttachmentPosition.RIGHT.getNumVal();
+        int orderType = Gun.OrderTypes.SHOOT.getNumVal();
+
+        this.robot.addOrder(position, orderType, new byte[0]);
+    }
+
+    public void shootGunLeft()
+    {
+        int position = Robot.AttachmentPosition.LEFT.getNumVal();
+        int orderType = Gun.OrderTypes.SHOOT.getNumVal();
 
         this.robot.addOrder(position, orderType, new byte[0]);
     }
