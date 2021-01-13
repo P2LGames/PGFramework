@@ -7,6 +7,7 @@ import entity.GenericEntity;
 import entity.Robot;
 import entity.RobotAttachments.Base;
 import entity.RobotAttachments.Head;
+import entity.RobotAttachments.Gun;
 import util.ByteManager;
 
 import java.nio.ByteBuffer;
@@ -36,19 +37,13 @@ public class RobotDefault {
 
     }
 
-
     public void playerClicked(float x, float y, int pressed) {
 
     }
 
-
-    /** Tread's interrupt event,
-     all actuators will have something like this **/
-
-    public void treadsFinishedOrder(int orderId) {
+    public void orderFinished(int attachmentPosition, int orderId) {
 
     }
-
 
     /** These are the sensor's interrupt events **/
 
@@ -112,15 +107,19 @@ public class RobotDefault {
                 this.playerClicked(x, y, action);
             }
         }
-        // It might be our base saying we are done moving
-        else if (position == Robot.AttachmentPosition.BASE.getNumVal()) {
-            // If the type was an action finished
-            if (type == Robot.InputType.ACTION_FINISHED.getNumVal()) {
-                int orderId = ByteBuffer.wrap(bytes, 8, 4).getInt();
-                // Then send the alert
-                treadsFinishedOrder(orderId);
-            }
+        else if (type == Robot.InputType.ACTION_FINISHED.getNumVal()){
+            int orderId = ByteBuffer.wrap(bytes, 8, 4).getInt();
+            orderFinished(position, orderId);
         }
+        // It might be our base saying we are done moving
+//        else if (position == Robot.AttachmentPosition.BASE.getNumVal()) {
+//            // If the type was an action finished
+//            if (type == Robot.InputType.ACTION_FINISHED.getNumVal()) {
+//                int orderId = ByteBuffer.wrap(bytes, 8, 4).getInt();
+//                // Then send the alert
+//                treadsFinishedOrder(orderId);
+//            }
+//        }
         // Sensor
         else if (position == Robot.AttachmentPosition.HEAD.getNumVal()) {
             // Event type
@@ -165,6 +164,18 @@ public class RobotDefault {
         this.robot = (Robot)robot;
     }
 
+    public void attackPoint(float x, float y, float z, int orderId) {
+        int position = Robot.AttachmentPosition.HEAD.getNumVal();
+        int orderType = Gun.OrderTypes.ATTACK.getNumVal();
+
+        ArrayList<Byte> orderParams = new ArrayList<>();
+        ByteManager.addFloatToByteArray(x, orderParams);
+        ByteManager.addFloatToByteArray(y, orderParams);
+        ByteManager.addFloatToByteArray(z, orderParams);
+        ByteManager.addIntToByteArray(orderId, orderParams);
+        this.robot.addOrder(position, orderType, ByteManager.convertArrayListToArray(orderParams));
+    }
+
     public void moveInDirectionForSeconds(int direction, float time) { moveInDirectionForSeconds(direction, time, -1); }
 
     public void moveInDirectionForSeconds(int direction, float time, int orderId) {
@@ -207,6 +218,18 @@ public class RobotDefault {
         int orderType = Base.OrderTypes.ROTATE_RIGHT.getNumVal();
 
         this.robot.addOrder(position, orderType, new byte[0]);
+    }
+
+    public void turnToAngle(float angle) { turnToAngle(angle, -1); }
+
+    public void turnToAngle(float angle, int orderId) {
+        int position = Robot.AttachmentPosition.BASE.getNumVal();
+        int orderType = Base.OrderTypes.ROTATE_TO.getNumVal();
+
+        ArrayList<Byte> orderParams = new ArrayList<>();
+        ByteManager.addFloatToByteArray(angle, orderParams);
+        ByteManager.addIntToByteArray(orderId, orderParams); // Add the order id
+        this.robot.addOrder(position, orderType, ByteManager.convertArrayListToArray(orderParams));
     }
 
     public void turnByAmount(float amount) { turnByAmount(amount, -1); }

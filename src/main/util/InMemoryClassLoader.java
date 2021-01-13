@@ -121,13 +121,12 @@ public class InMemoryClassLoader extends Thread implements MonitorableThread {
      * If success is true, then the message is the type (int), an int with the number of bytes, a 1, signifying success, along
      * with two ints signifying the entityId and the commandId
      * Otherwise, the message is the type, an int with the number of bytes, a 0 (byte), and the bytes representing the
-     * error message.
+     * error message.ds
      * @param success Whether or not we were able to successfully setup the entity data we recieved
      * @param errorMessage Empty if success is true
      * @return The array of bytes to send back to the client
      */
     private byte[] compileFileUpdateResult(boolean success, String errorMessage) {
-        System.out.println(success + " " + errorMessage);
         // Setup the response, add the response type to it
         ArrayList<Byte> result = new ArrayList<>();
         result.add((byte) RequestType.FILE_UPDATE.getNumVal());
