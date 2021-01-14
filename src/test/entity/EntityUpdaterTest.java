@@ -2,7 +2,7 @@ package test.entity;
 
 import communication.ServerException;
 import entity.GenericEntityMap;
-import entity.TestEntity;
+//import entity.TestEntity;
 import main.entity.EntityUpdater;
 import org.junit.Test;
 import util.Serializer;
