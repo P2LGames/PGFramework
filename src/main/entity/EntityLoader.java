@@ -22,7 +22,7 @@ public class EntityLoader {
      * @return
      *  The bytes that represent whether or not the entity was successfully registered
      */
-    public synchronized byte[] registerEntity(ClientHandler handler, EntityTypeMap entityTypeMap,
+    public synchronized byte[] registerEntity(EntityTypeMap entityTypeMap,
                                               GenericEntityMap entityMap, byte[] requestBytes) {
         // Parse the entity type and placeholder ID from the request bytes
         Integer entityType = ByteBuffer.wrap(requestBytes, 0, 4).getInt();
@@ -55,7 +55,6 @@ public class EntityLoader {
 
         if (entityId != -1) {
             System.out.println("EntityId: " + entityId + " PlaceholderId: " + placeholderId);
-            handler.addEntity(entityId);
         }
 
         // Compile and return the registerEntity result

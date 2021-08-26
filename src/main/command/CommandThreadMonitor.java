@@ -57,7 +57,7 @@ public class CommandThreadMonitor extends Thread {
 
                     // Send a message back to the client letting them know what happened
                     // Use the generic command handler to compile a return message
-                    client.sendByteArray(t.getTimeoutError());
+                    client.write(t.getTimeoutError());
 
                     // Remove all the threads from the queue, if there was a timeout we want to stop the robot
                     monitoringQueue.clear();

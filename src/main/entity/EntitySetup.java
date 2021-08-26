@@ -1,5 +1,6 @@
 package main.entity;
 
+import main.communication.ClientHandler;
 import main.communication.RequestType;
 import util.ByteManager;
 
@@ -13,11 +14,12 @@ public class EntitySetup {
      * @param bytes An array of bytes representing a string in id:className,id:className format.
      * @return The byte array to send back to the client, letting it know if we failed or succeeded.
      */
-    public byte[] setupEntitiesWithBytes(EntityTypeMap entityTypeMap, byte[] bytes) {
+    public byte[] setupEntitiesWithBytes(ClientHandler handler, EntityTypeMap entityTypeMap, byte[] bytes) {
         boolean success = true;
         String errorMessage = "";
 
         // Turn the data into a string
+        String s = new String()
         String entitySetupData = new String(bytes, StandardCharsets.US_ASCII);
 
         // Split the string and use it to get information to the entity type map
@@ -44,7 +46,9 @@ public class EntitySetup {
             errorMessage = "Error parsing setup data: " + e.getMessage();
         }
 
-        return compileSetupResult(success, errorMessage);
+        this.handler.write(compileSetupResult(success, errorMessage));
+
+        return ;
     }
 
     /**

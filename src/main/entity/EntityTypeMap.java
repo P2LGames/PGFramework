@@ -1,8 +1,8 @@
 package main.entity;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class EntityTypeMap extends HashMap<Integer, String> {
+public class EntityTypeMap extends ConcurrentHashMap<Integer, String> {
     private static EntityTypeMap instance;
 
     public EntityTypeMap() {}

@@ -11,13 +11,13 @@ import java.util.ArrayList;
 public class ServerHandler implements Runnable {
 
     public static int PORT = 5545;
-    public static String VERSION = "1.3.1";
+    public static String VERSION = "1.4";
 
     boolean running = true;
     ServerSocket serverSocket = null;
 
     volatile boolean handlersLock = false;
-    volatile ArrayList<ClientHandler> handlers = new ArrayList<>();
+    public volatile ArrayList<ClientHandler> handlers = new ArrayList<>();
     int handlerCount = 0;
 
     public ServerHandler() {

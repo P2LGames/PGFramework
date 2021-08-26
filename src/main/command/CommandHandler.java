@@ -47,7 +47,7 @@ public class CommandHandler extends Thread implements MonitorableThread {
         // If we did not time out
         if (!timedOut) {
             // Send the data back to the client handler
-            handler.sendByteArray(result);
+            handler.write(result);
         }
 
         // Mark ourselves as finished
